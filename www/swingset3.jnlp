@@ -10,7 +10,6 @@
     of the Swing Graphical User Interface.</description>
     <!--icon href="resources/images/splash3.png"/> -->
     <icon href="swingset3/resources/images/splash3.png" kind="splash"/>
-    <offline-allowed/>
     <shortcut online="true"/>
   </information>
   <security>
