@@ -20,7 +20,7 @@
   </security>
   <resources>
     <j2se version="1.6+" java-vm-args="-esa -Xnoclassgc"/>
-    <jar href="SwingSet3.jar"/>
+    <jar href="swingset3.jar"/>
   </resources>
   <application-desc main-class="SwingSet3"/>
 </jnlp> 
