@@ -1,9 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- JNLP File for SwingSet3 Demo Application -->
-<jnlp
-  spec="6.0+"
-  codebase="https://swingset3.dev.java.net/demo"
-  href="swingset3.jnlp">
+<jnlp codebase="https://swingset3.dev.java.net/demo" href="swingset3.jnlp" spec="6.0+">
   <information>
     <title>SwingSet3 Demo Application</title>
     <vendor>Sun Microsystems, Inc.</vendor>
@@ -12,15 +9,18 @@
     <description kind="short">A demo of the capabilities 
     of the Swing Graphical User Interface.</description>
     <!--icon href="resources/images/splash3.png"/> -->
-    <icon kind="splash" href="swingset3/resources/images/splash3.png"/>
-    <offline-allowed/> 
+    <icon href="swingset3/resources/images/splash3.png" kind="splash"/>
+    <offline-allowed/>
+    <shortcut online="true"/>
   </information>
   <security>
-      <all-permissions/>
+    <all-permissions/>
   </security>
   <resources>
-    <j2se version="1.6+" java-vm-args="-esa -Xnoclassgc"/>
+    <j2se java-vm-args="-esa -Xnoclassgc" version="1.6+"/>
     <jar href="swingset3.jar"/>
+    <jar href="lib/jlfgr-1_0.jar"/>
+    <jar href="lib/swing-layout-1.0.jar"/>
   </resources>
-  <application-desc main-class="SwingSet3"/>
-</jnlp> 
+  <application-desc main-class="swingset3.SwingSet3"/>
+</jnlp>
