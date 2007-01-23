@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- JNLP File for SwingSet3 Demo Application -->
-<jnlp codebase="https://swingset3.dev.java.net/demo" href="swingset3.jnlp" spec="6.0+">
+<jnlp codebase="https://swingset3.dev.java.net/demo" href="swingset3.jnlp" spec="5.0+">
   <information>
     <title>SwingSet3 Demo Application</title>
     <vendor>Sun Microsystems, Inc.</vendor>
