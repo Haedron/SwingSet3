@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- JNLP File for SwingSet3 Demo Application -->
-<jnlp codebase="https://swingset3.dev.java.net" href="swingset3.jnlp" spec="6.0+">
+<jnlp codebase="https://swingset3.dev.java.net/demo" href="swingset3.jnlp" spec="6.0+">
   <information>
     <title>SwingSet3 Demo Application</title>
     <vendor>Sun Microsystems, Inc.</vendor>
@@ -19,8 +19,8 @@
   <resources>
     <j2se java-vm-args="-esa -Xnoclassgc" version="1.6+"/>
     <jar href="swingset3.jar"/>
-    <jar href="demo/lib/jlfgr-1_0.jar"/>
-    <jar href="demo/lib/swing-layout-1.0.jar"/>
+    <jar href="lib/jlfgr-1_0.jar"/>
+    <jar href="lib/swing-layout-1.0.jar"/>
   </resources>
   <application-desc main-class="swingset3.SwingSet3"/>
 </jnlp>
