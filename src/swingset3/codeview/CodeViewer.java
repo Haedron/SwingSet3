@@ -110,7 +110,7 @@ public class CodeViewer extends JPanel {
     
     static {
         try {
-            URL url = CodeViewer.class.getResource("resources/images/SnippetArrow2.jpg");
+            URL url = CodeViewer.class.getResource("resources/images/SnippetArrow.png");
             SNIPPET_GLYPH = Toolkit.getDefaultToolkit().getImage(url);
         } catch (Exception e) {
             System.err.println(e);
@@ -159,6 +159,7 @@ public class CodeViewer extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
 
         JToolBar box = new JToolBar();
+        box.setFloatable(false);
         add(BorderLayout.NORTH, box);
         
         snippetSetsLabel = new JLabel("Highlight code:");
@@ -175,12 +176,12 @@ public class CodeViewer extends JPanel {
         previousSnippetButton.setHideActionText(true);
         previousSnippetButton.setAlignmentY(.5f);
         previousSnippetButton.setIcon(new ImageIcon(
-                CodeViewer.class.getResource("resources/images/previousarrow.jpg")));
+                CodeViewer.class.getResource("resources/images/previousarrow.png")));
         JButton nextSnippetButton = new JButton(nextSnippetAction);
         nextSnippetButton.setHideActionText(true);
         nextSnippetButton.setAlignmentY(.5f);
         nextSnippetButton.setIcon(new ImageIcon(
-                CodeViewer.class.getResource("resources/images/nextarrow.jpg")));
+                CodeViewer.class.getResource("resources/images/nextarrow.png")));
 
         box.add(Box.createHorizontalStrut(4));
         box.add(previousSnippetButton);
@@ -241,6 +242,9 @@ public class CodeViewer extends JPanel {
             int i = 0;
             boolean needProcessing = false;
             for(URL sourceFile: sourceFiles) {
+                if (sourceFile == null) {
+                    throw new NullPointerException("cannot load source file because URL is null");
+                }
                 currentCodeFilesInfo[i] = codeCache.get(sourceFile);
                 if (currentCodeFilesInfo[i++] == null) {
                     needProcessing = true;
@@ -309,12 +313,13 @@ public class CodeViewer extends JPanel {
         
     }
     
+    // Called from Source Processing Thread in SwingWorker
     private CodeFileInfo initializeCodeFileInfo(URL sourceFile) {
         CodeFileInfo CodeFileInfo = new CodeFileInfo();
         CodeFileInfo.url = sourceFile;
         CodeFileInfo.styled = loadSourceCode(sourceFile);
         CodeFileInfo.textPane = new JEditorPane();
-        System.out.println("glyph:"+ SNIPPET_GLYPH.getWidth(this));
+        //System.out.println("glyph:"+ SNIPPET_GLYPH.getWidth(this));
         CodeFileInfo.textPane.setMargin(
                 new Insets(0, SNIPPET_GLYPH.getWidth(this), 0, 0));
         CodeFileInfo.veneer = new CodeVeneer(CodeFileInfo);
@@ -393,8 +398,10 @@ public class CodeViewer extends JPanel {
         if (currentCodeFilesInfo != null) {
             
             for(CodeFileInfo code : currentCodeFilesInfo) {
-                Highlighter highlighter = code.textPane.getHighlighter();
-                highlighter.removeAllHighlights();
+                if (code.textPane != null) {
+                    Highlighter highlighter = code.textPane.getHighlighter();
+                    highlighter.removeAllHighlights();
+                }
             }
             snippetMap.setCurrentSet(null);
         }

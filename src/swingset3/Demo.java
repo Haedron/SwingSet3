@@ -26,7 +26,7 @@ import javax.swing.JLabel;
  */
 public class Demo {
     
-    public enum State { UNINITIALIZED, INITIALIZING, RUNNING, PAUSED }
+    public enum State { UNINITIALIZED, INITIALIZING, RUNNING, PAUSED, FAILED }
     
     private static final String imageExtensions[] = {".gif", ".png", ".jpg"};
     
@@ -36,8 +36,8 @@ public class Demo {
         if (packageName != null) {
             // if root package is swingset3, then remove it
             String swingsetPackageName = Demo.class.getPackage().getName();
-            if (packageName.startsWith(swingsetPackageName + ".")) {
-                packageName = packageName.replaceFirst(swingsetPackageName + ".",
+            if (packageName.startsWith(swingsetPackageName + ".demos.")) {
+                packageName = packageName.replaceFirst(swingsetPackageName + ".demos.",
                         "");
             }
         }
@@ -130,8 +130,28 @@ public class Demo {
         return icon;
     }
     
-    public String getOneLiner() {
-        return component != null? component.getToolTipText() : "need to fix this";
+    public String getShortDescription() {
+        String shortDescription = null;
+        
+        // look for static getShortDescription method on demo class
+        try {
+            Method getShortDescriptionMethod = demoClass.getMethod("getShortDescription", (Class[])null);
+            shortDescription = (String)getShortDescriptionMethod.invoke(component, (Object[])null);
+        } catch (NoSuchMethodException nsme) {
+            // okay, no getShortDescription method exists
+        } catch (IllegalAccessException iae) {
+            System.err.println(iae);
+            iae.printStackTrace();
+        } catch (java.lang.reflect.InvocationTargetException ite) {
+            System.err.println(demoClass.getName() +
+                    " getShortDescription method failed: " + ite.getMessage());
+            ite.printStackTrace();
+        }
+        if (shortDescription == null) {
+            // last resort: try inheriting tooltip if component is instantiated
+            shortDescription =  component != null? component.getToolTipText() : null;
+        }
+        return shortDescription;
     }
     
     public URL getHTMLDescription() {
@@ -163,8 +183,11 @@ public class Demo {
                 System.out.println("source: "+
                     "../sources/" +
                     className.replaceAll("\\.", "/") + ".java");
-                sourceFiles[0] = getClass().getResource("../sources/" +
+                
+                ClassLoader cl = getClass().getClassLoader();
+                sourceFiles[0] = cl.getResource("sources/" +
                     className.replaceAll("\\.", File.separator) + ".java");
+                
             }
         }
         return sourceFiles;
@@ -177,6 +200,8 @@ public class Demo {
         }
         JComponent old = this.component;
         this.component = component;
+        
+        System.out.println(this.getName() + ":setDemoComponent: " + this.component);
         pcs.firePropertyChange("demoComponent", old, component);
         if (component == null) {
             setState(State.UNINITIALIZED);
@@ -187,11 +212,12 @@ public class Demo {
         JComponent component = null;
         try {
             component = (JComponent)demoClass.newInstance();
+            setDemoComponent(component);
         } catch (Exception e) {
             System.err.println(e);
             e.printStackTrace();
-        }
-        setDemoComponent(component);
+            setState(State.FAILED);
+        }        
         return component;          
     }
     
@@ -206,6 +232,7 @@ public class Demo {
     protected void setState(State state) {
         State oldState = this.state;
         this.state = state;
+        System.out.println(getName() + ":setState="+state);
         pcs.firePropertyChange("state", oldState, state);
     }
     
@@ -248,6 +275,8 @@ public class Demo {
             System.err.println(demoClass.getName() + 
                     " stop method failed: " + ite.getMessage());
             ite.printStackTrace();
+        } catch (NullPointerException npe) {
+            System.out.println(getName()+":stopped before demo component was created.");
         }
     };
 }

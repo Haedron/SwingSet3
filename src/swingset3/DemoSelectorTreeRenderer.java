@@ -254,7 +254,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
             } else {
                 setDisabledIcon(demo.getIcon());
             }
-            setToolTipText(demo.getOneLiner());
+            setToolTipText(demo.getShortDescription());
             
             Demo.State demoState = demo.getState();
             if (demo != blinkingDemo &&
@@ -268,6 +268,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
             // don't display icon for categories
             demo = null;
             setIcon(null);
+            setToolTipText(null);
         }
         return this;
     }
@@ -280,8 +281,9 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
             Demo.State demoState = demo.getState();
             int width = getWidth();
             int height = getHeight();
-            if (demoState == Demo.State.RUNNING) {
-                if (blinkCount < 3) {
+            if (demoState == Demo.State.RUNNING || demoState == Demo.State.INITIALIZING) {
+                
+                if (blinkCount < 3 || demoState == Demo.State.INITIALIZING) {
                     if (!blinkTimer.isRunning()) {
                         blinkTimer.restart();
                     }                
@@ -291,7 +293,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
                 
                 } else { // not blinking anymore
                     paintLED(g, greenLED);                
-                    if (blinkCount == 3.5) {
+                    if (blinkCount >= 3.5) {
                         blinkTimer.stop();
                     }
                 }

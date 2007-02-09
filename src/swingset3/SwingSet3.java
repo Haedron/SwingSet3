@@ -37,6 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -52,27 +53,29 @@ import swingset3.codeview.CodeViewer;
  * @author  aim
  */
 public class SwingSet3 {
+    
+    // remind: initalize demos frome exterior list (?)
     private static String demoClassNames[] = {
-            "swingset3.toplevels.JFrameDemo",
-            "swingset3.toplevels.JDialogDemo",
-            "swingset3.toplevels.JWindowDemo",
+            "swingset3.demos.toplevels.JFrameDemo",
+            "swingset3.demos.toplevels.JDialogDemo",
+            "swingset3.demos.toplevels.JWindowDemo",
                     
             //"swingset3.layoutContainers.JPanelDemo",
             //"swingset3.layoutContainers.JTabbedPaneDemo",
             //"swingset3.layoutContainers.JScrollPaneDemo",
                     
-            "swingset3.controls.JButtonDemo",
-            "swingset3.controls.JCheckBoxDemo",
-            "swingset3.controls.JComboBoxDemo",
-            "swingset3.controls.JLabelDemo",
+            "swingset3.demos.controls.JButtonDemo",
+            "swingset3.demos.controls.JCheckBoxDemo",
+            "swingset3.demos.controls.JComboBoxDemo",
+            "swingset3.demos.controls.JLabelDemo",
             
-            "swingset3.data.JListDemo",
-            "swingset3.data.JTableDemo",
-            "swingset3.data.JTreeDemo",
+            "swingset3.demos.data.JListDemo",
+            "swingset3.demos.data.JTableDemo",
+            "swingset3.demos.data.JTreeDemo",
             
-            "swingset3.text.JEditorPaneDemo"
+            "swingset3.demos.text.JEditorPaneDemo"
     };
-    
+        
     static {
         // Property must be set *early* due to Apple Bug#3909714
         System.setProperty("apple.laf.useScreenMenuBar", "true");                
@@ -82,42 +85,57 @@ public class SwingSet3 {
         return System.getProperty("os.name").equals("Mac OS X");
     }
     
+    private static ArrayList<String> getDemoClassNames() {
+        ArrayList demoClassNamesList = new ArrayList<String>();
+        for(String demoClassName: demoClassNames) {
+            demoClassNamesList.add(demoClassName);
+        }
+        return demoClassNamesList;
+    }
+    
+    // Application models
+    private DefaultMutableTreeNode demos; /* all available demos */
+    private DemoList runningDemos; /* demos currently loaded */
+
+    // GUI components
     private JFrame frame;
     private JSplitPane vertSplitPane;
     private JSplitPane horizSplitPane;
     private JTree demoSelectorTree;
-    private DefaultMutableTreeNode demos;
     private JLabel runningDemosPlaceholder;
     private JTabbedPane runningDemosTabbedPane;
     private JPanel sourceCodePane;
-    private CodeViewer codeViewer;
-    
+    private CodeViewer codeViewer;    
     private JCheckBoxMenuItem sourceCodeCheckboxItem;
     
     private JPopupMenu popup;
     
+    // GUI state
     private int sourcePaneLocation;
     private int dividerSize;
-    
-    private DemoList runningDemos;
-    
+
+    // Application actions
     private Action quitDemoAction;
     private Action quitAllDemosAction;
     
     private PropertyChangeSupport pcs;
 
     
-    /** Creates new form SwingSet3 */
     public SwingSet3() {
+        this(getDemoClassNames());
+    }
+    
+    public SwingSet3(List<String>demoClassNames) {
+        
         pcs = new PropertyChangeSupport(this);
         
         // Create application model
-        runningDemos = new DemoList();
-        runningDemos.addDemoListListener(new RunningDemosListener());
+        initDemos(demoClassNames);
+        initRunningDemosList();
  
         // Create GUI
         initComponents();  
-        runningDemos.addPropertyChangeListener(new CurrentDemoListener());
+        expandAll(new TreePath(demos)); // expand all demos in tree
 
         // Create application-level actions
         quitDemoAction = new QuitDemoAction(); 
@@ -126,120 +144,10 @@ public class SwingSet3 {
         // Show GUI
         frame.setVisible(true);
     }
-    
-    protected void initComponents() {
-        // Create toplevel frame
-        frame = new JFrame("SwingSet3");
-        frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        // Create menubar
-        JMenuBar menubar = new JMenuBar();
-        menubar.setName("menubar");
+    protected void initDemos(List<String> demoClassNamesList) {
+        demos = new DefaultMutableTreeNode("Components");  
         
-        // Create file menu
-        JMenu fileMenu = new JMenu();
-        fileMenu.setText("File");
-        fileMenu.setName("fileMenu");
-        fileMenu.addMenuListener(new FileMenuListener());
-        menubar.add(fileMenu);
-
-        
-        // Create View menu
-        JMenu viewMenu = new JMenu();
-        viewMenu.setText("View");
-        viewMenu.setName("viewMenu");
-        sourceCodeCheckboxItem = new JCheckBoxMenuItem();
-        sourceCodeCheckboxItem.setSelected(true);
-        sourceCodeCheckboxItem.setText("Source Code");
-        sourceCodeCheckboxItem.setName("sourceCodeCheckboxItem");
-        sourceCodeCheckboxItem.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                sourceCodeCheckboxItemStateChanged(evt);
-            }
-        });
-        viewMenu.add(sourceCodeCheckboxItem);
-        menubar.add(viewMenu);
-
-        frame.setJMenuBar(menubar);
-        
-        // Create vertical splitpane with demos on top, source on bottom
-        vertSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        vertSplitPane.setBorder(null);
-        frame.add(vertSplitPane);
-        
-        // Create nested horizontal splitpane with demo selection tree on left, 
-        // running demos on right
-        horizSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        vertSplitPane.setTopComponent(horizSplitPane);
-
-        // Create demo selection tree
-        demos = new DefaultMutableTreeNode("Components");        
-        demoSelectorTree = new JTree(demos);
-        demoSelectorTree.setBorder(new EmptyBorder(2,8,2,8));
-        demoSelectorTree.setRowHeight(28);
-        demoSelectorTree.setShowsRootHandles(false);
-        demoSelectorTree.addMouseListener(new DemoTreeClickListener());
-        demoSelectorTree.setCellRenderer(new DemoSelectorTreeRenderer());
-        JScrollPane scrollPane = new JScrollPane(demoSelectorTree);
-        scrollPane.setPreferredSize(new Dimension(210,400)); // wide enough to avoid horiz scrollbar
-        horizSplitPane.setLeftComponent(scrollPane);
-
-        // Create tabbedpane to contain running demos
-        runningDemosPlaceholder = new JLabel(
-                new ImageIcon(SwingSet3.class.getResource("resources/images/demo_area.jpg")));
-        runningDemosTabbedPane = new JTabbedPane();
-        runningDemosTabbedPane.setPreferredSize(new Dimension(580,400));
-        runningDemosTabbedPane.addChangeListener(new TabSelectionListener());
-        //horizSplitPane.setRightComponent(runningDemosTabbedPane);
-        horizSplitPane.setRightComponent(runningDemosPlaceholder);
-        
-        
-        // Create source code pane with dismissable close button
-        sourceCodePane = new JPanel();
-        sourceCodePane.setLayout(new BorderLayout());
-        Box box = Box.createHorizontalBox();
-        box.add(Box.createHorizontalGlue());
-        CloseButton closeButton = new CloseButton(new HideSourceCodeAction());
-        closeButton.setToolTipText("hide source code");
-        box.add(closeButton);
-        //box.add(Box.createHorizontalStrut(2));
-        sourceCodePane.add(BorderLayout.NORTH, box);        
-        codeViewer = new CodeViewer();
-        sourceCodePane.add(BorderLayout.CENTER, codeViewer);
-        sourceCodePane.setPreferredSize(new Dimension(600,230));
-        vertSplitPane.setBottomComponent(sourceCodePane);
-        
-        sourcePaneLocation = vertSplitPane.getDividerLocation();
-        dividerSize = vertSplitPane.getDividerSize();        
-
-        // Start loading available demos
-        initializeDemos(getDemoClassNames());        
-        
-        // Create shareable popup menu for demo actions
-        popup = new JPopupMenu();
-        popup.add(new EditPropertiesAction());
-        popup.add(new ViewCodeSnippetAction());
-
-        // Ensure the demo tree categories come up initially expanded
-        TreeNode nodes[] = new TreeNode[2];
-        nodes[0] = demos;
-        for(int i = 0; i < demos.getChildCount(); i++) {
-            nodes[1] = demos.getChildAt(i);
-            demoSelectorTree.makeVisible(new TreePath(nodes));
-        }
-
-        frame.pack();        
-    }
-    
-    private ArrayList<String> getDemoClassNames() {
-        ArrayList demoClassNamesList = new ArrayList<String>();
-        for(String demoClassName: demoClassNames) {
-            demoClassNamesList.add(demoClassName);
-        }
-        return demoClassNamesList;
-    }
-    
-    protected void initializeDemos(List<String> demoClassNamesList) {
         DemoPropertyChangeListener demoPropertyListener = 
                 new DemoPropertyChangeListener();
         
@@ -285,16 +193,127 @@ public class SwingSet3 {
                 System.err.println(iae);
             }
         }
-        frame.validate(); // adjust size to fit loaded demos
     }
     
-    public void runDemo(Demo demo) {
-        if (!runningDemos.contains(demo)) {
-            demo.setState(Demo.State.INITIALIZING);
-            runningDemos.add(demo);
-        } else {
-            runningDemos.setSelected(demo);
+    protected void initRunningDemosList() {
+        runningDemos = new DemoList();
+        runningDemos.addDemoListListener(new RunningDemosListener());  
+        runningDemos.addPropertyChangeListener(new CurrentDemoListener());
+    }
+    
+    protected void initComponents() {
+        // Create toplevel frame
+        frame = new JFrame("SwingSet3");
+        frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        // Create menubar
+        JMenuBar menubar = new JMenuBar();
+        menubar.setName("menubar");
+        
+        // Create file menu
+        JMenu fileMenu = new JMenu();
+        fileMenu.setText("File");
+        fileMenu.setName("fileMenu");
+        fileMenu.addMenuListener(new FileMenuListener());
+        menubar.add(fileMenu);
+       
+        // Create View menu
+        JMenu viewMenu = new JMenu();
+        viewMenu.setText("View");
+        viewMenu.setName("viewMenu");
+        sourceCodeCheckboxItem = new JCheckBoxMenuItem();
+        sourceCodeCheckboxItem.setSelected(true);
+        sourceCodeCheckboxItem.setText("Source Code");
+        sourceCodeCheckboxItem.setName("sourceCodeCheckboxItem");
+        sourceCodeCheckboxItem.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sourceCodeCheckboxItemStateChanged(evt);
+            }
+        });
+        viewMenu.add(sourceCodeCheckboxItem);
+        menubar.add(viewMenu);
+
+        frame.setJMenuBar(menubar);
+        
+        // Create vertical splitpane with demos on top, source on bottom
+        vertSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        vertSplitPane.setBorder(null);
+        frame.add(vertSplitPane);
+        
+        // Create nested horizontal splitpane with demo selection tree on left, 
+        // running demos on right
+        horizSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        vertSplitPane.setTopComponent(horizSplitPane);
+
+        // Create demo selection tree
+        demoSelectorTree = new JTree(demos);
+        demoSelectorTree.setBorder(new EmptyBorder(2,8,2,8));
+        demoSelectorTree.setRowHeight(28);
+        demoSelectorTree.setShowsRootHandles(false);
+        demoSelectorTree.addMouseListener(new DemoTreeClickListener());
+        demoSelectorTree.setCellRenderer(new DemoSelectorTreeRenderer());
+        ToolTipManager.sharedInstance().registerComponent(demoSelectorTree);
+        JScrollPane scrollPane = new JScrollPane(demoSelectorTree);
+        scrollPane.setPreferredSize(new Dimension(210,400)); // wide enough to avoid horiz scrollbar
+        horizSplitPane.setLeftComponent(scrollPane);
+
+        // Create tabbedpane to contain running demos
+        runningDemosPlaceholder = new JLabel(
+                new ImageIcon(SwingSet3.class.getResource("resources/images/placeholder.png")));
+        runningDemosPlaceholder.setPreferredSize(new Dimension(600, 400));
+        runningDemosTabbedPane = new JTabbedPane();
+        runningDemosTabbedPane.setPreferredSize(new Dimension(600,400));
+        runningDemosTabbedPane.addChangeListener(new TabSelectionListener());
+        //horizSplitPane.setRightComponent(runningDemosTabbedPane);
+        horizSplitPane.setRightComponent(runningDemosPlaceholder);
+                
+        // Create source code pane with dismissable close button
+        sourceCodePane = new JPanel();
+        sourceCodePane.setLayout(new BorderLayout());
+        Box box = Box.createHorizontalBox();
+        box.add(Box.createHorizontalGlue());
+        CloseButton closeButton = new CloseButton(new HideSourceCodeAction());
+        closeButton.setToolTipText("hide source code");
+        box.add(closeButton);
+        //box.add(Box.createHorizontalStrut(2));
+        sourceCodePane.add(BorderLayout.NORTH, box);        
+        codeViewer = new CodeViewer();
+        sourceCodePane.add(BorderLayout.CENTER, codeViewer);
+        sourceCodePane.setPreferredSize(new Dimension(600,230));
+        vertSplitPane.setBottomComponent(sourceCodePane);
+        
+        sourcePaneLocation = vertSplitPane.getDividerLocation();
+        dividerSize = vertSplitPane.getDividerSize();        
+        
+        // Create shareable popup menu for demo actions
+        popup = new JPopupMenu();
+        popup.add(new EditPropertiesAction());
+        popup.add(new ViewCodeSnippetAction());
+
+        frame.pack();        
+    }
+    
+    private void expandToCategories(TreeNode top) {    
+        // Ensure the demo tree categories come up initially expanded
+        TreeNode nodes[] = new TreeNode[2];
+        nodes[0] = top;
+        for(int i = 0; i < top.getChildCount(); i++) {
+            nodes[1] = top.getChildAt(i);
+            demoSelectorTree.makeVisible(new TreePath(nodes));
         }
+    }
+    
+   private void expandAll(TreePath parent) {
+        // Traverse children
+        TreeNode node = (TreeNode)parent.getLastPathComponent();
+        if (node.getChildCount() >= 0) {
+            for (Enumeration e=node.children(); e.hasMoreElements(); ) {
+                TreeNode n = (TreeNode)e.nextElement();
+                TreePath path = parent.pathByAddingChild(n);
+                expandAll(path);
+            }
+        }
+        demoSelectorTree.expandPath(parent);
     }
     
     public void setSourceCodeVisible(boolean sourceVisible) {
@@ -333,6 +352,16 @@ public class SwingSet3 {
         setSourceCodeVisible(sourceCodeCheckboxItem.isSelected());
     }
     
+    public void runDemo(Demo demo) {
+        if (!runningDemos.contains(demo)) {
+            demo.setState(Demo.State.INITIALIZING);
+            //demoSelectorTree.paintImmediately(demoSelectorTree.getPathBounds(demoSelectorTree.getSelectionPath()));
+            runningDemos.add(demo);
+        } else {
+            runningDemos.setSelected(demo);
+        }
+    }
+    
     class RunningDemosListener implements DemoList.Listener {
         public void added(DemoList.Event event) {
             Demo demo = event.getDemo();
@@ -340,7 +369,7 @@ public class SwingSet3 {
                 horizSplitPane.setRightComponent(runningDemosTabbedPane);
             }
             runningDemosTabbedPane.addTab(demo.getName(), null,
-                    new DemoPane(demo), demo.getOneLiner());
+                    new DemoPane(demo), demo.getShortDescription());
             runningDemos.setSelected(demo);
 
         }
@@ -349,6 +378,11 @@ public class SwingSet3 {
             runningDemosTabbedPane.removeTabAt(
                     runningDemosTabbedPane.indexOfTab(demo.getName()));
             demo.setDemoComponent(null);
+            
+            if (runningDemosTabbedPane.getTabCount() == 0) {        
+                horizSplitPane.setRightComponent(runningDemosPlaceholder);
+                
+            }
         }
     }
     
@@ -539,8 +573,6 @@ public class SwingSet3 {
             component.setComponentPopupMenu(popup);
         }
     }    
-    
-
     
     
     /**
