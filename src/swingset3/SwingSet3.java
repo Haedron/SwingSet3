@@ -17,6 +17,8 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -38,6 +40,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -85,13 +89,6 @@ public class SwingSet3 {
         return System.getProperty("os.name").equals("Mac OS X");
     }
     
-    private static ArrayList<String> getDemoClassNames() {
-        ArrayList demoClassNamesList = new ArrayList<String>();
-        for(String demoClassName: demoClassNames) {
-            demoClassNamesList.add(demoClassName);
-        }
-        return demoClassNamesList;
-    }
     
     // Application models
     private DefaultMutableTreeNode demos; /* all available demos */
@@ -122,10 +119,15 @@ public class SwingSet3 {
 
     
     public SwingSet3() {
-        this(getDemoClassNames());
+        this(getDefaultDemoClassNames());
     }
     
     public SwingSet3(List<String>demoClassNames) {
+        
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ex) {
+        }
         
         pcs = new PropertyChangeSupport(this);
         
@@ -246,6 +248,7 @@ public class SwingSet3 {
         vertSplitPane.setTopComponent(horizSplitPane);
 
         // Create demo selection tree
+        UIManager.put("Tree.drawLines", Boolean.FALSE);
         demoSelectorTree = new JTree(demos);
         demoSelectorTree.setBorder(new EmptyBorder(2,8,2,8));
         demoSelectorTree.setRowHeight(28);
@@ -255,6 +258,7 @@ public class SwingSet3 {
         ToolTipManager.sharedInstance().registerComponent(demoSelectorTree);
         JScrollPane scrollPane = new JScrollPane(demoSelectorTree);
         scrollPane.setPreferredSize(new Dimension(210,400)); // wide enough to avoid horiz scrollbar
+        scrollPane.setMinimumSize(new Dimension(200,400));
         horizSplitPane.setLeftComponent(scrollPane);
 
         // Create tabbedpane to contain running demos
@@ -392,11 +396,9 @@ public class SwingSet3 {
                 Demo oldCurrentDemo = (Demo)e.getOldValue();
                 Demo currentDemo = (Demo)e.getNewValue();
                 if (oldCurrentDemo != null){
-                    System.out.println("DemoStop:"+ oldCurrentDemo.getName());
                     oldCurrentDemo.stop();
                 }
                 if (currentDemo != null) {
-                    System.out.println("DemoStart:" + currentDemo.getName());
                     if (currentDemo.getDemoComponent() != null) {
                         // only start demo if we know the component has been instantiated
                         // by now; if embedded in html, it might not be quite yet...
@@ -573,15 +575,59 @@ public class SwingSet3 {
             component.setComponentPopupMenu(popup);
         }
     }    
+
+    private static ArrayList<String> getDefaultDemoClassNames() {
+        ArrayList demoClassNamesList = new ArrayList<String>();
+        for(String demoClassName: demoClassNames) {
+            demoClassNamesList.add(demoClassName);
+        }
+        return demoClassNamesList;
+    }
     
+    private static void readDemoClassNames(String fileName, List demoList) {        
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            String line = null;
+            while((line = reader.readLine()) != null) {
+                demoList.add(line);
+            }
+        } catch (Exception ex) {
+            System.err.println("exception reading demos filename: " + fileName);
+            System.err.println(ex);
+        }
+    }
     
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        final ArrayList<String> demoList = new ArrayList();
+        ArrayList<String> userDemoList = null;
+        boolean augment = false;
+        
+        for(String arg : args) {
+            if (arg.equals("-a") || arg.equals("-augment")) {
+                augment = true;
+            } else {
+                // process argument as filename containing names of demo classes
+                if (userDemoList == null) {
+                    userDemoList = new ArrayList();
+                }
+                readDemoClassNames(arg /*filename*/, userDemoList);
+            }            
+        }
+        if (augment || userDemoList == null) {
+            // populate demo list with default Swing demos
+            demoList.addAll(getDefaultDemoClassNames());
+        }
+        if (userDemoList != null) {
+            // add demos specified by user on the command line
+            demoList.addAll(userDemoList);
+        }
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                SwingSet3 swingset = new SwingSet3();
+                SwingSet3 swingset = new SwingSet3(demoList);
             }
         });
     }                

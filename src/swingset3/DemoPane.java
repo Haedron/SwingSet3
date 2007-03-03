@@ -122,7 +122,6 @@ public class DemoPane extends JPanel {
         int i =  0;
         while(i < view.getViewCount() && component == null) {
             View childView = view.getView(i++);
-            System.out.print("  ");
             component = findComponent(childView, targetClass);            
         }
         

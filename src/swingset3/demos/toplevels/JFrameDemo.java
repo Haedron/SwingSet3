@@ -55,12 +55,17 @@ public class JFrameDemo extends JPanel {
         String className = JFrameDemo.class.getName();
         
         ClassLoader cl = JFrameDemo.class.getClassLoader();
-
+        
+        String sourceFileName = "sources/" +
+             className.replace(".", "/") + ".java";
         sourceFiles[0] = cl.getResource("sources/" +
-             className.replaceAll("\\.", File.separator) + ".java");
+             className.replace(".", "/") + ".java");
+        System.out.println("sourceFile="+sourceFileName);
+        System.out.println(sourceFiles[0]);
         sourceFiles[1] = cl.getResource("sources/swingset3/Utilities.java");
+        System.out.println(sourceFiles[1]);
         sourceFiles[2] = cl.getResource("sources/swingset3/demos/toplevels/BusyGlass.java");
-
+        System.out.println(sourceFiles[2]);
         return sourceFiles;
     }
     

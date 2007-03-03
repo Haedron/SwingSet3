@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -155,14 +156,11 @@ public class CodeViewer extends JPanel {
         box.setBackground(Color.blue);
         box.add(Box.createHorizontalStrut(8));
          */
-        GridBagLayout gridbag = new GridBagLayout();
-        GridBagConstraints c = new GridBagConstraints();
-
         JToolBar box = new JToolBar();
         box.setFloatable(false);
         add(BorderLayout.NORTH, box);
         
-        snippetSetsLabel = new JLabel("Highlight code:");
+        snippetSetsLabel = new JLabel(" Highlight code: ");
         snippetSetsComboBox = new JComboBox();
         snippetSetsComboBox.setAlignmentY(.51f);
         snippetSetsComboBox.setMaximumRowCount(20);
@@ -268,23 +266,32 @@ public class CodeViewer extends JPanel {
                     }
                     return codeFileInfos;
                 }
-                protected void process(CodeFileInfo... CodeFileInfos) {
+                // old signature, needed until OS X migrates to newer process() signature
+                protected void process(CodeFileInfo... codeFileInfoSet) {
+                    for(CodeFileInfo codeFileInfo: codeFileInfoSet) {
+                        processOneFile(codeFileInfo);
+                    }
+                } 
+                // updated signature
+                protected void process(List<CodeFileInfo> codeFileInfoList) {
+                    for(CodeFileInfo codeFileInfo: codeFileInfoList) {
+                        processOneFile(codeFileInfo);
+                    }
+                }                
+                private void processOneFile(CodeFileInfo codeFileInfo) {
+                    // Store code info no matter what
+                    codeCache.put(codeFileInfo.url, codeFileInfo);
                     
-                    for(CodeFileInfo codeFileInfo: CodeFileInfos) {
-                        // Store code info no matter what
-                        codeCache.put(codeFileInfo.url, codeFileInfo);
-                                               
-                        // It's possible that by now another demo has been made the "current" demo,
-                        // so check first before adding the source tab;'
-                        if (currentCodeFilesInfo == codeFileInfos) {
-                            createCodeFileTab(codeFileInfo);                            
-                            registerSnippets(codeFileInfo);
-                        } else {
-                            System.out.println("Demo was switched!!!!");
-                        }
-                        
-                    }                 
-                } // process
+                    // It's possible that by now another demo has been made the "current" demo,
+                    // so check first before adding the source tab;'
+                    if (currentCodeFilesInfo == codeFileInfos) {
+                        createCodeFileTab(codeFileInfo);
+                        registerSnippets(codeFileInfo);
+                    } else {
+                        System.out.println("Demo was switched!!!!");
+                    }
+                    
+                } // processOneFile
                 
                 protected void done() {
                     try { 
@@ -332,6 +339,7 @@ public class CodeViewer extends JPanel {
         
         // MUST parse AFTER textPane Document has been created to ensure
         // snippet offsets are relative to the editor pane's Document model
+        System.out.println("initializing CodeFileInfo="+sourceFile.getPath());
         CodeFileInfo.snippets = SnippetParser.parse(CodeFileInfo.textPane.getDocument());
         return CodeFileInfo;
     }
@@ -339,6 +347,7 @@ public class CodeViewer extends JPanel {
     private void createCodeFileTab(CodeFileInfo codeFileInfo) {
         JLayeredPane layeredPane = JLayeredPane.getLayeredPaneAbove(codeFileInfo.textPane);
         JScrollPane scrollPane = new JScrollPane(layeredPane);
+        System.out.println("adding tab:"+ codeFileInfo.url.getPath());
         codeTabbedPane.addTab(Utilities.getURLFileName(codeFileInfo.url), scrollPane);
     }
 
@@ -398,7 +407,7 @@ public class CodeViewer extends JPanel {
         if (currentCodeFilesInfo != null) {
             
             for(CodeFileInfo code : currentCodeFilesInfo) {
-                if (code.textPane != null) {
+                if (code != null && code.textPane != null) {
                     Highlighter highlighter = code.textPane.getHighlighter();
                     highlighter.removeAllHighlights();
                 }

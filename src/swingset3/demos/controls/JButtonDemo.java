@@ -55,7 +55,7 @@ public class JButtonDemo extends JPanel {
                         
         ClassLoader cl = JButtonDemo.class.getClassLoader();
         sourceFiles[0] = cl.getResource("sources/" +
-            className.replaceAll("\\.", File.separator) + ".java");
+            className.replace(".", "/") + ".java");
         sourceFiles[1] = cl.getResource("sources/" +
                 "swingset3/demos/controls/Hyperlink.java");
         return sourceFiles;

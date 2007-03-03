@@ -65,8 +65,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
     protected boolean selected;
     protected boolean hasFocus;
     
-    private Demo demo;
-    
+    private Demo demo;    
     
     public DemoSelectorTreeRenderer() {
 	setHorizontalAlignment(JLabel.LEFT);
@@ -88,7 +87,6 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
             e.printStackTrace();
         }
         setOpaque(true);
-
     }
     
     /**
@@ -202,12 +200,13 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
 	    font = null;
 	super.setFont(font);
     }
-    
+
+    /*
     public void setBackground(Color color) {
 	if(color instanceof ColorUIResource)
 	    color = null;
 	super.setBackground(color);
-    }
+    }*/
     
     public Component getTreeCellRendererComponent(
             JTree tree,
@@ -234,8 +233,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
             });
         }
         
-        setBackground(selected? getBackgroundSelectionColor() :
-            getBackgroundNonSelectionColor());
+        setBackground(selected? getBackgroundSelectionColor() : getBackgroundNonSelectionColor());
         setForeground(selected? getTextSelectionColor() : getTextNonSelectionColor());
         setComponentOrientation(tree.getComponentOrientation());
         setEnabled(tree.isEnabled());

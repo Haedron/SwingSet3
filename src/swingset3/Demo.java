@@ -173,20 +173,17 @@ public class Demo {
                 iae.printStackTrace();
             } catch (java.lang.reflect.InvocationTargetException ite) {
                 System.err.println(demoClass.getName() +
-                        " getSourceFiles method failed: " + ite.getMessage());
+                        " getSourceFiles method failed: " + ite.getCause());
                 ite.printStackTrace();
             }
             // by default return just the demo class's source file url
             if (sourceFiles == null) {
                 sourceFiles = new URL[1];
                 String className = demoClass.getName();
-                System.out.println("source: "+
-                    "../sources/" +
-                    className.replaceAll("\\.", "/") + ".java");
                 
                 ClassLoader cl = getClass().getClassLoader();
                 sourceFiles[0] = cl.getResource("sources/" +
-                    className.replaceAll("\\.", File.separator) + ".java");
+                    className.replace(".", "/") + ".java");
                 
             }
         }
