@@ -29,6 +29,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.ComponentView;
@@ -54,6 +56,7 @@ public class DemoPane extends JPanel {
         }
         
         setLayout(new BorderLayout()); // ensure components fills panel
+        setBorder(new TitledBorder(new EmptyBorder(0,0,0,0), demo.getName()));
 
         // If demo has HTML description, load with embedded demo component
         URL descriptionURL = demo.getHTMLDescription();
@@ -65,9 +68,7 @@ public class DemoPane extends JPanel {
                 public HTMLProcessor(URL descriptionURL) {
                     this.descriptionURL = descriptionURL;
                 }
-                public JScrollPane doInBackground() {
-                    //try {Thread.currentThread().sleep(10000);} catch (Exception e) {}
-                    
+                public JScrollPane doInBackground() {                   
                     descriptionPane = new JEditorPane();
                     descriptionPane.setEditable(false);
                     descriptionPane.setContentType("text/html");

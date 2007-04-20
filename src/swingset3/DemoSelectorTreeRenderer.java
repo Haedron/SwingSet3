@@ -15,10 +15,14 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -48,16 +52,18 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
     protected Color backgroundNonSelectionColor;
     protected Color borderSelectionColor;
     
-    private BufferedImage greyLED;
-    private BufferedImage greenLED;
-    private BufferedImage yellowLED;
+    private Color visitedForeground = new Color(85, 145, 90);
+    private Color errorForeground = Color.red;
     
-    private int LEDsize = 10;
-    private int LEDoffset = 4;
-    private Timer blinkTimer;    
-    private Demo blinkingDemo;
-    private boolean blinkOn = false;
-    private float blinkCount = 0;
+    // For demo loading progress animation
+    private int pieDiameter = 20;
+    private int pieOffset = 4;
+    private int sliceCount = 6;
+    private Timer animationTimer; 
+    private Color sliceColor = new Color(110,100,180);
+    private Color colorRamp[];
+    private float loopCount = 0;
+    private Demo animatingDemo;
     
     /** Last tree the renderer was painted in. */
     private JTree tree;
@@ -76,16 +82,15 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
 	setBackgroundSelectionColor(UIManager.getColor("Tree.selectionBackground"));
 	setBackgroundNonSelectionColor(UIManager.getColor("Tree.textBackground"));
 	setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));
+        /*
         try {
-            greyLED = ImageIO.read(DemoSelectorTreeRenderer.class.getResourceAsStream(
-                    "resources/images/greydot.png"));
-            greenLED = ImageIO.read(DemoSelectorTreeRenderer.class.getResourceAsStream(
-                    "resources/images/greendot.png"));
-            yellowLED = ImageIO.read(DemoSelectorTreeRenderer.class.getResourceAsStream(
-                    "resources/images/yellowdot.png"));
+            
+            progressImage = ImageIO.read(DemoSelectorTreeRenderer.class.getResourceAsStream(
+                    "resources/images/progress_ring.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+         */
         setOpaque(true);
     }
     
@@ -225,46 +230,75 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
         this.selected = isSelected;
 	setText(stringValue);
         
-        if (blinkTimer == null) {
-            blinkTimer = new Timer(500, new ActionListener() {
+        if (animationTimer == null) {
+            animationTimer = new Timer(150, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     DemoSelectorTreeRenderer.this.tree.repaint();
                 }
             });
+
+            colorRamp = new Color[sliceCount];
+            for(int i = 0; i < sliceCount; i++) {
+                colorRamp[i] = new Color(sliceColor.getRed() + (i*10),
+                        sliceColor.getGreen() + (i*10),
+                        sliceColor.getBlue() + (i*10));
+            }
         }
         
-        setBackground(selected? getBackgroundSelectionColor() : getBackgroundNonSelectionColor());
-        setForeground(selected? getTextSelectionColor() : getTextNonSelectionColor());
         setComponentOrientation(tree.getComponentOrientation());
         setEnabled(tree.isEnabled());
         
         if (isLeaf) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-            demo = (Demo)node.getUserObject();
-            String demoName = demo.getName();
-            if (demoName.endsWith("Demo")) {
-                setText(demoName.substring(0, demoName.indexOf("Demo")));
+            Object demoNode = node.getUserObject();
+            if (demoNode instanceof String) {
+                setText((String)demoNode);
+                setIcon(null);
+                setEnabled(false);
+                setToolTipText("not yet implemented");
+                
             } else {
-                setText(demoName);
-            }
-            if (isEnabled()) {
-                setIcon(demo.getIcon());
-            } else {
-                setDisabledIcon(demo.getIcon());
-            }
-            setToolTipText(demo.getShortDescription());
+                demo = (Demo)node.getUserObject();
             
-            Demo.State demoState = demo.getState();
-            if (demo != blinkingDemo &&
-                    (demoState == Demo.State.INITIALIZING ||
-                    demoState == Demo.State.RUNNING)) {
-                blinkingDemo = demo;
-                blinkCount = 0;
+                String demoName = demo.getName();
+                if (demoName.endsWith("Demo")) {
+                    setText(demoName.substring(0, demoName.indexOf("Demo")));
+                } else {
+                    setText(demoName);
+                }
+                if (isEnabled()) {
+                    setIcon(demo.getIcon());
+                } else {
+                    setDisabledIcon(demo.getIcon());
+                }
+                setToolTipText(demo.getShortDescription());
+                
+                Demo.State demoState = demo.getState();
+                setBackground(demoState == Demo.State.RUNNING ||
+                        demoState == Demo.State.INITIALIZING? getBackgroundSelectionColor() : 
+                            getBackgroundNonSelectionColor());
+                Color foreground = getTextNonSelectionColor();
+                switch(demoState) {
+                    case FAILED:
+                        foreground = errorForeground;
+                        break;
+                    case RUNNING:
+                    case INITIALIZING:
+                        foreground = getTextSelectionColor();
+                        break;
+                    case PAUSED:
+                        foreground = visitedForeground;
+                        break;
+                }                
+                setForeground(foreground);
+                
             }
                    
         } else {
             // don't display icon for categories
             demo = null;
+            setBackground(getBackgroundNonSelectionColor());
+            setForeground(getTextNonSelectionColor());
             setIcon(null);
             setToolTipText(null);
         }
@@ -279,34 +313,36 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
             Demo.State demoState = demo.getState();
             int width = getWidth();
             int height = getHeight();
-            if (demoState == Demo.State.RUNNING || demoState == Demo.State.INITIALIZING) {
-                
-                if (blinkCount < 3 || demoState == Demo.State.INITIALIZING) {
-                    if (!blinkTimer.isRunning()) {
-                        blinkTimer.restart();
-                    }                
-                    paintLED(g, blinkCount%1 == 0? greenLED : greyLED);
-                    blinkCount += .5;
-                
-                
-                } else { // not blinking anymore
-                    paintLED(g, greenLED);                
-                    if (blinkCount >= 3.5) {
-                        blinkTimer.stop();
-                    }
-                }
-            } else if (demoState == Demo.State.PAUSED) {
-                paintLED(g, yellowLED);
+            if (demoState == Demo.State.INITIALIZING) {
+                animatingDemo = demo;
+                animationTimer.start();
+                paintAnimation((Graphics2D)g, width - pieDiameter - 2, (height - pieDiameter)/2);
+            } else if (animatingDemo == demo &&
+                    demoState != Demo.State.INITIALIZING) {
+                animatingDemo = null;
+                animationTimer.stop();
+                loopCount = 0;
             }
         }
+         
     }
     
-    private void paintLED(Graphics g, Image LED) {
-        int width = getWidth();
-        int height = getHeight();
-        g.drawImage(LED,
-                width - LEDsize - 1, getBaseline(width, height) - LEDsize + 1,
-                LEDsize, LEDsize, this);
+    private void paintAnimation(Graphics g, int x, int y) {
+        Graphics2D g2 = (Graphics2D)g.create();
+        
+        g2.translate(x,y);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        int angle = 360 / sliceCount;
+        int cycle = (int)(loopCount++ % sliceCount);
+        for(int i = 0; i < sliceCount; i++) {
+            Arc2D.Float arc = new Arc2D.Float(new Rectangle(0,0,pieDiameter,pieDiameter),
+                    (i*angle), angle, Arc2D.PIE);
+            g2.setColor(colorRamp[(cycle+i)%sliceCount]);
+            g2.fill(arc);
+        }
+        g2.dispose();
+
     }
 
     private void paintFocus(Graphics g, int x, int y, int w, int h, Color notColor) {
@@ -323,7 +359,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
         Dimension  prefSize = super.getPreferredSize();
         
         if (prefSize != null) {
-            prefSize = new Dimension(prefSize.width + LEDoffset + LEDsize, 
+            prefSize = new Dimension(prefSize.width + pieOffset + pieDiameter, 
                     prefSize.height);
         }
         return prefSize;

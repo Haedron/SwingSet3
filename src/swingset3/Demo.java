@@ -30,7 +30,13 @@ public class Demo {
     
     private static final String imageExtensions[] = {".gif", ".png", ".jpg"};
     
-    private static String deriveCategoryFromPackageName(Class demoClass) {
+    public static String deriveCategoryFromPackageName(String className) {
+        String parts[] = className.split("\\.");
+        // return the right-most package name
+        return parts.length >= 2? parts[parts.length-2] : "general";
+    }
+    
+    public static String deriveCategoryFromPackageName(Class demoClass) {
         String packageName = demoClass.getPackage() != null? 
             demoClass.getPackage().getName() : null;
         if (packageName != null) {
@@ -44,11 +50,20 @@ public class Demo {
         return packageName != null? packageName : "general";        
     }
     
-    private static String deriveNameFromClassName(Class demoClass) {
+    public static String deriveNameFromClassName(String className) {
+        String simpleName = className.substring(className.lastIndexOf(".")+1, className.length());
+        return convertToDemoName(simpleName);
+    }
+    
+    public static String deriveNameFromClassName(Class demoClass) {
         String className = demoClass.getSimpleName();
+        return convertToDemoName(className);
+    }
+        
+    protected static String convertToDemoName(String simpleClassName) {
         StringBuffer nameBuffer = new StringBuffer();
-        if (className.endsWith("Demo")) {
-            nameBuffer.append(className.substring(0, className.indexOf("Demo")));
+        if (simpleClassName.endsWith("Demo")) {
+            nameBuffer.append(simpleClassName.substring(0, simpleClassName.indexOf("Demo")));
             nameBuffer.append(" ");
             nameBuffer.append("Demo");
         }

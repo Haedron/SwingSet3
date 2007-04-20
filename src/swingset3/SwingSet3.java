@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -37,14 +38,12 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -64,10 +63,6 @@ public class SwingSet3 {
             "swingset3.demos.toplevels.JDialogDemo",
             "swingset3.demos.toplevels.JWindowDemo",
                     
-            //"swingset3.layoutContainers.JPanelDemo",
-            //"swingset3.layoutContainers.JTabbedPaneDemo",
-            //"swingset3.layoutContainers.JScrollPaneDemo",
-                    
             "swingset3.demos.controls.JButtonDemo",
             "swingset3.demos.controls.JCheckBoxDemo",
             "swingset3.demos.controls.JComboBoxDemo",
@@ -77,7 +72,11 @@ public class SwingSet3 {
             "swingset3.demos.data.JTableDemo",
             "swingset3.demos.data.JTreeDemo",
             
-            "swingset3.demos.text.JEditorPaneDemo"
+            "swingset3.demos.text.JEditorPaneDemo",
+                                        
+            "swingset3.layoutContainers.JPanelDemo",
+            "swingset3.layoutContainers.JTabbedPaneDemo",
+            "swingset3.layoutContainers.JScrollPaneDemo"
     };
         
     static {
@@ -91,16 +90,16 @@ public class SwingSet3 {
     
     
     // Application models
-    private DefaultMutableTreeNode demos; /* all available demos */
-    private DemoList runningDemos; /* demos currently loaded */
+    private DefaultMutableTreeNode demos; /* all available demos */    
+    private HashMap<String,DemoPane> demoCache;
+    private Demo currentDemo;
 
     // GUI components
     private JFrame frame;
     private JSplitPane vertSplitPane;
     private JSplitPane horizSplitPane;
     private JTree demoSelectorTree;
-    private JLabel runningDemosPlaceholder;
-    private JTabbedPane runningDemosTabbedPane;
+    private JLabel runningDemoPlaceholder;
     private JPanel sourceCodePane;
     private CodeViewer codeViewer;    
     private JCheckBoxMenuItem sourceCodeCheckboxItem;
@@ -125,7 +124,8 @@ public class SwingSet3 {
     public SwingSet3(List<String>demoClassNames) {
         
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception ex) {
         }
         
@@ -133,7 +133,7 @@ public class SwingSet3 {
         
         // Create application model
         initDemos(demoClassNames);
-        initRunningDemosList();
+        demoCache = new HashMap();
  
         // Create GUI
         initComponents();  
@@ -141,7 +141,6 @@ public class SwingSet3 {
 
         // Create application-level actions
         quitDemoAction = new QuitDemoAction(); 
-        quitAllDemosAction = new QuitAllDemosAction();
         
         // Show GUI
         frame.setVisible(true);
@@ -154,53 +153,54 @@ public class SwingSet3 {
                 new DemoPropertyChangeListener();
         
         for(String demoClassName : demoClassNamesList) {
+            Class demoClass = null;
+            Demo demo = null;
+            String category = null;
             try {
-                Class demoClass = Class.forName(demoClassName);
-                Demo demo = null;
+                demoClass = Class.forName(demoClassName);
+            } catch (ClassNotFoundException cnfe) {
+                // okay.  for interim purposes we'll show an inactive nodes for TBW demos
+            }
+            if (demoClass != null) {
+                // If demo class happens to implement Demo, then instantiate it
                 if (Demo.class.isAssignableFrom(demoClass)) {
-                    demo = (Demo)demoClass.newInstance();
+                    try {
+                        demo = (Demo)demoClass.newInstance();
+                        
+                    } catch (Exception ex) {
+                        System.err.println("could not instantiate demo: "+ demoClass.getName());
+                        ex.printStackTrace();                       
+                    }
                     
                 } else {
                     // Wrap Demo 
                     demo = new Demo(demoClass);
                 }
                 demo.addPropertyChangeListener(demoPropertyListener);                
-
-                String category = demo.getCategory();
-
-                Enumeration categories = demos.children();
-                DefaultMutableTreeNode categoryNode = null;
-                while (categories.hasMoreElements()) {
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)categories.nextElement();
-                    if (node.getUserObject().equals(category)) {
-                        categoryNode = node;
-                        break; // category already exists
-                    }                    
-                }
+                category = demo.getCategory();
                 
-                if (categoryNode == null) {
-                    categoryNode = new DefaultMutableTreeNode(category);
-                    demos.add(categoryNode);                    
-                }
-                categoryNode.add(new DefaultMutableTreeNode(demo));
-                       
-                
-            } catch (ClassNotFoundException cnfe) {
-                System.err.println(cnfe);
-                
-            } catch (InstantiationException ie) {
-                System.err.println(ie);
-                
-            } catch (IllegalAccessException iae) {
-                System.err.println(iae);
+            } else {
+                category = Demo.deriveCategoryFromPackageName(demoClassName);
             }
+
+            Enumeration categories = demos.children();
+            DefaultMutableTreeNode categoryNode = null;
+            while (categories.hasMoreElements()) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode)categories.nextElement();
+                if (node.getUserObject().equals(category)) {
+                    categoryNode = node;
+                    break; // category already exists
+                }                    
+            }
+            
+            if (categoryNode == null) {
+                categoryNode = new DefaultMutableTreeNode(category);
+                demos.add(categoryNode);
+            }
+            categoryNode.add(new DefaultMutableTreeNode(demo != null? demo : 
+                Demo.deriveNameFromClassName(demoClassName)));
+
         }
-    }
-    
-    protected void initRunningDemosList() {
-        runningDemos = new DemoList();
-        runningDemos.addDemoListListener(new RunningDemosListener());  
-        runningDemos.addPropertyChangeListener(new CurrentDemoListener());
     }
     
     protected void initComponents() {
@@ -261,15 +261,11 @@ public class SwingSet3 {
         scrollPane.setMinimumSize(new Dimension(200,400));
         horizSplitPane.setLeftComponent(scrollPane);
 
-        // Create tabbedpane to contain running demos
-        runningDemosPlaceholder = new JLabel(
+        // Create pane to contain running demo
+        runningDemoPlaceholder = new JLabel(
                 new ImageIcon(SwingSet3.class.getResource("resources/images/placeholder.png")));
-        runningDemosPlaceholder.setPreferredSize(new Dimension(600, 400));
-        runningDemosTabbedPane = new JTabbedPane();
-        runningDemosTabbedPane.setPreferredSize(new Dimension(600,400));
-        runningDemosTabbedPane.addChangeListener(new TabSelectionListener());
-        //horizSplitPane.setRightComponent(runningDemosTabbedPane);
-        horizSplitPane.setRightComponent(runningDemosPlaceholder);
+        runningDemoPlaceholder.setPreferredSize(new Dimension(600, 400));
+        horizSplitPane.setRightComponent(runningDemoPlaceholder);
                 
         // Create source code pane with dismissable close button
         sourceCodePane = new JPanel();
@@ -324,7 +320,6 @@ public class SwingSet3 {
         boolean oldSourceCodeVisible = isSourceCodeVisible();
         if (oldSourceCodeVisible != sourceVisible) {
             if (sourceVisible) {
-                Demo currentDemo = runningDemos.getSelected();
                 codeViewer.setSourceFiles(currentDemo != null?
                     currentDemo.getSourceFiles() : null);
             } else {
@@ -356,91 +351,89 @@ public class SwingSet3 {
         setSourceCodeVisible(sourceCodeCheckboxItem.isSelected());
     }
     
-    public void runDemo(Demo demo) {
-        if (!runningDemos.contains(demo)) {
-            demo.setState(Demo.State.INITIALIZING);
-            //demoSelectorTree.paintImmediately(demoSelectorTree.getPathBounds(demoSelectorTree.getSelectionPath()));
-            runningDemos.add(demo);
-        } else {
-            runningDemos.setSelected(demo);
+    public void setCurrentDemo(Demo demo) {
+        if (currentDemo == demo) {
+            return; // already there
         }
-    }
-    
-    class RunningDemosListener implements DemoList.Listener {
-        public void added(DemoList.Event event) {
-            Demo demo = event.getDemo();
-            if (horizSplitPane.getRightComponent() != runningDemosTabbedPane) {
-                horizSplitPane.setRightComponent(runningDemosTabbedPane);
-            }
-            runningDemosTabbedPane.addTab(demo.getName(), null,
-                    new DemoPane(demo), demo.getShortDescription());
-            runningDemos.setSelected(demo);
-
+        Demo oldCurrentDemo = currentDemo;
+        if (oldCurrentDemo != null) {
+            oldCurrentDemo.stop();
         }
-        public void removed(DemoList.Event event) {
-            Demo demo = event.getDemo();
-            runningDemosTabbedPane.removeTabAt(
-                    runningDemosTabbedPane.indexOfTab(demo.getName()));
-            demo.setDemoComponent(null);
-            
-            if (runningDemosTabbedPane.getTabCount() == 0) {        
-                horizSplitPane.setRightComponent(runningDemosPlaceholder);
+        currentDemo = demo;
+        DemoPane demoPane = null;
+        if (demo != null) {
+            demoPane = demoCache.get(demo.getName());
+            if (demoPane == null) {
                 
-            }
-        }
-    }
-    
-    class CurrentDemoListener implements PropertyChangeListener {
-        public void propertyChange(PropertyChangeEvent e) {
-            if (e.getPropertyName().equals("selected")) {
-                Demo oldCurrentDemo = (Demo)e.getOldValue();
-                Demo currentDemo = (Demo)e.getNewValue();
-                if (oldCurrentDemo != null){
-                    oldCurrentDemo.stop();
-                }
-                if (currentDemo != null) {
-                    if (currentDemo.getDemoComponent() != null) {
-                        // only start demo if we know the component has been instantiated
-                        // by now; if embedded in html, it might not be quite yet...
-                        currentDemo.start();
+                demo.setState(Demo.State.INITIALIZING);
+                
+                class DemoLoader extends SwingWorker<DemoPane, Object> {
+                    Demo demo;                    
+                
+                    public DemoLoader(Demo demo) {
+                        this.demo = demo;
                     }
-                    runningDemosTabbedPane.setSelectedIndex(
-                            runningDemosTabbedPane.indexOfTab(currentDemo.getName()));
-                }
-                if (isSourceCodeVisible()) {
-                    codeViewer.setSourceFiles(currentDemo != null? 
-                        currentDemo.getSourceFiles() : null);
-                }
+                    public DemoPane doInBackground() {
+                        //try {Thread.currentThread().sleep(20000);} catch (Exception e) {}
+                        return new DemoPane(demo);
+                    }
+                    protected void done() {
+                        try {
+                            DemoPane demoPane = get();
+                            demoCache.put(demo.getName(), demoPane);
+                            horizSplitPane.setRightComponent(demoPane);
+                            // if demo is embedded in hTML, it might not be instantiated yet,
+                            // so cannot start() it...
+                        } catch (Exception e) {
+                            System.err.print(e);
+                            e.printStackTrace();
+                        }
+                    }
+                } // DemoLoader    
+    
+                // Load demo on separate thread...
+                new DemoLoader(demo).execute();
+                
+            } else {
+                horizSplitPane.setRightComponent(demoPane);
+                currentDemo.start();
             }
         }
+
+        if (currentDemo == null) {
+            horizSplitPane.setRightComponent(runningDemoPlaceholder);
+        }
+        
+        if (isSourceCodeVisible()) {
+            codeViewer.setSourceFiles(currentDemo != null?
+                currentDemo.getSourceFiles() : null);
+        }
+        pcs.firePropertyChange("currentDemo", oldCurrentDemo, demo);
     }
     
-     class DemoTreeClickListener extends MouseAdapter {
+    public Demo getCurrentDemo() {
+        return currentDemo;
+    }
+        
+    
+    class DemoTreeClickListener extends MouseAdapter {
         public void mousePressed(MouseEvent e) {
             JTree demoTree = (JTree)e.getSource();
             int selectedRow = demoTree.getRowForLocation(e.getX(), e.getY());            
             if (selectedRow != -1) {
                 TreePath selPath = demoTree.getPathForLocation(e.getX(), e.getY());
-                if (e.getClickCount() == 2) {
+                if (e.getClickCount() == 1) {
                     TreeNode node = (TreeNode)selPath.getLastPathComponent();
                     if (node.isLeaf()) {
                         // user double-clicked demo in tree, so run it
                         Demo demo = (Demo)((DefaultMutableTreeNode)node).getUserObject();
-                        runDemo(demo);
+                        setCurrentDemo(demo);
                     }
                 }                
             }
         }
     }
     
-    // Listens to when the user selects a running demo in the tabbedpane
-    class TabSelectionListener implements ChangeListener {
-        public void stateChanged(ChangeEvent e) {
-            JTabbedPane tabbedPane = (JTabbedPane)e.getSource();
-            DemoPane demoPane = (DemoPane)tabbedPane.getSelectedComponent();
-            runningDemos.setSelected(demoPane != null? demoPane.getDemo() : null);
-        }
-    }
     
     // registered on Demo to detect when the demo component is instantiated.
     // we need this because when we embed the demo inside an HTML description pane,
@@ -452,7 +445,6 @@ public class SwingSet3 {
                 Demo demo = (Demo)e.getSource();
                 JComponent demoComponent = (JComponent)e.getNewValue();
                 if (demoComponent != null) {
-                    Demo currentDemo = runningDemos.getSelected();
                     if (demo == currentDemo) {
                         currentDemo.start();
                     }                    
@@ -508,20 +500,13 @@ public class SwingSet3 {
         
         public void menuSelected(MenuEvent event) {
              JMenu fileMenu = (JMenu)event.getSource();
-             Demo demos[] = runningDemos.toArray();
-             for (Demo demo : demos) {
+             Demo demo = getCurrentDemo();
+             if (demo != null) {
                  JMenuItem quitItem = new JMenuItem();
-                 quitItem.putClientProperty("demo", demo);
                  quitItem.setHideActionText(true);
                  quitItem.setAction(quitDemoAction);
                  quitItem.setText("Quit " + demo.getName());
                  fileMenu.add(quitItem);
-             }
-             if (demos.length > 0) {
-                 fileMenu.addSeparator();
-                 JMenuItem quitAllItem = new JMenuItem("Quit All Demos");
-                 quitAllItem.setAction(quitAllDemosAction);
-                 fileMenu.add(quitAllItem);
              }
              if (!onMac()) {
                  // Mac puts Quit item in application menu
@@ -546,21 +531,7 @@ public class SwingSet3 {
     
     public class QuitDemoAction extends AbstractAction {
         public void actionPerformed(ActionEvent event) {
-            JMenuItem quitItem = (JMenuItem)event.getSource(); 
-            Demo demo = (Demo)quitItem.getClientProperty("demo");
-            runningDemos.remove(demo);
-        }
-    }
-    
-    public class QuitAllDemosAction extends AbstractAction {
-        public QuitAllDemosAction() {
-            super("Quit All Demos");
-        }
-        public void actionPerformed(ActionEvent e) {
-            Demo demos[] = runningDemos.toArray();
-            for(Demo demo: demos) {
-                runningDemos.remove(demo);
-            }
+            setCurrentDemo(null);
         }
     }
     
@@ -568,7 +539,9 @@ public class SwingSet3 {
     private void registerPopups(JComponent component) {
         Component children[] = component.getComponents();
         for(Component child: children) {
-            registerPopups((JComponent)child);
+            if (child instanceof JComponent) {
+                registerPopups((JComponent)child);
+            }
         }
         String snippetKey = (String)component.getClientProperty("snippetKey");
         if (snippetKey != null) {
