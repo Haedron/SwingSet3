@@ -1,5 +1,5 @@
 /*
- * DemoPane.java
+ * DemoPanel.java
  *
  * Created on September 8, 2006, 10:35 AM
  *
@@ -14,7 +14,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.Arc2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -22,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -29,6 +36,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
@@ -41,34 +50,42 @@ import javax.swing.text.View;
  *
  * @author aim
  */
-public class DemoPane extends JPanel {
+public class DemoPanel extends JPanel {
+    private static Image progressImage;
+    
     private static HyperlinkHandler hyperlinkHandler;
     private static Cursor defaultCursor;
     
+    static {
+        hyperlinkHandler = new HyperlinkHandler();
+        try {            
+            progressImage = ImageIO.read(DemoSelectorTreeRenderer.class.getResourceAsStream(
+                    "resources/images/clock.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     private JEditorPane descriptionPane;    
     private Demo demo;
+    private boolean demoAdded = false;
     
-    public DemoPane(Demo demo) {  
+    public DemoPanel(Demo demo) {  
         this.demo = demo;
-        
-        if (hyperlinkHandler == null) {
-            hyperlinkHandler = new HyperlinkHandler();
-        }
-        
-        setLayout(new BorderLayout()); // ensure components fills panel
-        setBorder(new TitledBorder(new EmptyBorder(0,0,0,0), demo.getName()));
-
-        // If demo has HTML description, load with embedded demo component
-        URL descriptionURL = demo.getHTMLDescription();
-        if (descriptionURL != null) {
-
-            class HTMLProcessor extends SwingWorker<JScrollPane, Object> {
-                URL descriptionURL;
                 
-                public HTMLProcessor(URL descriptionURL) {
-                    this.descriptionURL = descriptionURL;
-                }
-                public JScrollPane doInBackground() {                   
+        setLayout(new BorderLayout()); // ensure components fills panel
+        setBorder(new CompoundBorder(new EmptyBorder(8,2,8,2),
+                                     new TitledBorder(new EmptyBorder(0,0,0,0), demo.getName())));
+        
+        class DemoLoader extends SwingWorker<JComponent, Object> {
+            
+            public DemoLoader() {
+            }
+            public JComponent doInBackground() {
+                //try {Thread.currentThread().sleep(10000);} catch (Exception e) {}
+                // If demo has HTML description, load with embedded demo component
+                URL descriptionURL = DemoPanel.this.demo.getHTMLDescription();
+                if (descriptionURL != null) {
                     descriptionPane = new JEditorPane();
                     descriptionPane.setEditable(false);
                     descriptionPane.setContentType("text/html");
@@ -89,31 +106,46 @@ public class DemoPane extends JPanel {
                         e.printStackTrace();
                     }
                     return scrollPane;
+                } else {
+                    // no HTML description, just add demo component
+                    return DemoPanel.this.demo.createDemoComponent();
                 }
-                protected void done() {
-                    try { 
-                         add(/* scrollPane */ get());
-                         revalidate();
+            }
+            protected void done() {
+                try {
+                    
+                    add(get());
+                    demoAdded = true;
+                    revalidate();
+                                        
+                } catch (Exception ignore) {
+                    System.err.println(ignore);
+                }
+            }
+        } // DemoLoader
+        
+        // Instantiate demo component on separate thread...
+        new DemoLoader().execute();
 
-                    } catch (Exception ignore) {
-                        System.err.println(ignore);
-                    }
-                }       
-                
-            } // HTMLProcessor            
-    
-            // Load HTML on separate thread...
-            new HTMLProcessor(descriptionURL).execute();
- 
-        } else {
-            // no HTML description, just add demo component
-            add(demo.createDemoComponent());
-        }
-      
     }
     
     public Demo getDemo() {
         return demo;
+    }
+    
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (!demoAdded) {
+            Insets insets = getInsets();
+            Rectangle bounds = getBounds(); 
+            int diameter = Math.min(bounds.width - insets.left - insets.right, 
+                    bounds.height - insets.top - insets.bottom);
+            g.setColor(new Color(200,200,200));
+            g.drawOval(insets.left + (bounds.width - insets.left - insets.right - diameter)/2,
+                    insets.top + (bounds.height - insets.top - insets.bottom - diameter)/2,
+                    diameter, diameter);
+        } 
+        
     }
     
     // recursively searches views in editor pane to find the embedded 
@@ -145,23 +177,24 @@ public class DemoPane extends JPanel {
             // another event comes around ("Frame.active") we check for a null component and
             // try finding the component again.  not ideal, I know.
             if (propertyName.equals("page") ||
-                    (demo.getDemoComponent() == null && propertyName.equals("Frame.active"))) {
+                    (demo.getDemoComponent() == null /*&& propertyName.equals("Frame.active")*/)) {
                 JComponent demoComponent =
                    findComponent(descriptionPane.getUI().getRootView(descriptionPane),
                         demo.getDemoClass());
                 System.out.println(demo.getName()+":finding component="+demoComponent);
                 if (demoComponent != null) {
                     demo.setDemoComponent(demoComponent);
+                    demoComponent.getTopLevelAncestor().validate();
                 } else {
-                    System.err.println("error: couldn't find demo component for " +
+                    System.err.println(propertyName+": couldn't find demo component for " +
                             demo.getName());
                 }
             }
         }
     }
 
-    // single instance of handler is shared for ALL DemoPane instances
-    private class HyperlinkHandler implements HyperlinkListener {
+    // single instance of handler is shared for ALL DemoPanel instances
+    private static class HyperlinkHandler implements HyperlinkListener {
         public void hyperlinkUpdate(HyperlinkEvent event) {
             JEditorPane descriptionPane = (JEditorPane)event.getSource();
             HyperlinkEvent.EventType type = event.getEventType();

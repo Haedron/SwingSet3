@@ -26,7 +26,7 @@ import javax.swing.JLabel;
  */
 public class Demo {
     
-    public enum State { UNINITIALIZED, INITIALIZING, RUNNING, PAUSED, FAILED }
+    public enum State { UNINITIALIZED, INITIALIZING, INITIALIZED, RUNNING, PAUSED, FAILED }
     
     private static final String imageExtensions[] = {".gif", ".png", ".jpg"};
     
@@ -79,6 +79,8 @@ public class Demo {
     protected URL[] sourceFiles = null;
     
     protected State state;
+    
+    protected Exception failException;
     
     private PropertyChangeSupport pcs;
     
@@ -169,6 +171,10 @@ public class Demo {
         return shortDescription;
     }
     
+    public void initialize() {
+        setState(State.INITIALIZING);
+    }
+    
     public URL getHTMLDescription() {
         // by default look for an html file with the same name as the demo class
         return demoClass.getResource("resources/" + 
@@ -207,17 +213,20 @@ public class Demo {
     
     void setDemoComponent(JComponent component) {
         if (component != null && !demoClass.isInstance(component)) {
-            throw new IllegalArgumentException("component must be an instance of " +
+            setState(State.FAILED);
+            IllegalArgumentException e =
+                    new IllegalArgumentException("component must be an instance of " +
                     demoClass.getCanonicalName());
+            failException = e;
+            throw e;
         }
         JComponent old = this.component;
         this.component = component;
         
         System.out.println(this.getName() + ":setDemoComponent: " + this.component);
+        setState(component != null? State.INITIALIZED : State.UNINITIALIZED);
         pcs.firePropertyChange("demoComponent", old, component);
-        if (component == null) {
-            setState(State.UNINITIALIZED);
-        }
+
     }
     
     public JComponent createDemoComponent() {
@@ -228,6 +237,7 @@ public class Demo {
         } catch (Exception e) {
             System.err.println(e);
             e.printStackTrace();
+            failException = e;
             setState(State.FAILED);
         }        
         return component;          
@@ -244,7 +254,7 @@ public class Demo {
     protected void setState(State state) {
         State oldState = this.state;
         this.state = state;
-        System.out.println(getName() + ":setState="+state);
+        System.out.println("***** "+getName() + ":setState="+state);
         pcs.firePropertyChange("state", oldState, state);
     }
     
@@ -257,38 +267,54 @@ public class Demo {
     }
         
     public void start() {
-        setState(State.RUNNING);
+
         try {
             Method startMethod = demoClass.getMethod("start", (Class[])null);
             startMethod.invoke(component, (Object[])null);
+            setState(State.RUNNING);
         } catch (NoSuchMethodException nsme) {
+            setState(State.RUNNING);
             // okay, no start method exists
         } catch (IllegalAccessException iae) {
             System.err.println(iae);
             iae.printStackTrace();
+            failException = iae;
+            setState(State.FAILED);
         } catch (java.lang.reflect.InvocationTargetException ite) {
             System.err.println(demoClass.getName() +
                     " start method failed: " + ite.getMessage());
             ite.printStackTrace();
+            failException = ite;
+            setState(State.FAILED);
+        } catch (NullPointerException npe) {
+            System.out.println(getName()+":started before demo component was created.");
+            failException = npe;
+            setState(State.FAILED);
         }
     };
     
-    public void stop() {
+    public void pause() {
         setState(State.PAUSED);
         try {
-            Method stopMethod = demoClass.getMethod("stop", (Class[])null);
+            Method stopMethod = demoClass.getMethod("pause", (Class[])null);
             stopMethod.invoke(component, (Object[])null);
+
         } catch (NoSuchMethodException nsme) {
-            // okay, no start method exists
+            // okay, no pause method exists
+
         } catch (IllegalAccessException iae) {
             System.err.println(iae);
+            failException = iae;
+            setState(State.FAILED);
             iae.printStackTrace();
         } catch (java.lang.reflect.InvocationTargetException ite) {
             System.err.println(demoClass.getName() + 
-                    " stop method failed: " + ite.getMessage());
+                    " pause method failed: " + ite.getMessage());
+            failException = ite;
+            setState(State.FAILED);
             ite.printStackTrace();
         } catch (NullPointerException npe) {
-            System.out.println(getName()+":stopped before demo component was created.");
+            System.out.println(getName()+":paused before demo component was created.");
         }
     };
 }

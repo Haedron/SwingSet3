@@ -79,7 +79,7 @@ public class JDialogDemo extends JPanel {
         //</snip>
     };
     
-    public void stop() {
+    public void pause() {
         //<snip>Hide dialog
         dialog.setVisible(false);
         //</snip>

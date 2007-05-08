@@ -53,6 +53,7 @@ public class Hyperlink extends JButton {
     public Hyperlink(String text) {
         super(text);
         setBorderPainted(false);
+        setContentAreaFilled(false);
         setForeground(Color.blue);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         setMargin(new Insets(0,0,0,0));

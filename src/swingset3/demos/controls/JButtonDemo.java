@@ -147,6 +147,7 @@ public class JButtonDemo extends JPanel {
         button.setIcon(new ImageIcon(getClass().getResource("resources/images/earth_day.gif")));
         button.setPressedIcon(new ImageIcon(getClass().getResource("resources/images/earth_night.gif")));
         button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
         button.setVerticalTextPosition(JButton.BOTTOM);
         button.setHorizontalTextPosition(JButton.CENTER);
         button.setIconTextGap(0);
@@ -158,6 +159,7 @@ public class JButtonDemo extends JPanel {
         //<snip>Create image button with rollover image
         button = new JButton();
         button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
         button.setIcon(new ImageIcon(getClass().getResource("resources/images/redbutton.png")));
         button.setRolloverEnabled(true);
         button.setRolloverIcon(new ImageIcon(getClass().getResource("resources/images/redbutton_glow.png")));

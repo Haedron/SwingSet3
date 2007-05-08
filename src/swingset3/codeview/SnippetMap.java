@@ -9,6 +9,8 @@
 
 package swingset3.codeview;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,66 +42,115 @@ import java.util.Set;
  * @author aim
  */
 public class SnippetMap {
-    private HashMap <String,HashMap>snippetSets = new HashMap();
-
+    private HashMap <String,ArrayList>snippetSets = new HashMap();    
+    
     private String currentKey;
-    private HashMap<URL,ArrayList>currentSet;
-    private URL currentFiles[];
-    private int currentFileIndex;
+    private ArrayList<FileSnippets> currentSet;
+    private FileSnippets currentFileSnippets;
+    private int currentFileSnippetsIndex;
     private int currentSnippetIndex;
+    private Snippet currentSnippet;
+    
+    private PropertyChangeSupport pcs;
     
     /** Creates a new instance of SnippetMap */
     public SnippetMap() {
+        pcs = new PropertyChangeSupport(this);
+    }
+    
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        pcs.addPropertyChangeListener(pcl);
     }
     
     public void add(String key, URL codeFile, Snippet snippet) {
-        HashMap snippetSet = snippetSets.get(key);
-        if (snippetSet == null) {
+        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(key);
+        if (fileSnippetList == null) {
             // new key! so create new set...
-            snippetSet = new HashMap<URL,ArrayList>();
-            snippetSets.put(key, snippetSet);
+            fileSnippetList = new ArrayList<FileSnippets>();
+            snippetSets.put(key, fileSnippetList);
         }
-        addSnippetToSet(snippetSet, codeFile, snippet);
+        
+        FileSnippets fileSnippets = findFileSnippetsForFile(fileSnippetList, codeFile);
+        if (fileSnippets == null) {
+            // found first snippet in this file
+            fileSnippets = new FileSnippets(key, codeFile);
+            fileSnippetList.add(fileSnippets);
+        }
+        if (!fileSnippets.snippets.contains(snippet)) {
+            fileSnippets.snippets.add(snippet);
+        }
                                 
-    }
-    
-    protected void addSnippetToSet(HashMap<URL,ArrayList>set, URL file, Snippet snippet) {
-        ArrayList snippets = set.get(file);
-        if (snippets == null) {
-            snippets = new ArrayList();
-            set.put(file, snippets);
-        }
-        if (!snippets.contains(snippet)) {
-            snippets.add(snippet);
-        }
     }
     
     public Set keySet() {
         return snippetSets.keySet();
     }
     
+    public int getSnippetCountForSet(String key) {
+        int count = 0;
+        URL files[] = getFilesForSet(key);
+        for(URL file : files) {
+            Snippet snippets[] = getSnippetsForFile(key, file);
+            count += snippets.length;
+        }
+        return count;
+    }
+    
     public URL[] getFilesForSet(String key) {
-        HashMap<URL,ArrayList> snippetSet = snippetSets.get(key); 
-        return (URL[])snippetSet.keySet().toArray(new URL[0]);
+        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(key);
+        URL files[] = null;
+        if (fileSnippetList != null) {
+            files = new URL[fileSnippetList.size()];
+            int i = 0;
+            for(FileSnippets fileSnippets : fileSnippetList) {
+                files[i++] = fileSnippets.file;
+            }
+        } else {
+            files = new URL[0];
+        }
+        return files;
     }
     
     public Snippet[] getSnippetsForFile(String key, URL file) {
-        HashMap<URL,ArrayList> snippetSet = snippetSets.get(key); 
-        return (Snippet[])snippetSet.get(file).toArray(new Snippet[0]);
+        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(key);
+        FileSnippets fileSnippets = findFileSnippetsForFile(fileSnippetList, file);
+        if (fileSnippets != null) {          
+            if (fileSnippets.snippets != null) {
+                return (Snippet[])fileSnippets.snippets.toArray(new Snippet[0]);
+            } 
+        }
+        return new Snippet[0];        
     }
     
-    public URL getFileForSnippet(Snippet snippet) {
-        HashMap<URL,ArrayList> snippetSet = snippetSets.get(snippet.key); 
-        URL files[] = getFilesForSet(snippet.key);
-        for(URL file : files) {
-            ArrayList<Snippet> snippets = snippetSet.get(file);
-            for(Snippet s : snippets) {
-                if (s == snippet) {
-                    return file;
+    public int getIndexForSnippet(Snippet snippet) {
+        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(snippet.key); 
+        if (fileSnippetList != null) {
+            int index = 1;
+            for(FileSnippets fileSnippets : fileSnippetList) {
+                for(Snippet snippetInFile : fileSnippets.snippets) {
+                    if (snippetInFile == snippet) {
+                        return index;
+                    } else {
+                        index++;
+                    }
                 }
             }
         }
-        return null;            
+        return -1;
+    }
+    
+    public URL getFileForSnippet(Snippet snippet) {
+        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(snippet.key); 
+        if (fileSnippetList != null) {
+            for(FileSnippets fileSnippets : fileSnippetList) {
+                for(Snippet snippetInFile : fileSnippets.snippets) {
+                    if (snippetInFile == snippet) {
+                        return fileSnippets.file;
+                    } 
+                }
+            }
+        }
+        return null;     
     }
     
     public boolean isEmpty() {
@@ -111,49 +162,70 @@ public class SnippetMap {
     }
     
     public void clear() {
-        snippetSets.clear(); 
+        snippetSets.clear();
+        setCurrentSnippet(null);
         setCurrentSet(null);
     }
     
     public void setCurrentSet(String key) {
+        String oldKey = currentKey;
         if (key == null) {
             // current snippet being cleared
             currentKey = null;
             currentSet = null;
-            currentFiles = null;
-            currentFileIndex = -1;
+            currentFileSnippets = null;
+            currentFileSnippetsIndex = -1;
             currentSnippetIndex = -1;
-        } else {            
-            HashMap<URL,ArrayList>snippetSet = snippetSets.get(key);
-            if (snippetSet == null) {
+        } else {   
+            ArrayList<FileSnippets> fileSnippetList = snippetSets.get(key); 
+            if (fileSnippetList == null) {
                 throw new IllegalArgumentException("snippet key " + key + " does not exist.");
             }
             currentKey = key;
-            currentSet = snippetSet;
-            currentFiles = (URL[])currentSet.keySet().toArray(new URL[0]);
-            currentFileIndex = 0;
+            currentSet = fileSnippetList;
+            currentFileSnippetsIndex = 0;
+            currentFileSnippets = currentSet.get(currentFileSnippetsIndex);
             currentSnippetIndex = 0;
+            currentSnippet = currentFileSnippets.snippets.get(currentSnippetIndex);
         }
+        pcs.firePropertyChange("currentSet", oldKey, currentKey);
+        pcs.firePropertyChange("currentSnippet", null, currentSnippet);
         
     }
     
+    public String getCurrentSet() {
+        return currentKey;
+    }
+    
     public Snippet getCurrentSnippet() {
-        if (currentKey != null && currentFileIndex != -1) {
-            ArrayList<Snippet> snippets = currentSet.get(currentFiles[currentFileIndex]);
-            return snippets.get(currentSnippetIndex);
-        } else {
-            return null;
+        return currentSnippet;
+    }
+    
+    protected void setCurrentSnippet(Snippet snippet) {
+        Snippet oldCurrentSnippet = currentSnippet;
+        currentSnippet = snippet;
+        pcs.firePropertyChange("currentSnippet", oldCurrentSnippet, snippet);
+    }
+
+    public Snippet firstSnippet() {
+        if (currentKey != null) {
+            currentFileSnippetsIndex = 0;
+            currentFileSnippets = currentSet.get(currentFileSnippetsIndex);
+            currentSnippetIndex = 0;
+            Snippet firstSnippet = currentFileSnippets.snippets.get(currentSnippetIndex);
+            setCurrentSnippet(firstSnippet);
+            return getCurrentSnippet();
         }
+        return null;
     }
     
     public boolean nextSnippetExists() {
         if (currentKey != null) {
-            ArrayList<Snippet> snippets = currentSet.get(currentFiles[currentFileIndex]);
-            if (currentSnippetIndex+1 < snippets.size()) {
+            if (currentSnippetIndex+1 < currentFileSnippets.snippets.size()) {
                 // There is a next snippet in the current file
                 return true;
             }
-            if (currentFileIndex+1 < currentFiles.length) {
+            if (currentFileSnippetsIndex+1 < currentSet.size()) {
                 // There is another file containing the next snippet
                 return true;
             }
@@ -163,16 +235,17 @@ public class SnippetMap {
     
     public Snippet nextSnippet() {
         if (currentKey != null) {
-            ArrayList<Snippet> snippets = currentSet.get(currentFiles[currentFileIndex]);
-            if (currentSnippetIndex+1 < snippets.size()) {
+            if (currentSnippetIndex+1 < currentFileSnippets.snippets.size()) {
                 // There is a next snippet in the current file
-                return snippets.get(++currentSnippetIndex);
+                setCurrentSnippet(currentFileSnippets.snippets.get(++currentSnippetIndex));
+                return getCurrentSnippet();
             }
-            if (currentFileIndex+1 < currentFiles.length) {
+            if (currentFileSnippetsIndex+1 < currentSet.size()) {
                 // The next snippet is contained in the next file
-                snippets = currentSet.get(currentFiles[++currentFileIndex]);
+                currentFileSnippets = currentSet.get(++currentFileSnippetsIndex);
                 currentSnippetIndex = 0;
-                return snippets.get(currentSnippetIndex);
+                setCurrentSnippet(currentFileSnippets.snippets.get(currentSnippetIndex));
+                return getCurrentSnippet();
             }
         }
         return null;
@@ -180,12 +253,11 @@ public class SnippetMap {
     
     public boolean previousSnippetExists() {
         if (currentKey != null) {
-            ArrayList<Snippet> snippets = currentSet.get(currentFiles[currentFileIndex]);
             if (currentSnippetIndex-1 >= 0) {
                 // There is a previous snippet in the current file
                 return true;
             }
-            if (currentFileIndex-1 >= 0) {
+            if (currentFileSnippetsIndex-1 >= 0) {
                 // There is a previous file containing the previous snippet
                 return true;
             }
@@ -195,19 +267,52 @@ public class SnippetMap {
     
     public Snippet previousSnippet() {
         if (currentKey != null) {
-            ArrayList<Snippet> snippets = currentSet.get(currentFiles[currentFileIndex]);
             if (currentSnippetIndex-1 >= 0) {
                 // There is a previous snippet in the current file
-                return snippets.get(--currentSnippetIndex);
+                setCurrentSnippet(currentFileSnippets.snippets.get(--currentSnippetIndex));
+                return getCurrentSnippet();
             }
-            if (currentFileIndex-1 >= 0) {
+            if (currentFileSnippetsIndex-1 >= 0) {
                 // The previous snippet is contained in the previous file
-                snippets = currentSet.get(currentFiles[--currentFileIndex]);
-                currentSnippetIndex = snippets.size() - 1;
-                return snippets.get(currentSnippetIndex);
+                currentFileSnippets = currentSet.get(--currentFileSnippetsIndex);
+                currentSnippetIndex = currentFileSnippets.snippets.size() - 1;
+                setCurrentSnippet(currentFileSnippets.snippets.get(currentSnippetIndex));
+                return getCurrentSnippet();
             }
         }
         return null;      
     }
+    
+     public Snippet lastSnippet() {
+        if (currentKey != null) {
+            currentFileSnippetsIndex = currentSet.size() - 1;
+            currentFileSnippets = currentSet.get(currentFileSnippetsIndex);
+            currentSnippetIndex = currentFileSnippets.snippets.size() - 1;
+            setCurrentSnippet(currentFileSnippets.snippets.get(currentSnippetIndex));
+            return getCurrentSnippet();
+        }
+        return null;
+    }
+     
+    private FileSnippets findFileSnippetsForFile(ArrayList<FileSnippets> fileSnippetList, URL file) {
+        for(FileSnippets fileSnippets : fileSnippetList) {
+            if (fileSnippets.file == file) {
+                return fileSnippets;
+            }
+        }
+        return null;
+    }
+     
+    // data structure for keeping track of a particular snippet set's snippets within one file'
+    private class FileSnippets {
+        public String key;
+        public URL file;
+        public ArrayList<Snippet> snippets;
         
+        public FileSnippets(String key, URL file) {
+            this.key = key;
+            this.file = file;
+            snippets = new ArrayList<Snippet>();
+        }
+    }      
 }

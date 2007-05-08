@@ -176,7 +176,7 @@ public class JFrameDemo extends JPanel {
         //</snip>
     };
     
-    public void stop() {
+    public void pause() {
         //<snip>Hide frame
         frame.setVisible(false);
         //</snip>

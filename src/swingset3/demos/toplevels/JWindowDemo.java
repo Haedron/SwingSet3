@@ -79,7 +79,7 @@ public class JWindowDemo extends JPanel {
         //</snip>
     };
     
-    public void stop() {
+    public void pause() {
         //<snip>Hide window
         window.setVisible(false);
         //</snip>

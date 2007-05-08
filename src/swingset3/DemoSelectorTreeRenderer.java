@@ -27,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.Timer;
@@ -75,8 +76,8 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
     
     public DemoSelectorTreeRenderer() {
 	setHorizontalAlignment(JLabel.LEFT);
-        setClosedIcon(UIManager.getIcon("Tree.closedIcon"));
-	setOpenIcon(UIManager.getIcon("Tree.openIcon"));
+        setClosedIcon(new ImageIcon(DemoSelectorTreeRenderer.class.getResource("resources/images/right_arrow.png")));
+	setOpenIcon(new ImageIcon(DemoSelectorTreeRenderer.class.getResource("resources/images/down_arrow.png")));
  	setTextSelectionColor(UIManager.getColor("Tree.selectionForeground"));
 	setTextNonSelectionColor(UIManager.getColor("Tree.textForeground"));
 	setBackgroundSelectionColor(UIManager.getColor("Tree.selectionBackground"));
@@ -230,21 +231,6 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
         this.selected = isSelected;
 	setText(stringValue);
         
-        if (animationTimer == null) {
-            animationTimer = new Timer(150, new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    DemoSelectorTreeRenderer.this.tree.repaint();
-                }
-            });
-
-            colorRamp = new Color[sliceCount];
-            for(int i = 0; i < sliceCount; i++) {
-                colorRamp[i] = new Color(sliceColor.getRed() + (i*10),
-                        sliceColor.getGreen() + (i*10),
-                        sliceColor.getBlue() + (i*10));
-            }
-        }
-        
         setComponentOrientation(tree.getComponentOrientation());
         setEnabled(tree.isEnabled());
         
@@ -253,6 +239,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
             Object demoNode = node.getUserObject();
             if (demoNode instanceof String) {
                 setText((String)demoNode);
+                setBackground(getBackgroundNonSelectionColor());
                 setIcon(null);
                 setEnabled(false);
                 setToolTipText("not yet implemented");
@@ -299,7 +286,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
             demo = null;
             setBackground(getBackgroundNonSelectionColor());
             setForeground(getTextNonSelectionColor());
-            setIcon(null);
+	    setIcon(null);
             setToolTipText(null);
         }
         return this;
@@ -308,7 +295,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
     public void paint(Graphics g) {
         
         super.paint(g);
-        
+        /*
         if (demo != null) {
             Demo.State demoState = demo.getState();
             int width = getWidth();
@@ -324,6 +311,7 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
                 loopCount = 0;
             }
         }
+         */
          
     }
     
