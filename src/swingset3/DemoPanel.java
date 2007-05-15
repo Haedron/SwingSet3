@@ -9,6 +9,7 @@
 
 package swingset3;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -20,6 +21,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.Arc2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -136,15 +139,25 @@ public class DemoPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (!demoAdded) {
+            Graphics2D g2 = (Graphics2D)g;
             Insets insets = getInsets();
             Rectangle bounds = getBounds(); 
-            int diameter = Math.min(bounds.width - insets.left - insets.right, 
-                    bounds.height - insets.top - insets.bottom);
-            g.setColor(new Color(200,200,200));
-            g.drawOval(insets.left + (bounds.width - insets.left - insets.right - diameter)/2,
-                    insets.top + (bounds.height - insets.top - insets.bottom - diameter)/2,
-                    diameter, diameter);
-        } 
+            int thickness = 24;
+            int diameter = Math.min(bounds.width - insets.left - insets.right - thickness, 
+                    bounds.height - insets.top - insets.bottom - thickness);
+            g2.setColor(new Color(200,200,200));
+            g2.setStroke(new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            
+            int x = insets.left + (bounds.width - insets.left - insets.right - diameter)/2;
+            int y = insets.top + (bounds.height - insets.top - insets.bottom - diameter)/2;
+            g2.drawOval(x, y, diameter, diameter);
+            g2.drawLine(x + (diameter/2), y + (diameter/2),
+                    x + (diameter/2) + 70, insets.top + 70);
+            g2.drawLine(x + (diameter/2), y + (diameter/2),
+                    x + diameter - 70, y + (diameter/2));
+        } else {
+            
+        }
         
     }
     

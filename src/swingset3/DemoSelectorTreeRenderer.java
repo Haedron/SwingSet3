@@ -11,30 +11,12 @@ package swingset3;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Arc2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.Timer;
 import javax.swing.UIManager;
-import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
@@ -44,154 +26,31 @@ import javax.swing.tree.TreeCellRenderer;
  */
 class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
 
-    transient protected Icon closedIcon;
-    transient protected Icon openIcon;
-
-    protected Color textSelectionColor;
-    protected Color textNonSelectionColor;
-    protected Color backgroundSelectionColor;
-    protected Color backgroundNonSelectionColor;
-    protected Color borderSelectionColor;
-    
-    private Color visitedForeground = new Color(85, 145, 90);
-    private Color errorForeground = Color.red;
-    
-    // For demo loading progress animation
-    private int pieDiameter = 20;
-    private int pieOffset = 4;
-    private int sliceCount = 6;
-    private Timer animationTimer; 
-    private Color sliceColor = new Color(110,100,180);
-    private Color colorRamp[];
-    private float loopCount = 0;
-    private Demo animatingDemo;
+    protected Color selectedForeground;
+    protected Color selectedBackground;
+    protected Color unselectedForeground;
+    protected Color unselectedBackground;
+    protected Color visitedForeground; 
+    protected Color errorForeground;
     
     /** Last tree the renderer was painted in. */
-    private JTree tree;
+    protected JTree tree;
 
     protected boolean selected;
     protected boolean hasFocus;
     
-    private Demo demo;    
+    protected Demo demo;    
     
     public DemoSelectorTreeRenderer() {
-	setHorizontalAlignment(JLabel.LEFT);
-        setClosedIcon(new ImageIcon(DemoSelectorTreeRenderer.class.getResource("resources/images/right_arrow.png")));
-	setOpenIcon(new ImageIcon(DemoSelectorTreeRenderer.class.getResource("resources/images/down_arrow.png")));
- 	setTextSelectionColor(UIManager.getColor("Tree.selectionForeground"));
-	setTextNonSelectionColor(UIManager.getColor("Tree.textForeground"));
-	setBackgroundSelectionColor(UIManager.getColor("Tree.selectionBackground"));
-	setBackgroundNonSelectionColor(UIManager.getColor("Tree.textBackground"));
-	setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));
-        /*
-        try {
-            
-            progressImage = ImageIO.read(DemoSelectorTreeRenderer.class.getResourceAsStream(
-                    "resources/images/progress_ring.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-         */
+        setHorizontalAlignment(JLabel.LEFT);
+ 	selectedForeground = UIManager.getColor("Tree.selectionForeground");
+        selectedBackground = UIManager.getColor("Tree.selectionBackground");
+	unselectedForeground = UIManager.getColor("Tree.textForeground");
+	unselectedBackground = UIManager.getColor("Tree.textBackground");
+        visitedForeground = new Color(85, 145, 90);
+        errorForeground = Color.RED;
+	//setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));
         setOpaque(true);
-    }
-    
-    /**
-      * Sets the icon used to represent non-leaf nodes that are expanded.
-      */
-    public void setOpenIcon(Icon newIcon) {
-	openIcon = newIcon;
-    }
-
-    /**
-      * Returns the icon used to represent non-leaf nodes that are expanded.
-      */
-    public Icon getOpenIcon() {
-	return openIcon;
-    }
-
-    /**
-      * Sets the icon used to represent non-leaf nodes that are not expanded.
-      */
-    public void setClosedIcon(Icon newIcon) {
-	closedIcon = newIcon;
-    }
-
-    /**
-      * Returns the icon used to represent non-leaf nodes that are not
-      * expanded.
-      */
-    public Icon getClosedIcon() {
-	return closedIcon;
-    }
-    /**
-      * Sets the color the text is drawn with when the node is selected.
-      */
-    public void setTextSelectionColor(Color newColor) {
-	textSelectionColor = newColor;
-    }
-
-    /**
-      * Returns the color the text is drawn with when the node is selected.
-      */
-    public Color getTextSelectionColor() {
-	return textSelectionColor;
-    }
-
-    /**
-      * Sets the color the text is drawn with when the node isn't selected.
-      */
-    public void setTextNonSelectionColor(Color newColor) {
-	textNonSelectionColor = newColor;
-    }
-
-    /**
-      * Returns the color the text is drawn with when the node isn't selected.
-      */
-    public Color getTextNonSelectionColor() {
-	return textNonSelectionColor;
-    }
-
-    /**
-      * Sets the color to use for the background if node is selected.
-      */
-    public void setBackgroundSelectionColor(Color newColor) {
-	backgroundSelectionColor = newColor;
-    }
-
-
-    /**
-      * Returns the color to use for the background if node is selected.
-      */
-    public Color getBackgroundSelectionColor() {
-	return backgroundSelectionColor;
-    }
-
-    /**
-      * Sets the background color to be used for non selected nodes.
-      */
-    public void setBackgroundNonSelectionColor(Color newColor) {
-	backgroundNonSelectionColor = newColor;
-    }
-
-    /**
-      * Returns the background color to be used for non selected nodes.
-      */
-    public Color getBackgroundNonSelectionColor() {
-	return backgroundNonSelectionColor;
-    }
-
-    /**
-      * Sets the color to use for the border.
-      */
-    public void setBorderSelectionColor(Color newColor) {
-	borderSelectionColor = newColor;
-    }
-
-    /**
-      * Returns the color the border is drawn.
-      */
-    public Color getBorderSelectionColor() {
-	return borderSelectionColor;
     }
 
     /**
@@ -202,17 +61,10 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
      * a <code>FontUIResource</code>, the font becomes <code>font</code>.
      */
     public void setFont(Font font) {
-	if(font instanceof FontUIResource)
+	if (font instanceof FontUIResource)
 	    font = null;
 	super.setFont(font);
     }
-
-    /*
-    public void setBackground(Color color) {
-	if(color instanceof ColorUIResource)
-	    color = null;
-	super.setBackground(color);
-    }*/
     
     public Component getTreeCellRendererComponent(
             JTree tree,
@@ -238,8 +90,9 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
             Object demoNode = node.getUserObject();
             if (demoNode instanceof String) {
+                // Demo class listed, but class doesn't exist yet
                 setText((String)demoNode);
-                setBackground(getBackgroundNonSelectionColor());
+                setBackground(unselectedBackground);
                 setIcon(null);
                 setEnabled(false);
                 setToolTipText("not yet implemented");
@@ -262,16 +115,16 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
                 
                 Demo.State demoState = demo.getState();
                 setBackground(demoState == Demo.State.RUNNING ||
-                        demoState == Demo.State.INITIALIZING? getBackgroundSelectionColor() : 
-                            getBackgroundNonSelectionColor());
-                Color foreground = getTextNonSelectionColor();
+                        demoState == Demo.State.INITIALIZING? selectedBackground : 
+                            unselectedBackground);
+                Color foreground = unselectedForeground;
                 switch(demoState) {
                     case FAILED:
                         foreground = errorForeground;
                         break;
                     case RUNNING:
                     case INITIALIZING:
-                        foreground = getTextSelectionColor();
+                        foreground = selectedForeground;
                         break;
                     case PAUSED:
                         foreground = visitedForeground;
@@ -284,73 +137,13 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
         } else {
             // don't display icon for categories
             demo = null;
-            setBackground(getBackgroundNonSelectionColor());
-            setForeground(getTextNonSelectionColor());
+            setBackground(unselectedBackground);
+            setForeground(unselectedForeground);
 	    setIcon(null);
+            // remind: Need to figure out how to get tooltip text on "category" node
             setToolTipText(null);
         }
         return this;
-    }
-    
-    public void paint(Graphics g) {
-        
-        super.paint(g);
-        /*
-        if (demo != null) {
-            Demo.State demoState = demo.getState();
-            int width = getWidth();
-            int height = getHeight();
-            if (demoState == Demo.State.INITIALIZING) {
-                animatingDemo = demo;
-                animationTimer.start();
-                paintAnimation((Graphics2D)g, width - pieDiameter - 2, (height - pieDiameter)/2);
-            } else if (animatingDemo == demo &&
-                    demoState != Demo.State.INITIALIZING) {
-                animatingDemo = null;
-                animationTimer.stop();
-                loopCount = 0;
-            }
-        }
-         */
-         
-    }
-    
-    private void paintAnimation(Graphics g, int x, int y) {
-        Graphics2D g2 = (Graphics2D)g.create();
-        
-        g2.translate(x,y);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        int angle = 360 / sliceCount;
-        int cycle = (int)(loopCount++ % sliceCount);
-        for(int i = 0; i < sliceCount; i++) {
-            Arc2D.Float arc = new Arc2D.Float(new Rectangle(0,0,pieDiameter,pieDiameter),
-                    (i*angle), angle, Arc2D.PIE);
-            g2.setColor(colorRamp[(cycle+i)%sliceCount]);
-            g2.fill(arc);
-        }
-        g2.dispose();
-
-    }
-
-    private void paintFocus(Graphics g, int x, int y, int w, int h, Color notColor) {
-	Color       focusColor = getBorderSelectionColor();
-
-	if (focusColor != null && (selected)) {
-	    g.setColor(focusColor);
-	    g.drawRect(x, y, w - 1, h - 1);
-	}
-    }
-
-    
-    public Dimension getPreferredSize() {
-        Dimension  prefSize = super.getPreferredSize();
-        
-        if (prefSize != null) {
-            prefSize = new Dimension(prefSize.width + pieOffset + pieDiameter, 
-                    prefSize.height);
-        }
-        return prefSize;
     }
     
     public void validate() {}
@@ -384,18 +177,5 @@ class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
     public void firePropertyChange(String propertyName, float oldValue, float newValue) {}
     public void firePropertyChange(String propertyName, double oldValue, double newValue) {}
     public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
-
-    
-    class BlinkRepainter implements ActionListener {
-        private JTree tree;
-        
-        public BlinkRepainter(JTree tree) {
-        }
-        public void actionPerformed(ActionEvent e) {
-            tree.repaint();
-        }
-    }
-    
-    
     
 }

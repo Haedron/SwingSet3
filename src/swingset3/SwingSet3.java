@@ -14,7 +14,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -28,31 +27,21 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JToggleButton;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -143,10 +132,6 @@ private JPanel vertSplitPane;
     CompositeEffect effect = null;
     JComponent activePanel = null;
     JComponent nextPanel = null;
-
-    // Application actions
-    private Action quitDemoAction;
-    private Action quitAllDemosAction;
     
     private PropertyChangeSupport pcs;
 
@@ -269,7 +254,13 @@ private JPanel vertSplitPane;
 
         // Create demo selection tree
         UIManager.put("Tree.paintLines", Boolean.FALSE);
-        demoSelectorTree = new JTree(demos);
+        // We must set these icons here because they will be initialized when TreeUI installs
+        // and cannot be replaced afterwards (without touching the TreeUI direction)
+        UIManager.put("Tree.expandedIcon", 
+                new ImageIcon(SwingSet3.class.getResource("resources/images/down_arrow.png")));
+        UIManager.put("Tree.collapsedIcon", 
+                new ImageIcon(SwingSet3.class.getResource("resources/images/right_arrow.png")));
+        demoSelectorTree = new DemoSelectorTree(demos);
         demoSelectorTree.setBorder(new EmptyBorder(2,8,2,8));
         demoSelectorTree.setRowHeight(28);
         demoSelectorTree.setShowsRootHandles(false);
@@ -453,9 +444,10 @@ private JPanel vertSplitPane;
                 TreePath selPath = demoTree.getPathForLocation(e.getX(), e.getY());
                 if (e.getClickCount() == 1) {
                     TreeNode node = (TreeNode)selPath.getLastPathComponent();
-                    if (node.isLeaf()) {
-                        // user double-clicked demo in tree, so run it
-                        final Demo demo = (Demo)((DefaultMutableTreeNode)node).getUserObject();
+                    Object demoObject = ((DefaultMutableTreeNode)node).getUserObject();
+                    if (node.isLeaf() && demoObject instanceof Demo) {
+                        // user clicked demo in tree, so run it                       
+                        final Demo demo = (Demo)demoObject;
                         
                         transition.start();
                         
