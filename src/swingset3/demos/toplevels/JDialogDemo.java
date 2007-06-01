@@ -18,18 +18,19 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import swingset3.DemoProperties;
 import swingset3.Utilities;
 
 /**
  *
  * @author aim
  */
+@DemoProperties(
+      value = "JDialog Demo", 
+      category = "Toplevel Containers",
+      description = "Demonstrates JDialog, Swing's top-level dialog container."
+)
 public class JDialogDemo extends JPanel { 
-    
-    // remind: replace with annotation?
-    public static String getShortDescription() {
-        return "Demonstrates JDialog, Swing's top-level dialog container.";
-    }
     
     private JDialog dialog;
     
@@ -37,7 +38,6 @@ public class JDialogDemo extends JPanel {
         
     public JDialogDemo() {        
         initComponents();
-        setToolTipText(getShortDescription());
     }
     
     protected void initComponents() {

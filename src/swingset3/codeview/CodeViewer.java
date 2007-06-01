@@ -28,6 +28,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -105,15 +107,17 @@ import swingset3.Utilities;
  */
 public class CodeViewer extends JPanel {
     private static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(255,255,176); 
-    private static Image SNIPPET_GLYPH;
+    private static BufferedImage SNIPPET_GLYPH;
+    private static Insets CODE_INSETS;
     private static final String NO_SNIPPET_SELECTED = "Select One";
     
     private static final Rectangle scrollRect = new Rectangle(5,5,50,50);
     
     static {
         try {
-            URL url = CodeViewer.class.getResource("resources/images/SnippetArrow.png");
-            SNIPPET_GLYPH = Toolkit.getDefaultToolkit().getImage(url);
+            URL imageURL = CodeViewer.class.getResource("resources/images/SnippetArrow.png");
+            SNIPPET_GLYPH = ImageIO.read(imageURL);
+            CODE_INSETS = new Insets(0, SNIPPET_GLYPH.getWidth(), 0, 0);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -124,9 +128,9 @@ public class CodeViewer extends JPanel {
     private JLabel snippetSetsLabel;
     private JComboBox snippetSetsComboBox;
     private JTabbedPane codeTabbedPane;
-
     private Color highlightColor;
     private Highlighter.HighlightPainter snippetPainter;
+    
 
     // Current code file set
     private URL currentCodeFiles[] = null;
@@ -314,9 +318,7 @@ public class CodeViewer extends JPanel {
         CodeFileInfo.url = sourceFile;
         CodeFileInfo.styled = loadSourceCode(sourceFile);
         CodeFileInfo.textPane = new JEditorPane();
-        //System.out.println("glyph:"+ SNIPPET_GLYPH.getWidth(this));
-        CodeFileInfo.textPane.setMargin(
-                new Insets(0, SNIPPET_GLYPH.getWidth(this), 0, 0));
+        CodeFileInfo.textPane.setMargin(CODE_INSETS);
         CodeFileInfo.veneer = new CodeVeneer(CodeFileInfo);
         Stacker layers = new Stacker(CodeFileInfo.textPane);
         layers.add(CodeFileInfo.veneer, JLayeredPane.POPUP_LAYER);
@@ -417,14 +419,15 @@ public class CodeViewer extends JPanel {
     
     public void clearAllSnippetHighlights() {
         if (currentCodeFilesInfo != null) {
-            
+            snippetMap.setCurrentSet(null);
             for(CodeFileInfo code : currentCodeFilesInfo) {
                 if (code != null && code.textPane != null) {
                     Highlighter highlighter = code.textPane.getHighlighter();
                     highlighter.removeAllHighlights();
+                    code.textPane.repaint();
+                    code.veneer.repaint();
                 }
             }
-            snippetMap.setCurrentSet(null);
         }
     }
     
@@ -481,8 +484,8 @@ public class CodeViewer extends JPanel {
     }
     
     protected String getCurrentSnippetKey() {
-        Snippet snippet = getCurrentSnippet();
-        return snippet != null? snippet.key : NO_SNIPPET_SELECTED;
+        String key = snippetMap.getCurrentSet();
+        return key != null? key : NO_SNIPPET_SELECTED;
     }
     
     protected Snippet getCurrentSnippet() {
@@ -630,8 +633,7 @@ public class CodeViewer extends JPanel {
         protected void paintComponent(Graphics g) {
 
             String snippetKey = getCurrentSnippetKey();
-            
-            if (snippetKey != NO_SNIPPET_SELECTED && snippetMap.getCurrentSnippet() != null) { 
+            if (snippetKey != NO_SNIPPET_SELECTED) { 
                 // Count total number of snippets for key
                 int snippetTotal = 0;
                 int snippetIndex = 0;

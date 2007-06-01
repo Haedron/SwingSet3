@@ -409,7 +409,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
 		    if ((p0.y + p0.height) != p1.y) {
 			g.fillRect(alloc.x, p0.y + p0.height, alloc.width, 
 				   p1.y - (p0.y + p0.height));
-		    }             
+		    }  
 		    g.fillRect(alloc.x, p1.y, (p1.x - alloc.x), p1.height);
 		}
 	    } catch (BadLocationException e) {
@@ -450,10 +450,11 @@ public class SnippetHighlighter extends LayeredHighlighter {
 		else {
 		    alloc = bounds.getBounds();
 		}
-                // Change to get highlight to paint full width of text pane
-		//g.fillRect(alloc.x, alloc.y, alloc.width, alloc.height);
-                alloc.width = c.getWidth() - alloc.x;
-                g.fillRect(alloc.x, alloc.y, alloc.width, alloc.height);
+                // For CodeViewer Snippet painting, this is the paint block that is called.
+                // We need to reset x to the left edge of the text pane to ensure the highlight
+                // paints underneath the snippet glyph;  we also adjust the width to paint the
+                // full width of the text pane, rather than just to the end of line.
+                g.fillRect(alloc.x, alloc.y, c.getWidth() - alloc.x, alloc.height);
 		return alloc;
 	    }
 	    else {
@@ -465,6 +466,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
                                                    bounds);
                     Rectangle r = (shape instanceof Rectangle) ?
                                   (Rectangle)shape : shape.getBounds();
+                                        System.out.println("fillRect7=0");
                     //g.fillRect(r.x, r.y, r.width, r.height);
                     g.fillRect(0, r.y, c.getWidth(), r.height);
                     return r;

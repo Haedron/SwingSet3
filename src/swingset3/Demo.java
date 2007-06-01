@@ -27,6 +27,22 @@ import javax.swing.JLabel;
 public class Demo {
     
     public enum State { UNINITIALIZED, INITIALIZING, INITIALIZED, RUNNING, PAUSED, FAILED }
+
+    public @interface Name {
+        String value();
+    }
+    
+    public @interface Category {
+        String value();
+    }
+    
+    public @interface Description {
+        String value();
+    }
+    
+    public @interface SourceFiles {
+        String[] sourceFiles();
+    }
     
     private static final String imageExtensions[] = {".gif", ".png", ".jpg"};
     
@@ -70,13 +86,16 @@ public class Demo {
         return nameBuffer.toString();
     }
     
-    protected Class demoClass;
+    protected Class<?> demoClass;
     protected String name;
     protected String category;
+    protected String shortDescription; // used for tooltips
+    protected String iconPath;
+    protected Icon icon;
+    protected String[] sourceFilePaths;
+    protected URL[] sourceFiles;
     
     protected JComponent component;
-    protected Icon icon = null;
-    protected URL[] sourceFiles = null;
     
     protected State state;
     
@@ -84,18 +103,29 @@ public class Demo {
     
     private PropertyChangeSupport pcs;
     
-    public Demo(Class demoClass) {
-        this(demoClass, 
-             deriveCategoryFromPackageName(demoClass), 
-             deriveNameFromClassName(demoClass));
-    }
-    
-    public Demo(Class demoClass, String category, String name) {
+    public Demo(Class<?> demoClass) {
         this.demoClass = demoClass;
-        this.category = category;
-        this.name = name;
-        this.pcs = new PropertyChangeSupport(this);
-        this.state = State.UNINITIALIZED;
+
+        initializeProperties();
+    }
+            
+    protected void initializeProperties() {
+        
+        // First look for DemoProperties annotation if it exists
+        DemoProperties properties = demoClass.getAnnotation(DemoProperties.class);
+        if (properties != null) {
+            this.name = properties.value();
+            this.category = properties.category();
+            this.shortDescription = properties.description();
+            this.iconPath = properties.iconFile();
+            this.sourceFilePaths = properties.sourceFiles();
+        } else {
+            this.name = deriveNameFromClassName(demoClass);
+            this.category = deriveCategoryFromPackageName(demoClass);
+            this.shortDescription = "No demo description, run it to find out...";            
+        }
+        state = State.UNINITIALIZED;
+        pcs = new PropertyChangeSupport(this);
     }
     
     public Class getDemoClass() {
@@ -112,14 +142,17 @@ public class Demo {
     
     public Icon getIcon() {
         if (icon == null) {
-            for(String ext : imageExtensions) {
-                icon = getIconFromPath(getIconImagePath(ext));
-                if (icon != null) {
-                    break;
+            if (iconPath != null && !iconPath.equals("")) {
+                // icon path was specified in DemoProperties annotation
+                icon = getIconFromPath(iconPath);
+            } else {
+                // Look for icon with same name as demo class
+                for(String ext : imageExtensions) {
+                    icon = getIconFromPath(getIconImagePath(ext));
+                    if (icon != null) {
+                        break;
+                    }
                 }
-            }
-            if (icon == null) {
-                icon = getIconFromPath(getBeanInfoIconPath());
             }
         }
         return icon;
@@ -129,13 +162,6 @@ public class Demo {
         // by default look for an image with the same name as the demo class
         return "resources/images/" + 
                 demoClass.getSimpleName() + extension;
-    }
-    
-    protected String getBeanInfoIconPath() {
-        // look for standard Swing component beaninfo icon
-        return "resources/images/" + 
-                getClass().getSimpleName().replaceFirst("Demo", "Color32") + 
-                ".gif";
     }
     
     private Icon getIconFromPath(String path) {
@@ -148,26 +174,6 @@ public class Demo {
     }
     
     public String getShortDescription() {
-        String shortDescription = null;
-        
-        // look for static getShortDescription method on demo class
-        try {
-            Method getShortDescriptionMethod = demoClass.getMethod("getShortDescription", (Class[])null);
-            shortDescription = (String)getShortDescriptionMethod.invoke(component, (Object[])null);
-        } catch (NoSuchMethodException nsme) {
-            // okay, no getShortDescription method exists
-        } catch (IllegalAccessException iae) {
-            System.err.println(iae);
-            iae.printStackTrace();
-        } catch (java.lang.reflect.InvocationTargetException ite) {
-            System.err.println(demoClass.getName() +
-                    " getShortDescription method failed: " + ite.getMessage());
-            ite.printStackTrace();
-        }
-        if (shortDescription == null) {
-            // last resort: try inheriting tooltip if component is instantiated
-            shortDescription =  component != null? component.getToolTipText() : null;
-        }
         return shortDescription;
     }
     
@@ -183,32 +189,28 @@ public class Demo {
     
     public URL[] getSourceFiles() {
         if (sourceFiles == null) {
-            // first look for getSourceFiles method
-            try {
-                Method getSourceFilesMethod = demoClass.getMethod("getSourceFiles", (Class[])null);
-                sourceFiles = (URL[])getSourceFilesMethod.invoke(component, (Object[])null);
-            } catch (NoSuchMethodException nsme) {
-                // okay, no getSourceFiles method exists
-            } catch (IllegalAccessException iae) {
-                System.err.println(iae);
-                iae.printStackTrace();
-            } catch (java.lang.reflect.InvocationTargetException ite) {
-                System.err.println(demoClass.getName() +
-                        " getSourceFiles method failed: " + ite.getCause());
-                ite.printStackTrace();
-            }
-            // by default return just the demo class's source file url
-            if (sourceFiles == null) {
-                sourceFiles = new URL[1];
-                String className = demoClass.getName();
+            if (sourceFilePaths != null && !sourceFilePaths.equals("")) {
+                initSourceFiles(sourceFilePaths);
                 
-                ClassLoader cl = getClass().getClassLoader();
-                sourceFiles[0] = cl.getResource("sources/" +
-                    className.replace(".", "/") + ".java");
-                
+            } else {
+                // by default return just the demo class's source file url
+                sourceFilePaths = new String[1];
+                sourceFilePaths[0] = "sources/" +
+                        demoClass.getName().replace(".", "/") + ".java";
+                initSourceFiles(sourceFilePaths);               
             }
         }
         return sourceFiles;
+    }
+    
+    protected void initSourceFiles(String sourceFilePaths[]) {
+        sourceFiles = new URL[sourceFilePaths.length];
+        for(int i = 0; i < sourceFilePaths.length; i++) {
+            sourceFiles[i] = getClass().getClassLoader().getResource(sourceFilePaths[i]);
+            if (sourceFiles[i] == null) {
+                System.err.println("warning: unable to load source file: " + sourceFilePaths[i]);
+            }
+        }
     }
     
     void setDemoComponent(JComponent component) {
@@ -223,7 +225,6 @@ public class Demo {
         JComponent old = this.component;
         this.component = component;
         
-        System.out.println(this.getName() + ":setDemoComponent: " + this.component);
         setState(component != null? State.INITIALIZED : State.UNINITIALIZED);
         pcs.firePropertyChange("demoComponent", old, component);
 

@@ -37,11 +37,21 @@ import javax.swing.text.Element;
 import javax.swing.text.Position;
 import javax.swing.text.View;
 
+import swingset3.DemoProperties;
 
 /**
  *
  * @author aim
  */
+@DemoProperties(
+      value = "JButton Demo", 
+      category = "Controls",
+      description = "Demonstrates JButton, Swing's push button component.",
+      sourceFiles = {
+        "sources/swingset3/demos/controls/JButtonDemo.java",
+        "sources/swingset3/demos/controls/Hyperlink.java"
+      }
+)
 public class JButtonDemo extends JPanel {
 
     // remind: replace with annotation?

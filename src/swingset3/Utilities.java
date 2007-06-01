@@ -9,11 +9,16 @@
 
 package swingset3;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import javax.swing.JFrame;
@@ -94,6 +99,25 @@ public class Utilities implements SwingConstants {
     public static String getURLFileName(URL url) {
         String path = url.getPath();
         return path.substring(path.lastIndexOf("/") + 1);
+    }
+    
+    public static BufferedImage createCompatibleImage(int width, int height) {
+        
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().
+                    getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height);
+
+    }
+    
+    public static BufferedImage createGradientImage(int width, int height, Color gradient1, Color gradient2) {
+                   
+            BufferedImage gradientImage = Utilities.createCompatibleImage(width, height);
+            GradientPaint gradient = new GradientPaint(0, 0, gradient1, 0, height, gradient2, false);
+            Graphics2D g2 = (Graphics2D)gradientImage.getGraphics();
+            g2.setPaint(gradient);
+            g2.fillRect(0, 0, width, height);
+            g2.dispose();
+            
+            return gradientImage;
     }
     
     private static void testSetToplevelLocation(Window base, int relativePosition) {        

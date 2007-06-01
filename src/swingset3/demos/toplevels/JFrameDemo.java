@@ -28,6 +28,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import swingset3.DemoProperties;
 import swingset3.Utilities;
 import swingset3.demos.toplevels.BusyGlass;
 
@@ -35,6 +36,16 @@ import swingset3.demos.toplevels.BusyGlass;
  *
  * @author aim
  */
+@DemoProperties(
+      value = "JFrame Demo", 
+      category = "Toplevel Containers",
+      description = "Demonstrates JFrame, Swing's top-level primary window container.",
+      sourceFiles = {
+        "sources/swingset3/demos/toplevels/JFrameDemo.java",
+        "sources/swingset3/demos/toplevels/BusyGlass.java",
+        "sources/swingset3/Utilities.java"       
+      }
+)
 public class JFrameDemo extends JPanel {
     //<snip>Ensure system menubar is used on Mac OSX
     static {
@@ -43,31 +54,6 @@ public class JFrameDemo extends JPanel {
         System.setProperty("apple.laf.useScreenMenuBar", "true");              
     }
     //</snip>
-
-    // remind: replace with annotation?
-    public static String getShortDescription() {
-        return "Demonstrates JFrame, Swing's top-level primary window container.";
-    }
-
-    // remind: replace with annotation?
-    public static URL[] getSourceFiles() {
-        URL sourceFiles[] = new URL[3];
-        String className = JFrameDemo.class.getName();
-        
-        ClassLoader cl = JFrameDemo.class.getClassLoader();
-        
-        String sourceFileName = "sources/" +
-             className.replace(".", "/") + ".java";
-        sourceFiles[0] = cl.getResource("sources/" +
-             className.replace(".", "/") + ".java");
-        System.out.println("sourceFile="+sourceFileName);
-        System.out.println(sourceFiles[0]);
-        sourceFiles[1] = cl.getResource("sources/swingset3/Utilities.java");
-        System.out.println(sourceFiles[1]);
-        sourceFiles[2] = cl.getResource("sources/swingset3/demos/toplevels/BusyGlass.java");
-        System.out.println(sourceFiles[2]);
-        return sourceFiles;
-    }
     
     // Panel components
     private JButton showButton;
@@ -78,7 +64,6 @@ public class JFrameDemo extends JPanel {
             
     public JFrameDemo() {        
         initComponents();
-        setToolTipText(getShortDescription());
     }
 
     protected void initComponents() {

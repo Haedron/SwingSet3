@@ -8,9 +8,11 @@ package swingset3;
 
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -26,7 +28,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -38,7 +39,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
@@ -60,9 +60,24 @@ import swingset3.codeview.CodeViewer;
  *
  * @author  aim
  */
-public class SwingSet3  {
+public class SwingSet3 extends JFrame  {
+
+    public static final String CONTROL_VERY_LIGHT_SHADOW_COLOR = "controlVeryLightShadowColor";
+    public static final String CONTROL_LIGHT_SHADOW_COLOR = "controlLightShadowColor";
+    public static final String CONTROL_MID_SHADOW_COLOR = "controlMidShadowColor";
+    public static final String CONTROL_VERY_DARK_SHADOW_COLOR = "controlVeryDarkShadowColor";
+    public static final String CONTROL_DARK_SHADOW_COLOR = "controlDarkShadowColor";
+
+    private static final int DEMO_WIDTH = 600;
+    private static final int DEMO_HEIGHT = 420;
+    private static final int TREE_WIDTH = 220;
+    private static final int SOURCE_HEIGHT = 300;
+    private static final Insets UPPER_PANEL_INSETS = new Insets(12,12,8,12);
+    private static final Insets TREE_INSETS = new Insets(2,8,2,8);
+    private static final Insets SOURCE_PANE_INSETS = new Insets(4,8,8,8);
     
     // remind: initalize demos frome exterior list (?)
+    //remind(aim): change to load default set of demo jars
     private static String demoClassNames[] = {
             "swingset3.demos.toplevels.JFrameDemo",
             "swingset3.demos.toplevels.JDialogDemo",
@@ -91,14 +106,7 @@ public class SwingSet3  {
     
     public static boolean onMac() {
         return System.getProperty("os.name").equals("Mac OS X");
-    }
-    
-
-    private static final int DEMO_WIDTH = 600;
-    private static final int DEMO_HEIGHT = 420;
-    private static final int TREE_WIDTH = 220;
-    private static final int SOURCE_HEIGHT = 300;
-    
+    }        
     
     // Application models
     private DefaultMutableTreeNode demos; /* all available demos */    
@@ -106,12 +114,11 @@ public class SwingSet3  {
     private Demo currentDemo;
 
     // GUI components
-    private JFrame frame;
-    //private JSplitPane vertSplitPane;
-private JPanel vertSplitPane;
-    private JPanel topPanel;
+    //private JSplitPane vertSplitPane; //JSplitPane has trouble with animation
+    private JPanel vertSplitPane;
+    private JPanel upperPanel;
     private JTree demoSelectorTree;
-    private JLabel runningDemoPlaceholder;
+    private JComponent runningDemoPlaceholder;
     private CollapsiblePanel sourceCodePane;
     private CodeViewer codeViewer;    
     private JCheckBoxMenuItem sourceCodeCheckboxItem;
@@ -121,31 +128,29 @@ private JPanel vertSplitPane;
     // GUI state
     private int sourcePaneLocation;
     private int dividerSize;
-    private int codeViewerHeight;
-    
+    private int codeViewerHeight;    
     private boolean sourceVisible = true;
     
     // Animation
-    Animator animator = new Animator(1000);
-    ScreenTransition transition = null;
-    LoadAnimator loadAnimator = new LoadAnimator();
-    CompositeEffect effect = null;
-    JComponent activePanel = null;
-    JComponent nextPanel = null;
+    Animator animator;
+    ScreenTransition transition;
+    LoadAnimator loadAnimator;
+    CompositeEffect effect;
+    ScaleMoveIn scaler;
+    JComponent activePanel;
+    JComponent nextPanel;
     
     private PropertyChangeSupport pcs;
-
     
     public SwingSet3() {
         this(getDefaultDemoClassNames());
     }
     
     public SwingSet3(List<String>demoClassNames) {
-        
+        super("SwingSet3");
         try {
-            if (!onMac()) {
-                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            }
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            
         } catch (Exception ex) {
         }
         
@@ -156,24 +161,13 @@ private JPanel vertSplitPane;
         demoCache = new HashMap();
  
         // Create GUI
-        initComponents();  
+        initColorPalette();
+        initComponents(); 
+        initAnimation();
         expandAll(new TreePath(demos)); // expand all demos in tree
         
-        // Initialize Animation
-        // Set up non-linear timing behavior on animator. Accelerate for
-        // first 20%, decelerate for final 30%.
-        animator.setAcceleration(.2f);
-        animator.setDeceleration(.3f);
-        // Create the screen transition. It uses 'this' as the container that
-        // we are transitioning, 'this' as the target for the callback
-        // 'setupNextScreen()', and animator as the underlying animation.
-        transition = new ScreenTransition(topPanel, loadAnimator, animator);
-
-        
-        // Show GUI
-        frame.setVisible(true);
     }
-
+    
     protected void initDemos(List<String> demoClassNamesList) {
         demos = new DefaultMutableTreeNode("Components");  
         
@@ -181,7 +175,7 @@ private JPanel vertSplitPane;
                 new DemoPropertyChangeListener();
         
         for(String demoClassName : demoClassNamesList) {
-            Class demoClass = null;
+            Class<?> demoClass = null;
             Demo demo = null;
             String category = null;
             try {
@@ -231,10 +225,28 @@ private JPanel vertSplitPane;
         }
     }
     
+    protected void initColorPalette() {
+        // Color palette algorithm courtesy of Jasper Potts
+        Color controlColor = UIManager.getColor("control");
+        float[] controlHSB = Color.RGBtoHSB(
+                controlColor.getRed(), controlColor.getGreen(),
+                controlColor.getBlue(), null);
+	UIManager.put(CONTROL_VERY_LIGHT_SHADOW_COLOR, Color.getHSBColor(controlHSB[0], controlHSB[1],
+                controlHSB[2] - 0.02f));
+        UIManager.put(CONTROL_LIGHT_SHADOW_COLOR, Color.getHSBColor(controlHSB[0], controlHSB[1],
+                controlHSB[2] - 0.06f));
+        UIManager.put(CONTROL_MID_SHADOW_COLOR, Color.getHSBColor(controlHSB[0], controlHSB[1],
+                controlHSB[2] - 0.16f));
+        UIManager.put(CONTROL_VERY_DARK_SHADOW_COLOR, Color.getHSBColor(controlHSB[0], controlHSB[1],
+                controlHSB[2] - 0.5f));
+        UIManager.put(CONTROL_DARK_SHADOW_COLOR, Color.getHSBColor(controlHSB[0], controlHSB[1],
+                controlHSB[2] - 0.32f));
+
+    }  
+    
     protected void initComponents() {
-        // Create toplevel frame
-        frame = new JFrame("SwingSet3");
-        frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        // Set frame properties
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         createMenuBar();
         
@@ -243,14 +255,14 @@ private JPanel vertSplitPane;
         // Temporarily replaced splitpane with panel because animation fails with splitpane
         vertSplitPane = new JPanel();
         vertSplitPane.setLayout(new BorderLayout());
-        frame.add(vertSplitPane);
+        add(vertSplitPane);
         
         // Create top panel to hold demo-selection-tree and current demo
-        topPanel = new JPanel();
-        topPanel.setLayout(new BorderLayout());
-        //vertSplitPane.setTopComponent(topPanel);
-        topPanel.setBorder(new EmptyBorder(12,12,8,12));
-        vertSplitPane.add(topPanel, BorderLayout.CENTER);
+        upperPanel = new JPanel();
+        upperPanel.setLayout(new BorderLayout());
+        //vertSplitPane.setTopComponent(upperPanel);
+        upperPanel.setBorder(new EmptyBorder(UPPER_PANEL_INSETS));
+        vertSplitPane.add(upperPanel, BorderLayout.CENTER);
 
         // Create demo selection tree
         UIManager.put("Tree.paintLines", Boolean.FALSE);
@@ -261,30 +273,27 @@ private JPanel vertSplitPane;
         UIManager.put("Tree.collapsedIcon", 
                 new ImageIcon(SwingSet3.class.getResource("resources/images/right_arrow.png")));
         demoSelectorTree = new DemoSelectorTree(demos);
-        demoSelectorTree.setBorder(new EmptyBorder(2,8,2,8));
+                //UIManager.getColor("Tree.background"),
+                //UIManager.getColor(CONTROL_MID_SHADOW_COLOR));
+        demoSelectorTree.setBorder(new EmptyBorder(TREE_INSETS));
         demoSelectorTree.setRowHeight(28);
-        demoSelectorTree.setShowsRootHandles(false);
         demoSelectorTree.addMouseListener(new DemoTreeClickListener());
-        demoSelectorTree.setCellRenderer(new DemoSelectorTreeRenderer());
-        ToolTipManager.sharedInstance().registerComponent(demoSelectorTree);
         JScrollPane scrollPane = new JScrollPane(demoSelectorTree);
         scrollPane.setPreferredSize(new Dimension(TREE_WIDTH,DEMO_HEIGHT)); // wide enough to avoid horiz scrollbar
         scrollPane.setMinimumSize(new Dimension(TREE_WIDTH,DEMO_HEIGHT));
-        topPanel.add(scrollPane, BorderLayout.WEST);
+        upperPanel.add(scrollPane, BorderLayout.WEST);
 
 
         // Create pane to contain running demo
-        runningDemoPlaceholder = new JLabel(
-                new ImageIcon(SwingSet3.class.getResource("resources/images/splash3.png")));
-        runningDemoPlaceholder.setPreferredSize(new Dimension(DEMO_WIDTH, DEMO_HEIGHT));
-        topPanel.add(runningDemoPlaceholder, BorderLayout.CENTER);
+        runningDemoPlaceholder = new IntroPanel(DEMO_WIDTH, DEMO_HEIGHT);
+        upperPanel.add(runningDemoPlaceholder, BorderLayout.CENTER);
         activePanel = runningDemoPlaceholder;
                 
         // Create collapsible source code pane 
         codeViewer = new CodeViewer();
         codeViewer.setPreferredSize(new Dimension(TREE_WIDTH+DEMO_WIDTH, SOURCE_HEIGHT));
         sourceCodePane = new CollapsiblePanel("Demo Source Code", codeViewer);
-        sourceCodePane.setBorder(new EmptyBorder(4,8,8,8));
+        sourceCodePane.setBorder(new EmptyBorder(SOURCE_PANE_INSETS));
         sourceCodePane.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getPropertyName().equals("expanded")) {
@@ -292,21 +301,9 @@ private JPanel vertSplitPane;
                 }
             }
         });
-        addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
-                if (event.getPropertyName().equals("sourceCodeVisible")) {
-                    boolean sourceVisible = ((Boolean)event.getNewValue()).booleanValue();
-                    if (sourceVisible) {
-                        // update codeViewer in case current demo changed while 
-                        // source was invisible                    
-                        codeViewer.setSourceFiles(currentDemo != null? 
-                            currentDemo.getSourceFiles() : null);
-                    }
-                    sourceCodePane.setExpanded(sourceVisible);
-                }
-            }
-        });
         vertSplitPane.add(sourceCodePane, BorderLayout.SOUTH);
+        
+        addPropertyChangeListener(new SourceVisibilityListener());
         
         //sourcePaneLocation = vertSplitPane.getDividerLocation();
         //dividerSize = vertSplitPane.getDividerSize();        
@@ -316,7 +313,7 @@ private JPanel vertSplitPane;
         popup.add(new EditPropertiesAction());
         popup.add(new ViewCodeSnippetAction());
 
-        frame.pack();        
+        pack();        
     }
     
     protected void createMenuBar() {
@@ -336,7 +333,7 @@ private JPanel vertSplitPane;
         viewMenu.setText("View");
         viewMenu.setName("viewMenu");
         sourceCodeCheckboxItem = new JCheckBoxMenuItem();
-        sourceCodeCheckboxItem.setSelected(true);
+        sourceCodeCheckboxItem.setSelected(isSourceCodeVisible());
         sourceCodeCheckboxItem.setText("Source Code");
         sourceCodeCheckboxItem.setName("sourceCodeCheckboxItem");
         sourceCodeCheckboxItem.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -347,7 +344,39 @@ private JPanel vertSplitPane;
         viewMenu.add(sourceCodeCheckboxItem);
         menubar.add(viewMenu);
 
-        frame.setJMenuBar(menubar);
+        setJMenuBar(menubar);
+    }
+    
+    protected void initAnimation() {
+        loadAnimator = new LoadAnimator();
+        
+        // Initialize Animation
+        // Set up non-linear timing behavior on animator. Accelerate for
+        // first 20%, decelerate for final 30%.
+        // first animation is 500ms longer, because it needs that warmup adjustment
+        animator = new Animator(1500);
+        animator.setAcceleration(.2f);
+        animator.setDeceleration(.3f);
+        // Create the screen transition. It uses 'this' as the container that
+        // we are transitioning, 'this' as the target for the callback
+        // 'setupNextScreen()', and animator as the underlying animation.
+        transition = new ScreenTransition(upperPanel, loadAnimator, animator);         
+
+    }
+    
+    private TreePath getPathForDemo(Demo demo) {
+        DefaultMutableTreeNode nodes[] = new DefaultMutableTreeNode[3];
+        nodes[0] = demos;
+        for(int i = 0; i < nodes[0].getChildCount(); i++) {
+            nodes[1] = (DefaultMutableTreeNode)nodes[0].getChildAt(i);
+            for(int j = 0; j < nodes[1].getChildCount(); j++) {
+                nodes[2] = (DefaultMutableTreeNode)nodes[1].getChildAt(j);
+                if (nodes[2].getUserObject() == demo) {
+                    return new TreePath(nodes);
+                }
+            }
+        }
+        return null;
     }
     
     private void expandToCategories(TreeNode top) {    
@@ -397,7 +426,8 @@ private JPanel vertSplitPane;
         if (currentDemo == demo) {
             return; // already there
         }
-        Demo oldCurrentDemo = currentDemo;
+        Demo oldCurrentDemo = currentDemo;        
+
         if (oldCurrentDemo != null) {
             oldCurrentDemo.pause();
         }
@@ -413,14 +443,33 @@ private JPanel vertSplitPane;
             } else {
                 currentDemo.start();
             }
+            if (nextPanel != null) {
+                animator.setDuration(1000);
+            }
             nextPanel = demoPanel;
+            TreePath demoPath = getPathForDemo(demo);
+            Rectangle nodeBounds = demoSelectorTree.getRowBounds(
+                    demoSelectorTree.getRowForPath(demoPath));
+            transition.start();    
+                    
+            // Now, create a new ScaleMoveIn effect based on the button location
+            scaler = new ScaleMoveIn();
+            scaler.setStartLocation(nodeBounds.x + nodeBounds.width/2,
+                                nodeBounds.y + nodeBounds.height/2);
+            // Now, create a Composite effect that combines our custom effect
+            // with a standard FadeIn effect
+            
+            FadeIn fader = new FadeIn();
+            effect = new CompositeEffect(scaler);
+            effect.addEffect(fader);
             //sourcePaneLocation = vertSplitPane.getDividerLocation();
+
             EffectsManager.setEffect(nextPanel, effect, EffectsManager.TransitionType.APPEARING);
-            frame.validate();
+            validate();
         }
 
         if (currentDemo == null) {
-            topPanel.add(BorderLayout.CENTER, runningDemoPlaceholder);
+            upperPanel.add(BorderLayout.CENTER, runningDemoPlaceholder);
         }
         
         if (isSourceCodeVisible()) {
@@ -434,7 +483,18 @@ private JPanel vertSplitPane;
         return currentDemo;
     }
 
-
+    private void registerPopups(JComponent component) {
+        Component children[] = component.getComponents();
+        for(Component child: children) {
+            if (child instanceof JComponent) {
+                registerPopups((JComponent)child);
+            }
+        }
+        String snippetKey = (String)component.getClientProperty("snippetKey");
+        if (snippetKey != null) {
+            component.setComponentPopupMenu(popup);
+        }
+    }    
     
     class DemoTreeClickListener extends MouseAdapter {
         public void mousePressed(MouseEvent e) {
@@ -446,36 +506,17 @@ private JPanel vertSplitPane;
                     TreeNode node = (TreeNode)selPath.getLastPathComponent();
                     Object demoObject = ((DefaultMutableTreeNode)node).getUserObject();
                     if (node.isLeaf() && demoObject instanceof Demo) {
-                        // user clicked demo in tree, so run it                       
+                        // user clicked demo in tree, so run it
                         final Demo demo = (Demo)demoObject;
+                                                
+                        //Rectangle nodeBounds = demoTree.getRowBounds(selectedRow);
                         
-                        transition.start();
-                        
-                        // The following code sets up a custom effect, based on the
-                        // location of the button clicked
-                        // If you comment it out, you will just get the standard
-                        // fade-in effect
-                        
-                        // First, get the button center
-                        
-                        Rectangle nodeBounds = demoTree.getRowBounds(selectedRow);
-                        Point nodeCenter = new Point(
-                                nodeBounds.x + nodeBounds.width/2,
-                                nodeBounds.y + nodeBounds.height/2);
-                        
-                        // Now, create a new ScaleMoveIn effect based on the button location
-                        ScaleMoveIn scaler = new ScaleMoveIn(nodeCenter.x, nodeCenter.y);
-                        
-                        // Now, create a Composite effect that combines our custom effect
-                        // with a standard FadeIn effect
-                        FadeIn fader = new FadeIn();
-                        effect = new CompositeEffect(scaler);
-                        effect.addEffect(fader);
+                        //scaler.setStartLocation(nodeBounds.x + nodeBounds.width/2,
+                                //nodeBounds.y + nodeBounds.height/2);
                         
                         // Finally, tell the EffectsManager to use our composite effect for
                         // the component that will be appearing during the transition
-                        setCurrentDemo(demo);
-
+                        setCurrentDemo(demo);                       
                     }
                 }
             }
@@ -503,15 +544,11 @@ private JPanel vertSplitPane;
          * ColoredPanel and add the new one selected
          */
         public void setupNextScreen() {
-            topPanel.remove(activePanel);
-            topPanel.add(nextPanel, BorderLayout.CENTER);
+            upperPanel.remove(activePanel);
+            upperPanel.add(nextPanel, BorderLayout.CENTER);
             activePanel = nextPanel;
             //vertSplitPane.setDividerLocation(sourcePaneLocation);
-            System.out.println("topPanel pref="+topPanel.getPreferredSize());
-        }
-        
-        
-        
+        }        
     }
            
     /**
@@ -522,7 +559,15 @@ private JPanel vertSplitPane;
         
         private Point startLocation = new Point();
         
+        public ScaleMoveIn() {
+            this(0,0);
+        }
+        
         public ScaleMoveIn(int x, int y) {
+            setStartLocation(x, y);
+        }
+        
+        public void setStartLocation(int x, int y) {
             startLocation.x = x;
             startLocation.y = y;
         }
@@ -547,6 +592,23 @@ private JPanel vertSplitPane;
             animator.addTarget(ps);
             super.init(animator, parentEffect);
         }
+    }
+
+    // registered on swingset to track source code visibility property
+    class SourceVisibilityListener implements PropertyChangeListener {       
+        public void propertyChange(PropertyChangeEvent event) {
+            if (event.getPropertyName().equals("sourceCodeVisible")) {
+                boolean sourceVisible = ((Boolean)event.getNewValue()).booleanValue();
+                if (sourceVisible) {
+                    // update codeViewer in case current demo changed while
+                    // source was invisible
+                    codeViewer.setSourceFiles(currentDemo != null?
+                        currentDemo.getSourceFiles() : null);
+                }
+                sourceCodePane.setExpanded(sourceVisible);
+                sourceCodeCheckboxItem.setSelected(sourceVisible);
+            }
+        }        
     }
     
     // registered on Demo to detect when the demo component is instantiated.
@@ -609,30 +671,7 @@ private JPanel vertSplitPane;
             
         }
     }
-    
-    public class SourceVisibilityListener implements PropertyChangeListener {       
-        public void propertyChange(PropertyChangeEvent event) {
-            if (event.getPropertyName().equals("sourceCodeVisible")) {
-                boolean sourceVisible = ((Boolean)event.getNewValue()).booleanValue();
-                sourceCodePane.setExpanded(sourceVisible);
-            } 
-        }
-        
-    }
-       
-    
-    private void registerPopups(JComponent component) {
-        Component children[] = component.getComponents();
-        for(Component child: children) {
-            if (child instanceof JComponent) {
-                registerPopups((JComponent)child);
-            }
-        }
-        String snippetKey = (String)component.getClientProperty("snippetKey");
-        if (snippetKey != null) {
-            component.setComponentPopupMenu(popup);
-        }
-    }    
+   
 
     private static ArrayList<String> getDefaultDemoClassNames() {
         ArrayList demoClassNamesList = new ArrayList<String>();
@@ -659,6 +698,9 @@ private JPanel vertSplitPane;
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        Splash splash = new Splash();
+        final Rectangle splashBounds = splash.getBounds();
+        
         final ArrayList<String> demoList = new ArrayList();
         ArrayList<String> userDemoList = null;
         boolean augment = false;
@@ -686,6 +728,13 @@ private JPanel vertSplitPane;
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 SwingSet3 swingset = new SwingSet3(demoList);
+                
+                // Show GUI
+                /*        
+                swingset.setLocation(splashBounds.x - (DEMO_WIDTH - splashBounds.width)/2 - TREE_WIDTH - UPPER_PANEL_INSETS.left,
+                        splashBounds.y - ((DEMO_HEIGHT - splashBounds.height)/2) - UPPER_PANEL_INSETS.top);
+                */
+                swingset.setVisible(true);
             }
         });
     }                

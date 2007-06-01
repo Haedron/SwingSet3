@@ -18,18 +18,19 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
+import swingset3.DemoProperties;
 import swingset3.Utilities;
 
 /**
  *
  * @author aim
  */
+@DemoProperties(
+      value = "JWindow Demo", 
+      category = "Toplevel Containers",
+      description = "Demonstrates JWindow, a toplevel container with no system border."
+)
 public class JWindowDemo extends JPanel { 
-
-    // remind: replace with annotation?
-    public static String getShortDescription() {
-        return "Demonstrates JWindow, a toplevel container with no system border.";
-    }
     
     private JWindow window;
     
@@ -37,7 +38,6 @@ public class JWindowDemo extends JPanel {
         
     public JWindowDemo() {   
         initComponents();
-        setToolTipText(getShortDescription());
     }
     
     protected void initComponents() {

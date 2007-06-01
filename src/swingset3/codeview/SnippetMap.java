@@ -169,6 +169,7 @@ public class SnippetMap {
     
     public void setCurrentSet(String key) {
         String oldKey = currentKey;
+
         if (key == null) {
             // current snippet being cleared
             currentKey = null;

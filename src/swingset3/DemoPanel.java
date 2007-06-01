@@ -62,7 +62,7 @@ public class DemoPanel extends JPanel {
     static {
         hyperlinkHandler = new HyperlinkHandler();
         try {            
-            progressImage = ImageIO.read(DemoSelectorTreeRenderer.class.getResourceAsStream(
+            progressImage = ImageIO.read(DemoPanel.class.getResourceAsStream(
                     "resources/images/clock.png"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -190,11 +190,10 @@ public class DemoPanel extends JPanel {
             // another event comes around ("Frame.active") we check for a null component and
             // try finding the component again.  not ideal, I know.
             if (propertyName.equals("page") ||
-                    (demo.getDemoComponent() == null /*&& propertyName.equals("Frame.active")*/)) {
+                    (demo.getDemoComponent() == null && propertyName.equals("Frame.active"))) {
                 JComponent demoComponent =
                    findComponent(descriptionPane.getUI().getRootView(descriptionPane),
                         demo.getDemoClass());
-                System.out.println(demo.getName()+":finding component="+demoComponent);
                 if (demoComponent != null) {
                     demo.setDemoComponent(demoComponent);
                     demoComponent.getTopLevelAncestor().validate();
