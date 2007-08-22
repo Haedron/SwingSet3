@@ -60,6 +60,7 @@ import javax.swing.text.Position;
 import javax.swing.text.View;
 
 import swingset3.DemoProperties;
+import swingset3.hyperlink.JHyperlink;
 
 /**
  *
@@ -68,10 +69,10 @@ import swingset3.DemoProperties;
 @DemoProperties(
       value = "JButton Demo", 
       category = "Controls",
-      description = "Demonstrates JButton, Swing's push button component.",
+      description = "Demonstrates the many uses of JButton, Swing's push button component.",
       sourceFiles = {
         "sources/swingset3/demos/controls/JButtonDemo.java",
-        "sources/swingset3/demos/controls/Hyperlink.java"
+        "sources/swingset3/hyperlink/JHyperlink.java"
       }
 )
 public class JButtonDemo extends JPanel {
@@ -96,19 +97,21 @@ public class JButtonDemo extends JPanel {
     public JButtonDemo() {        
         setToolTipText(getShortDescription());
         initComponents();
+        setOpaque(false);
     }    
                 
     protected void initComponents() {
         setLayout(new GridLayout(0,1));
         
-        add(createSimpleButtons());
-        add(createCreativeButtons());
+        add(createSimpleButtonPanel());
+        add(createCreativeButtonPanel());
     }
     
-    protected JPanel createSimpleButtons() {
+    protected JPanel createSimpleButtonPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 8));
-        panel.setBorder(BorderFactory.createTitledBorder("Simple Buttons"));
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                "Simple Buttons"));
         
         //<snip>Create simple button
         final JButton simpleButton = new JButton("Do it");
@@ -168,10 +171,11 @@ public class JButtonDemo extends JPanel {
         return panel;
     }
     
-    protected JPanel createCreativeButtons() {
+    protected JPanel createCreativeButtonPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.CENTER, 16, 8));
-        panel.setBorder(BorderFactory.createTitledBorder("More Interesting Buttons"));
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                "More Interesting Buttons"));
         
         //<snip>Create button with no border
         JButton button = new JButton();
@@ -202,12 +206,12 @@ public class JButtonDemo extends JPanel {
         panel.add(button);
         
         //<snip>Create HTML hyperlink        
-        Hyperlink hyperlink;
+        JHyperlink hyperlink;
         try {
-            hyperlink = new Hyperlink("Get More Info", "http://java.sun.com/j2se");
+            hyperlink = new JHyperlink("Get More Info", "http://java.sun.com/j2se");
         } catch (URISyntaxException use) {
             use.printStackTrace();
-            hyperlink = new Hyperlink("Get More Info");
+            hyperlink = new JHyperlink("Get More Info");
         }
         //</snip>
         hyperlink.putClientProperty("snippetKey", "Create HTML hyperlink");
@@ -215,7 +219,7 @@ public class JButtonDemo extends JPanel {
         
         //<snip>Create HTML image hyperlink
         try {
-            hyperlink = new Hyperlink(
+            hyperlink = new JHyperlink(
                     new ImageIcon(getClass().getResource("resources/images/blogs.png")),
                     "http://weblogs.java.net");
         } catch (URISyntaxException use) {

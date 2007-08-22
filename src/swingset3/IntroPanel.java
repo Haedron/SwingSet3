@@ -171,7 +171,13 @@ public class IntroPanel extends JComponent {
             sparkleAnimator.start();
 
         }
-
+        // adjust position of painting to center the graphics
+        System.out.println("bounds="+bounds+" title="+title.getWidth()+" "+title.getHeight());
+        int dx = Math.max(0, (bounds.width - title.getWidth())/2);
+        int dy = Math.max(0, (bounds.height - title.getHeight())/2);
+        System.out.println("dx="+dx+" dy="+dy);
+        g.translate(dx, dy);
+        
         glowingTitle.paint(g);
         title.paint(g);
         gleam.paint(g);
@@ -193,50 +199,6 @@ public class IntroPanel extends JComponent {
         this.messageAlpha = alpha;
         repaint();
     }
-    
-    private void drawText(Graphics2D g2, String text, int size, float opacity) {
-        // algorithm courtesy of Romain Guy
-        Composite oldComposite = g2.getComposite();
-        float preAlpha = 1.0f;
-        if (oldComposite instanceof AlphaComposite &&
-                ((AlphaComposite) oldComposite).getRule() == AlphaComposite.SRC_OVER) {
-            preAlpha = ((AlphaComposite) oldComposite).getAlpha();
-        }
-        
-        g2.setFont(getFont());
-        FontMetrics metrics = g2.getFontMetrics();
-        int ascent = metrics.getAscent();
-        int heightDiff = (metrics.getHeight() - ascent) / 2;
-        
-        g2.setColor(Color.BLACK);
-        
-        double tx = 2.0;
-        double ty = 2.0 + heightDiff - size;
-        g2.translate(tx, ty);
-        
-        for (int i = -size; i <= size; i++) {
-            for (int j = -size; j <= size; j++) {
-                double distance = i * i + j * j;
-                float alpha = opacity;
-                if (distance > 0.0d) {
-                    alpha = (float) (1.0f / ((distance * size) * opacity));
-                }
-                alpha *= preAlpha;
-                if (alpha > 1.0f) {
-                    alpha = 1.0f;
-                }
-                g2.setComposite(AlphaComposite.SrcOver.derive(alpha));
-                g2.drawString(text, i + size, j + size + ascent);
-            }
-        }
-        
-        g2.setComposite(oldComposite);
-        g2.setColor(Color.WHITE);
-        g2.drawString(text, size, size + ascent);
-        
-        g2.translate(-tx, -ty);
-    }
-
     
     // remind(aim): could just use java.awt.Component. ?
     public abstract class Glyph {

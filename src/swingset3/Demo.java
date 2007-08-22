@@ -31,11 +31,13 @@
 
 package swingset3;
 
+import java.awt.Component;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.logging.Level;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -50,21 +52,6 @@ public class Demo {
     
     public enum State { UNINITIALIZED, INITIALIZING, INITIALIZED, RUNNING, PAUSED, FAILED }
 
-    public @interface Name {
-        String value();
-    }
-    
-    public @interface Category {
-        String value();
-    }
-    
-    public @interface Description {
-        String value();
-    }
-    
-    public @interface SourceFiles {
-        String[] sourceFiles();
-    }
     
     private static final String imageExtensions[] = {".gif", ".png", ".jpg"};
     
@@ -117,7 +104,7 @@ public class Demo {
     protected String[] sourceFilePaths;
     protected URL[] sourceFiles;
     
-    protected JComponent component;
+    protected Component component;
     
     protected State state;
     
@@ -199,10 +186,6 @@ public class Demo {
         return shortDescription;
     }
     
-    public void initialize() {
-        setState(State.INITIALIZING);
-    }
-    
     public URL getHTMLDescription() {
         // by default look for an html file with the same name as the demo class
         return demoClass.getResource("resources/" + 
@@ -231,12 +214,16 @@ public class Demo {
         for(int i = 0; i < sourceFilePaths.length; i++) {
             sourceFiles[i] = getClass().getClassLoader().getResource(sourceFilePaths[i]);
             if (sourceFiles[i] == null) {
-                System.err.println("warning: unable to load source file: " + sourceFilePaths[i]);
+                System.err.println("warning: unable to load source file: " +sourceFilePaths[i]);
             }
         }
     }
     
-    void setDemoComponent(JComponent component) {
+    void startInitializing() {
+        setState(Demo.State.INITIALIZING);
+    }
+    
+    void setDemoComponent(Component component) {
         if (component != null && !demoClass.isInstance(component)) {
             setState(State.FAILED);
             IllegalArgumentException e =
@@ -245,18 +232,22 @@ public class Demo {
             failException = e;
             throw e;
         }
-        JComponent old = this.component;
+        Component old = this.component;
         this.component = component;
         
-        setState(component != null? State.INITIALIZED : State.UNINITIALIZED);
+        if (component != null) {
+            init();
+        } else {
+            setState(State.UNINITIALIZED);
+        }
         pcs.firePropertyChange("demoComponent", old, component);
 
     }
     
-    public JComponent createDemoComponent() {
-        JComponent component = null;
+    public Component createDemoComponent() {
+        Component component = null;
         try {
-            component = (JComponent)demoClass.newInstance();
+            component = (Component)demoClass.newInstance();
             setDemoComponent(component);
         } catch (Exception e) {
             System.err.println(e);
@@ -267,7 +258,7 @@ public class Demo {
         return component;          
     }
     
-    public JComponent getDemoComponent() {
+    public Component getDemoComponent() {
         return component;    
     } 
     
@@ -278,7 +269,7 @@ public class Demo {
     protected void setState(State state) {
         State oldState = this.state;
         this.state = state;
-        System.out.println("***** "+getName() + ":setState="+state);
+        SwingSet3.logger.log(Level.FINE, "***>" +getName() + ":setState="+state);
         pcs.firePropertyChange("state", oldState, state);
     }
     
@@ -288,6 +279,29 @@ public class Demo {
     
     public void removePropertyChangeListener(PropertyChangeListener pcl) {
         pcs.removePropertyChangeListener(pcl);
+    }
+    
+    public void init() {
+        setState(State.INITIALIZED);
+        try {
+            Method initMethod = demoClass.getMethod("init", (Class[])null);
+            initMethod.invoke(component, (Object[])null);
+        } catch (NoSuchMethodException nsme) {
+            // okay, no init method exists
+        } catch (IllegalAccessException iae) {
+            SwingSet3.logger.log(Level.SEVERE, "unable to init demo: "+demoClass.getName(), iae);
+            failException = iae;
+            setState(State.FAILED);
+        } catch (java.lang.reflect.InvocationTargetException ite) {
+            SwingSet3.logger.log(Level.SEVERE, "init method failed for demo: "+demoClass.getName(), ite);
+            failException = ite;
+            setState(State.FAILED);
+        } catch (NullPointerException npe) {
+            SwingSet3.logger.log(Level.SEVERE, "init method called before demo was instantiated: "
+                    +demoClass.getName(), npe);
+            failException = npe;
+            setState(State.FAILED);
+        }
     }
         
     public void start() {
@@ -300,45 +314,41 @@ public class Demo {
             setState(State.RUNNING);
             // okay, no start method exists
         } catch (IllegalAccessException iae) {
-            System.err.println(iae);
-            iae.printStackTrace();
+            SwingSet3.logger.log(Level.SEVERE, "unable to start demo: "+demoClass.getName(), iae);
             failException = iae;
             setState(State.FAILED);
         } catch (java.lang.reflect.InvocationTargetException ite) {
-            System.err.println(demoClass.getName() +
-                    " start method failed: " + ite.getMessage());
-            ite.printStackTrace();
+            SwingSet3.logger.log(Level.SEVERE, "start method failed for demo: "+demoClass.getName(), ite);
             failException = ite;
             setState(State.FAILED);
         } catch (NullPointerException npe) {
-            System.out.println(getName()+":started before demo component was created.");
+            SwingSet3.logger.log(Level.SEVERE, "start method called before demo was instantiated: "
+                    +demoClass.getName(), npe);
             failException = npe;
             setState(State.FAILED);
         }
     };
     
-    public void pause() {
+    public void stop() {
         setState(State.PAUSED);
         try {
             Method stopMethod = demoClass.getMethod("pause", (Class[])null);
             stopMethod.invoke(component, (Object[])null);
 
         } catch (NoSuchMethodException nsme) {
-            // okay, no pause method exists
+            // okay, no stop method exists
 
         } catch (IllegalAccessException iae) {
-            System.err.println(iae);
+            SwingSet3.logger.log(Level.SEVERE, "unable to pause demo: "+demoClass.getName(), iae);
             failException = iae;
             setState(State.FAILED);
-            iae.printStackTrace();
         } catch (java.lang.reflect.InvocationTargetException ite) {
-            System.err.println(demoClass.getName() + 
-                    " pause method failed: " + ite.getMessage());
+            SwingSet3.logger.log(Level.SEVERE, "pause method failed for demo: "+demoClass.getName(), ite);
             failException = ite;
             setState(State.FAILED);
-            ite.printStackTrace();
         } catch (NullPointerException npe) {
-            System.out.println(getName()+":paused before demo component was created.");
+            SwingSet3.logger.log(Level.SEVERE, "pause method called before demo was instantiated: "
+                    +demoClass.getName(), npe);
         }
     };
 }

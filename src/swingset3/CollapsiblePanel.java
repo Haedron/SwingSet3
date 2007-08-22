@@ -73,7 +73,6 @@ public class CollapsiblePanel extends JPanel {
         expandCheckBox = new JCheckBox(title);
         expandCheckBox.setToolTipText("Click arrow to expand or contract source code panel");
         Font font = UIManager.getFont("Label.font");
-        System.out.println(font);
         expandCheckBox.setFont(font.deriveFont(Font.PLAIN, 13));
         expandCheckBox.setHorizontalTextPosition(JCheckBox.RIGHT);
         expandCheckBox.setSelectedIcon(new ImageIcon(

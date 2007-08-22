@@ -175,7 +175,7 @@ public class JFrameDemo extends JPanel {
             showFrame(); // bring frame back to front for demo purposes
         }
     }    
- 
+/* 
     public void start() {
         Utilities.setToplevelLocation(frame, showButton, Utilities.SOUTH_EAST);
         
@@ -183,6 +183,7 @@ public class JFrameDemo extends JPanel {
         frame.setVisible(true);
         //</snip>
     };
+ */
     
     public void pause() {
         //<snip>Hide frame

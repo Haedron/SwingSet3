@@ -92,13 +92,14 @@ public class JWindowDemo extends JPanel {
         
         return window;
     }
-    
+/*    
     public void start() {
         Utilities.setToplevelLocation(window, showButton, Utilities.SOUTH_EAST);
         //<snip>Show window
         window.setVisible(true);
         //</snip>
     };
+ */
     
     public void pause() {
         //<snip>Hide window
@@ -113,6 +114,7 @@ public class JWindowDemo extends JPanel {
             if (window.isShowing()) {
                 window.toFront();
             } else {
+                Utilities.setToplevelLocation(window, showButton, Utilities.SOUTH_EAST);
                 window.setVisible(true);
             }
             //</snip>

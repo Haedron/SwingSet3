@@ -93,13 +93,14 @@ public class JDialogDemo extends JPanel {
         
         return dialog;
     }
-    
+/*    
     public void start() {
         Utilities.setToplevelLocation(dialog, showButton, Utilities.SOUTH_EAST);
         //<snip>Show dialog
         dialog.setVisible(true);
         //</snip>
     };
+ */
     
     public void pause() {
         //<snip>Hide dialog
@@ -114,6 +115,7 @@ public class JDialogDemo extends JPanel {
             if (dialog.isShowing()) {
                 dialog.toFront();
             } else {
+                Utilities.setToplevelLocation(dialog, showButton, Utilities.SOUTH_EAST);
                 dialog.setVisible(true);
             }
             //</snip>

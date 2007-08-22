@@ -34,12 +34,9 @@ package swingset3;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.nio.Buffer;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
@@ -48,7 +45,6 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
 
 /**
  *
@@ -57,23 +53,25 @@ import javax.swing.tree.TreeNode;
 public class DemoSelectorTree extends JTree {
     private Color gradientColors[];
     private Image gradientImage;
+    private Image selectedGradientImage;
     
     /** Creates a new instance of DemoSelectorTree */
-    public DemoSelectorTree(TreeNode root) {
-        super(root);
+    public DemoSelectorTree(TreeModel model) {
+        super(model);
         setCellRenderer(new DemoSelectorTreeRenderer());
         setShowsRootHandles(false);
         ToolTipManager.sharedInstance().registerComponent(this);
     }
     
-    public DemoSelectorTree(TreeNode root, Color gradientColor1, Color gradientColor2) {
-        this(root);
+    public DemoSelectorTree(TreeModel model, Color gradientColor1, Color gradientColor2) {
+        this(model);
         gradientColors = new Color[2];
         gradientColors[0] = gradientColor1;
         gradientColors[1] = gradientColor2;
         setOpaque(false);
     }
     
+    @Override
     protected void paintComponent(Graphics g) {
         if (gradientColors != null) {
             Rectangle bounds = getBounds();
@@ -88,6 +86,7 @@ public class DemoSelectorTree extends JTree {
             //System.out.println("painting gradient");
             g.drawImage(gradientImage, 0, 0, null);
         }
+        
         super.paintComponent(g);
     }
     
@@ -148,6 +147,7 @@ public class DemoSelectorTree extends JTree {
             
             setComponentOrientation(tree.getComponentOrientation());
             setEnabled(tree.isEnabled());
+            selected = false;
             
             if (isLeaf) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
@@ -181,7 +181,7 @@ public class DemoSelectorTree extends JTree {
                     selected = demoState == Demo.State.RUNNING ||
                             demoState == Demo.State.INITIALIZING;
                     setBackground(selected? selectedBackground : unselectedBackground);
-                    setOpaque(selected);
+                    setOpaque(false);
                     Color foreground = unselectedForeground;
                     switch(demoState) {
                         case FAILED:
@@ -209,6 +209,23 @@ public class DemoSelectorTree extends JTree {
                 setToolTipText(null);
             }
             return this;
+        }
+      
+        @Override
+        protected void paintComponent(Graphics g) {
+            if (selected) {
+                Rectangle bounds = getBounds();
+                if (selectedGradientImage == null || 
+                    selectedGradientImage.getWidth(this) != bounds.width ||
+                    selectedGradientImage.getHeight(this) != bounds.height) {
+                
+                    selectedGradientImage = Utilities.createGradientImage(bounds.width, bounds.height,
+                        selectedBackground, selectedBackground.darker());
+                }
+                //System.out.println("painting gradient");
+                g.drawImage(selectedGradientImage, 0, 0, null);
+            }        
+            super.paintComponent(g);
         }
         
         public void validate() {}

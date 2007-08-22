@@ -33,42 +33,32 @@ package swingset3.demos.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import swingset3.hyperlink.Link;
 
 /**
  *
  * @author aim
  */
 public class OscarCandidate {
-    public enum Category { 
-        BEST_ACTOR, BEST_ACTRESS, BEST_PICTURE,
-        BEST_SUPPORTING_ACTOR, BEST_SUPPORTING_ACTRESS, BEST_ART_DIRECTION, 
-        BEST_ASSISTANT_DIRECTOR, BEST_DIRECTOR, BEST_CINEMATOGRAPHY, 
-        BEST_COSUME_DESIGN, BEST_DANCE_DIRECTION, BEST_FEATURE_DOCUMENTARY, 
-        BEST_SHORT_DOCUMENTARY, BEST_FILM_EDITING, BEST_FOREIGN_FILM, 
-        BEST_MAKEUP, BEST_MUSICAL_SCORE, BEST_SONG, 
-        BEST_ADAPTED_SCREENPLAY, BEST_ORIGINAL_SCREENPLAY, BEST_ANIMATION_SHORT, 
-        BEST_LIVE_ACTION_SHORT, BEST_SOUND, BEST_SOUND_EDITING, 
-        BEST_SPECIAL_EFFECTS, BEST_VISUAL_EFFECTS, BEST_ENGINEERING_EFFECTS,
-        BEST_WRITING, MOST_UNIQUE_ARTISTIC_PICTURE
-    };        
     
-    private Category category;
+    private String category;
     private String year;
     private boolean winner = false;
     private String movie;
-    private ArrayList persons;
+    private Link movieLink;
+    private ArrayList<String> persons;
     
     /** Creates a new instance of OscarCandidate */
-    public OscarCandidate(Category category) {
+    public OscarCandidate(String category) {
         this.category = category;
         persons = new ArrayList();
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 
@@ -95,8 +85,15 @@ public class OscarCandidate {
     public void setMovie(String movie) {
         this.movie = movie;
     }
+    
+    public Link getMovieLink() {
+        if (movieLink == null) {
+            movieLink = new Link(movie);
+        }
+        return movieLink;
+    }
 
-    public List getPersons() {
+    public List<String> getPersons() {
         return persons;
     }
     
