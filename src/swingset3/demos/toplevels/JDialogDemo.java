@@ -93,16 +93,15 @@ public class JDialogDemo extends JPanel {
         
         return dialog;
     }
-/*    
+    
     public void start() {
-        Utilities.setToplevelLocation(dialog, showButton, Utilities.SOUTH_EAST);
+        Utilities.setToplevelLocation(dialog, this, Utilities.SOUTH);
         //<snip>Show dialog
         dialog.setVisible(true);
         //</snip>
     };
- */
     
-    public void pause() {
+    public void stop() {
         //<snip>Hide dialog
         dialog.setVisible(false);
         //</snip>

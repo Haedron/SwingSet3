@@ -127,7 +127,7 @@ public class DirectionPanel extends JPanel {
     public ImageIcon trdn_dot = loadImageIcon("trdn.gif","selected top right layout button");
     
     public ImageIcon loadImageIcon(String filename, String description) {
-	String path = "/resources/images/buttons/" + filename;
+	String path = "resources/images/buttons/" + filename;
 	return new ImageIcon(getClass().getResource(path), description);
     }
 

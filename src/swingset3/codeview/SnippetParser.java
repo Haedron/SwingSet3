@@ -97,15 +97,11 @@ public class SnippetParser {
                                 }
                                 snippet.endLine = charCount + 1;
                                 ArrayList snippetList = snippetMap.get(snippet.key);
-                                //System.out.println("Snippet pop: " + snippet.key + " " +
-                                //        snippet.startLine + " to " + snippet.endLine);
+                                
                                 if (snippetList == null) {
                                     snippetList = new ArrayList();
-                                //    System.out.println("register new snippet key: " + snippet.key);
                                     snippetMap.put(snippet.key, snippetList);
                                 }
-                                //System.out.println("adding snippet:" +
-                                //        snippet.key + " " + snippet.startLine);
                                 snippetList.add(snippet);                                
                                 endMarkerIndex = 0;
                             }
@@ -122,7 +118,6 @@ public class SnippetParser {
                         startMarkerIndex++;
                         if (startMarkerIndex == startMarkerChars.length) {
                             // found new begin marker
-                            //System.out.println("Snippet push: "+ lineStart);
                             if (!stack.isEmpty()) {
                                 // nested snippet, save previous key before pushing new one
                                 Snippet snippet = stack.peek();

@@ -488,7 +488,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
                                                    bounds);
                     Rectangle r = (shape instanceof Rectangle) ?
                                   (Rectangle)shape : shape.getBounds();
-                                        System.out.println("fillRect7=0");
+
                     //g.fillRect(r.x, r.y, r.width, r.height);
                     g.fillRect(0, r.y, c.getWidth(), r.height);
                     return r;

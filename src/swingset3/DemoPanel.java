@@ -42,6 +42,7 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -76,10 +77,9 @@ public class DemoPanel extends JPanel {
     public Demo getDemo() {
         return demo;
     }
-    
-    
+        
     private void printComponent(Component c, String indent) {
-        System.out.println(indent+ c.getClass().getSimpleName()+ "  visible="+c.isVisible());
+        SwingSet3.logger.log(Level.FINEST, indent+ c.getClass().getSimpleName()+ "  visible="+c.isVisible());
         if (c instanceof Container) {
             Container p = (Container)c;
             Component children[] = p.getComponents();

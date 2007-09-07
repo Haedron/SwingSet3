@@ -172,10 +172,8 @@ public class IntroPanel extends JComponent {
 
         }
         // adjust position of painting to center the graphics
-        System.out.println("bounds="+bounds+" title="+title.getWidth()+" "+title.getHeight());
         int dx = Math.max(0, (bounds.width - title.getWidth())/2);
         int dy = Math.max(0, (bounds.height - title.getHeight())/2);
-        System.out.println("dx="+dx+" dy="+dy);
         g.translate(dx, dy);
         
         glowingTitle.paint(g);

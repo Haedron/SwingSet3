@@ -64,9 +64,9 @@ import swingset3.demos.DemoBase;
  * @author Jeff Dinkins
  */
 @DemoProperties(
-      value = "Buttons Demo", 
+      value = "ToggleButtons Demo", 
       category = "Controls",
-      description = "Demonstrates the JButton, JRadioButton, & JToggleButton",
+      description = "Demonstrates JCheckBox & JRadioButton",
       sourceFiles = {
         "sources/swingset3/demos/controls/ButtonDemo.java",
         "sources/swingset3/demos/DemoBase.java",
@@ -127,11 +127,11 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
 	demo.setLayout(new BoxLayout(demo, BoxLayout.Y_AXIS));
 	demo.add(tab);
 
-	addButtons();
+	//addButtons();
 	addRadioButtons();
 	addCheckBoxes();
-	// addToggleButtons();
-	currentControls = buttons;
+	//addToggleButtons();
+	currentControls = checkboxes;
     }
 
     public void addButtons() {

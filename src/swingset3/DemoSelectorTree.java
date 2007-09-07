@@ -53,7 +53,6 @@ import javax.swing.tree.TreeModel;
 public class DemoSelectorTree extends JTree {
     private Color gradientColors[];
     private Image gradientImage;
-    private Image selectedGradientImage;
     
     /** Creates a new instance of DemoSelectorTree */
     public DemoSelectorTree(TreeModel model) {
@@ -83,7 +82,6 @@ public class DemoSelectorTree extends JTree {
                         gradientColors[0], gradientColors[1]);
                 
             }
-            //System.out.println("painting gradient");
             g.drawImage(gradientImage, 0, 0, null);
         }
         
@@ -93,10 +91,6 @@ public class DemoSelectorTree extends JTree {
     
     public class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
         
-        protected Color selectedForeground;
-        protected Color selectedBackground;
-        protected Color unselectedForeground;
-        protected Color unselectedBackground;
         protected Color visitedForeground;
         protected Color errorForeground;
                 
@@ -107,14 +101,9 @@ public class DemoSelectorTree extends JTree {
         
         public DemoSelectorTreeRenderer() {
             setHorizontalAlignment(JLabel.LEFT);
-            selectedForeground = UIManager.getColor("Tree.selectionForeground");
-            selectedBackground = UIManager.getColor("Tree.selectionBackground");
-            unselectedForeground = UIManager.getColor("Tree.textForeground");
-            unselectedBackground = UIManager.getColor("Tree.textBackground");
             visitedForeground = new Color(85, 145, 90);
             errorForeground = Color.RED;
             //setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));
-            setOpaque(false);
         }
         
         /**
@@ -155,7 +144,7 @@ public class DemoSelectorTree extends JTree {
                 if (demoNode instanceof String) {
                     // Demo class listed, but class doesn't exist yet
                     setText((String)demoNode);
-                    setBackground(unselectedBackground);
+                    setBackground(UIManager.getColor("Tree.textBackground"));
                     setIcon(null);
                     setEnabled(false);
                     setOpaque(false);
@@ -180,18 +169,19 @@ public class DemoSelectorTree extends JTree {
                     Demo.State demoState = demo.getState();
                     selected = demoState == Demo.State.RUNNING ||
                             demoState == Demo.State.INITIALIZING;
-                    setBackground(selected? selectedBackground : unselectedBackground);
-                    setOpaque(false);
-                    Color foreground = unselectedForeground;
+                    setBackground(selected? UIManager.getColor("Tree.selectionBackground") : 
+                        UIManager.getColor("Tree.textBackground"));
+                    setOpaque(true);
+                    Color foreground = UIManager.getColor("Tree.textForeground");
                     switch(demoState) {
                         case FAILED:
                             foreground = errorForeground;
                             break;
                         case RUNNING:
                         case INITIALIZING:
-                            foreground = selectedForeground;
+                            foreground = UIManager.getColor("Tree.selectionForeground");
                             break;
-                        case PAUSED:
+                        case STOPPED:
                             foreground = visitedForeground;
                             break;
                     }
@@ -202,30 +192,13 @@ public class DemoSelectorTree extends JTree {
                 // don't display icon for categories
                 demo = null;
                 setOpaque(false);
-                setBackground(unselectedBackground);
-                setForeground(unselectedForeground);
+                setBackground(UIManager.getColor("Tree.textBackground"));
+                setForeground(UIManager.getColor("Tree.textForeground"));
                 setIcon(null);
                 // remind: Need to figure out how to get tooltip text on "category" node
                 setToolTipText(null);
             }
             return this;
-        }
-      
-        @Override
-        protected void paintComponent(Graphics g) {
-            if (selected) {
-                Rectangle bounds = getBounds();
-                if (selectedGradientImage == null || 
-                    selectedGradientImage.getWidth(this) != bounds.width ||
-                    selectedGradientImage.getHeight(this) != bounds.height) {
-                
-                    selectedGradientImage = Utilities.createGradientImage(bounds.width, bounds.height,
-                        selectedBackground, selectedBackground.darker());
-                }
-                //System.out.println("painting gradient");
-                g.drawImage(selectedGradientImage, 0, 0, null);
-            }        
-            super.paintComponent(g);
         }
         
         public void validate() {}

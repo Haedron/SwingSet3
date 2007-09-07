@@ -81,7 +81,7 @@ public class JWindowDemo extends JPanel {
         //<snip>Add window's content
         JLabel label = new JLabel("I have no system border.");
         label.setHorizontalAlignment(JLabel.CENTER);
-        label.setPreferredSize(new Dimension(300,300));
+        label.setPreferredSize(new Dimension(250,200));
         window.add(label);
         //</snip>
         
@@ -92,16 +92,15 @@ public class JWindowDemo extends JPanel {
         
         return window;
     }
-/*    
+    
     public void start() {
-        Utilities.setToplevelLocation(window, showButton, Utilities.SOUTH_EAST);
+        Utilities.setToplevelLocation(window, this, Utilities.SOUTH);
         //<snip>Show window
         window.setVisible(true);
         //</snip>
     };
- */
     
-    public void pause() {
+    public void stop() {
         //<snip>Hide window
         window.setVisible(false);
         //</snip>

@@ -37,6 +37,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.logging.Level;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -50,7 +51,7 @@ import javax.swing.JLabel;
  */
 public class Demo {
     
-    public enum State { UNINITIALIZED, INITIALIZING, INITIALIZED, RUNNING, PAUSED, FAILED }
+    public enum State { UNINITIALIZED, INITIALIZING, INITIALIZED, RUNNING, STOPPED, FAILED }
 
     
     private static final String imageExtensions[] = {".gif", ".png", ".jpg"};
@@ -202,7 +203,7 @@ public class Demo {
                 sourceFilePaths = new String[1];
                 sourceFilePaths[0] = "sources/" +
                         demoClass.getName().replace(".", "/") + ".java";
-                System.out.println(sourceFilePaths[0]);
+
                 initSourceFiles(sourceFilePaths);               
             }
         }
@@ -330,24 +331,24 @@ public class Demo {
     };
     
     public void stop() {
-        setState(State.PAUSED);
+        setState(State.STOPPED);
         try {
-            Method stopMethod = demoClass.getMethod("pause", (Class[])null);
+            Method stopMethod = demoClass.getMethod("stop", (Class[])null);
             stopMethod.invoke(component, (Object[])null);
 
         } catch (NoSuchMethodException nsme) {
             // okay, no stop method exists
 
         } catch (IllegalAccessException iae) {
-            SwingSet3.logger.log(Level.SEVERE, "unable to pause demo: "+demoClass.getName(), iae);
+            SwingSet3.logger.log(Level.SEVERE, "unable to stop demo: "+demoClass.getName(), iae);
             failException = iae;
             setState(State.FAILED);
         } catch (java.lang.reflect.InvocationTargetException ite) {
-            SwingSet3.logger.log(Level.SEVERE, "pause method failed for demo: "+demoClass.getName(), ite);
+            SwingSet3.logger.log(Level.SEVERE, "stop method failed for demo: "+demoClass.getName(), ite);
             failException = ite;
             setState(State.FAILED);
         } catch (NullPointerException npe) {
-            SwingSet3.logger.log(Level.SEVERE, "pause method called before demo was instantiated: "
+            SwingSet3.logger.log(Level.SEVERE, "stop method called before demo was instantiated: "
                     +demoClass.getName(), npe);
         }
     };

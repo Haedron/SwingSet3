@@ -143,7 +143,7 @@ public class JFrameDemo extends JPanel {
         //<snip>Add the content area
         JLabel label = new JLabel("I'm content and a little blue.");
         label.setHorizontalAlignment(JLabel.CENTER);
-        label.setPreferredSize(new Dimension(400,300));
+        label.setPreferredSize(new Dimension(400,200));
         label.setBackground(new Color(197, 216, 236));
         label.setOpaque(true); // labels non-opaque by default
         frame.add(label);
@@ -175,17 +175,16 @@ public class JFrameDemo extends JPanel {
             showFrame(); // bring frame back to front for demo purposes
         }
     }    
-/* 
+
     public void start() {
-        Utilities.setToplevelLocation(frame, showButton, Utilities.SOUTH_EAST);
+        Utilities.setToplevelLocation(frame, this, Utilities.SOUTH);
         
         //<snip>Show frame
         frame.setVisible(true);
         //</snip>
     };
- */
     
-    public void pause() {
+    public void stop() {
         //<snip>Hide frame
         frame.setVisible(false);
         //</snip>

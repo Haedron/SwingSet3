@@ -33,8 +33,11 @@ package swingset3.demos;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -56,7 +59,8 @@ import javax.swing.border.SoftBevelBorder;
  * @version 1.23 11/17/05
  * @author Jeff Dinkins
  */
-public class DemoBase extends JApplet {
+public class DemoBase extends JPanel {
+    static final Logger logger = Logger.getLogger(DemoBase.class.getName());
 
     // The preferred size of the demo
     protected int PREFERRED_WIDTH = 600;
@@ -87,7 +91,6 @@ public class DemoBase extends JApplet {
     public static Dimension HGAP30 = new Dimension(30,1);
     public static Dimension VGAP30 = new Dimension(1,30);
 	
-    protected JPanel panel = null;
 
     // Resource bundle for internationalized and accessible text
     private ResourceBundle bundle = null;
@@ -95,19 +98,17 @@ public class DemoBase extends JApplet {
 
     protected DemoBase() {
         UIManager.put("swing.boldMetal", Boolean.FALSE);
-	panel = new JPanel();
-	panel.setLayout(new BorderLayout());    
+	setLayout(new BorderLayout());    
     }
 
     public JPanel getDemoPanel() {
-	return panel;
+	return this;
     }
 
     public String getString(String key) {
         String value = "nada";
         if(bundle == null) {
             String bundleName = getClass().getPackage().getName()+".resources."+getClass().getSimpleName();
-            System.out.println("DemoBase bundle:"+bundleName);
             bundle = ResourceBundle.getBundle(bundleName);
         }
         try {
@@ -124,7 +125,12 @@ public class DemoBase extends JApplet {
 
     public ImageIcon createImageIcon(String filename, String description) {
         String path = "resources/images/" + filename;
-        return new ImageIcon(getClass().getResource(path), description);
+        URL imageURL = getClass().getResource(path);
+        if (imageURL == null) {
+            logger.log(Level.SEVERE, "unable to access image file: "+path);
+        }        
+        return imageURL != null? 
+            new ImageIcon(getClass().getResource(path), description) : null;
         
     }    
 
@@ -148,12 +154,6 @@ public class DemoBase extends JApplet {
             p.setBorder(loweredBorder);
         }
         return p;
-    }
-
-    @Override
-    public void init() {
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(getDemoPanel(), BorderLayout.CENTER);
     }
     
     protected void mainImpl() {

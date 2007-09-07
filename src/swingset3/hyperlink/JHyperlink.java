@@ -183,12 +183,11 @@ public class JHyperlink extends JButton {
             
             iconRect.x = iconRect.y = iconRect.width = iconRect.height = 0;
             textRect.x = textRect.y = textRect.width = textRect.height = 0;
-            System.out.println("horizontalAlignment="+getHorizontalAlignment());
             SwingUtilities.layoutCompoundLabel(g.getFontMetrics(), getText(),
                     getIcon(), getVerticalAlignment(), getHorizontalAlignment(),
                     getVerticalTextPosition(), getHorizontalTextPosition(),
                     viewRect, iconRect, textRect, getIconTextGap());
-               System.out.println("paint:"+ viewRect+" baseline="+baseline+" textRect="+textRect);         
+
             g.setColor(new Color(200,200,200,200));
             g.drawRect(textRect.x, textRect.y + textRect.height, 
                     textRect.width, textRect.height);

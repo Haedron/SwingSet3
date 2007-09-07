@@ -44,6 +44,8 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -87,6 +89,7 @@ import javax.swing.JTree;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -103,6 +106,7 @@ import org.jdesktop.animation.transitions.ScreenTransition;
 import org.jdesktop.animation.transitions.TransitionTarget;
 import org.jdesktop.animation.transitions.effects.CompositeEffect;
 import org.jdesktop.animation.transitions.effects.FadeIn;
+import org.jdesktop.animation.transitions.effects.FadeOut;
 import swingset3.codeview.CodeViewer;
 
 
@@ -123,7 +127,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     public static final String controlVeryDarkShadowKey = "controlVeryDarkShadowColor";
     public static final String controlDarkShadowKey = "controlDarkShadowColor";
 
-    public static final int DEMO_WIDTH = 600;
+    public static final int DEMO_WIDTH = 650;
     public static final int DEMO_HEIGHT = 500;
     public static final int TREE_WIDTH = 200;
     public static final int SOURCE_HEIGHT = 250;
@@ -196,9 +200,9 @@ public class SwingSet3 extends SingleFrameApplication  {
 
     // GUI components
     //private JSplitPane vertSplitPane; //JSplitPane has trouble with animation
-    private JPanel vertSplitPane;
+    private JPanel contentPanel;
     private JPanel upperPanel;
-    private JTree demoSelectorTree;
+    private DemoSelectorTree demoSelectorTree;
     private JComponent demoPlaceholder;
     private CollapsiblePanel sourceCodePane;
     private CodeViewer codeViewer;    
@@ -208,23 +212,35 @@ public class SwingSet3 extends SingleFrameApplication  {
     
     private JPopupMenu popup;
     
-    // GUI state
+    // Properties
     private List availableLookAndFeels;
     private String lookAndFeel;
     private boolean sourceVisible = true;
     private boolean animationOn = true;
+    private int treeRowHeight = 32;
+    
+    // GUI state
     private int sourcePaneLocation;
     private int dividerSize;
     private int codeViewerHeight;    
     
     // Demo transition animation
-    private Animator animator;
-    private ScreenTransition transition;
-    private LoadAnimator loadAnimator;
-    private CompositeEffect effect;
-    private ScaleMoveIn scaler;
-    private JComponent activePanel;
-    private JComponent nextPanel;
+    private Animator launchAnimator;
+    private ScreenTransition launchTransition;
+    private LaunchTransitionTarget launchTransitionTarget;
+    private CompositeEffect launchEffect;
+    private ScaleMoveEffect scaleMoveEffect;
+    private JComponent activeDemoPanel;
+    private JComponent nextDemoPanel;
+    
+    // Look and Feel Change animation
+    private Animator lafAnimator;
+    private CrossFadeTransition lafTransition;
+    private LafTransitionTarget lafTransitionTarget;
+
+    
+    // Transient variables
+    private transient Point nodePoint = new Point();
     
     @Override
     protected void initialize(String args[]) {        
@@ -269,91 +285,9 @@ public class SwingSet3 extends SingleFrameApplication  {
             JOptionPane.showMessageDialog(getMainFrame(),
                     resourceMap.getString("error.noDemosLoaded"),
                     resourceMap.getString("error.title"), JOptionPane.ERROR);
-        }
-        
+        }        
         return demoList;
   
-    }
-                
-    private List<String> getDemoListOLD(String args[]) {
-        final ArrayList<String> demoList = new ArrayList();
-        boolean augment = false;
-    
-        if (runningFromWebStart()) {
-            // Look inside each jar resource and check manifests for classes marked as demos
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            InputStream is = classLoader.getResourceAsStream("demolist");
-            if (is != null) {
-                try {
-                    demoList.addAll(readDemoClassNames(new InputStreamReader(is)));
-                    
-                } catch (IOException ioe) {
-                    logger.log(Level.SEVERE, "unable to read demo list from " + "demolist");
-                }
-            }
-            else if (classLoader instanceof URLClassLoader) {
-                URLClassLoader jnlpClassLoader = (URLClassLoader)classLoader;                                
-                URL urls[] = jnlpClassLoader.getURLs();
-                
-                if (urls != null) {
-                    for(URL url : urls) {
-                        try {
-                            URL jarURL = new URL("jar:"+url+"!/");
-                            JarURLConnection jarConnection = (JarURLConnection)jarURL.openConnection();
-                            demoList.addAll(readDemoClassNames(jarConnection.getManifest()));
-                            
-                        } catch (Exception e) {
-                            logger.log(Level.SEVERE, "unable to obtain demo list from jar manifest :"+url, e);
-                        }
-                    }
-                }
-            } else {
-                logger.log(Level.SEVERE, "unable to access JNLPClassLoader required to obtain demo list");
-            }
-        } else {     
-            // Not running under Webstart
-            // Must obtain list of demo classes from command-line arguments
-            for(String arg : args) {           
-                if (arg.endsWith(".jar")) {                    
-                    try {
-                        demoList.addAll(readDemoClassNames(new JarFile(arg).getManifest()));
-                        
-                    } catch (IOException e) {
-                        System.err.println("cannot access jar "+arg+" :"+e);
-                    }
-                    
-                } else {
-                    // process argument as filename containing names of demo classes
-                    try {
-                        demoList.addAll(readDemoClassNames(new FileReader(arg) /*filename*/));
-                        
-                    } catch (IOException e) {
-                        System.err.println("cannot read class names from file: "+arg);
-                    }
-                }
-            }
-            if (demoList.isEmpty()) {
-                // nothing specified on command-line, so load default swing demos from swingset jar
-                //ClassLoader classLoader = SwingSet3.class.getClassLoader();
-                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-                System.out.println("classLoader="+classLoader.getClass().getName());
-                InputStream is = classLoader.getResourceAsStream("demolist");
-                if (is != null) {
-                    try {
-                        demoList.addAll(readDemoClassNames(new InputStreamReader(is)));
-                        
-                    } catch (IOException ioe) {
-                        logger.log(Level.SEVERE, "unable to read demo list from " + "demolist");
-                    }
-                } 
-                if (demoList.isEmpty()) {
-                    JOptionPane.showMessageDialog(getMainFrame(),
-                            resourceMap.getString("error.noDemosLoaded"),
-                            resourceMap.getString("error.title"), JOptionPane.ERROR);
-                }
-            }
-        }
-        return demoList;        
     }
 
     /**
@@ -364,7 +298,9 @@ public class SwingSet3 extends SingleFrameApplication  {
      * @param demoClassNamesList the list of demo class names
      */
     public void setDemos(String demosTitle, List<String> demoClassNamesList) {
+        
         demoTreeTop = new DefaultMutableTreeNode(demosTitle); 
+        
         if (demoTreeModel == null) {
             demoTreeModel = new DefaultTreeModel(demoTreeTop);
         } else {
@@ -398,49 +334,37 @@ public class SwingSet3 extends SingleFrameApplication  {
         try {
             demoClass = Class.forName(demoClassName);
         } catch (ClassNotFoundException cnfe) {
-            // okay.  for interim purposes we'll show an inactive node for TBW demos
+            logger.log(Level.WARNING, "demo class not found:"+ demoClassName);
         }
+        
         if (demoClass != null) {
-            // If demo class happens to implement Demo, then instantiate it
-            if (Demo.class.isAssignableFrom(demoClass)) {
-                try {
-                    demo = (Demo)demoClass.newInstance();
-                    
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, "could not instantiate demo: "+ demoClass.getName(), ex);
-                }
-                
-            } else {
-                // Wrap Demo (the common case)
-                demo = new Demo(demoClass);
-            }
+            // Wrap Demo 
+            demo = new Demo(demoClass);            
             demo.addPropertyChangeListener(getDemoPropertyChangeListener());
-            category = demo.getCategory();
             
-        } else {
-            category = Demo.deriveCategoryFromPackageName(demoClassName);
-        }
-        
-        Enumeration categories = demoTreeTop.children();
-        DefaultMutableTreeNode categoryNode = null;
-        while (categories.hasMoreElements()) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)categories.nextElement();
-            if (node.getUserObject().equals(category)) {
-                categoryNode = node;
-                break; // category already exists
+            // Place demo in appropriate category node in tree
+            category = demo.getCategory();           
+            Enumeration categories = demoTreeTop.children();
+            DefaultMutableTreeNode categoryNode = null;
+            while (categories.hasMoreElements()) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode)categories.nextElement();
+                if (node.getUserObject().equals(category)) {
+                    categoryNode = node;
+                    break; // category already exists
+                }
             }
+            
+            if (categoryNode == null) {
+                // create new category
+                categoryNode = new DefaultMutableTreeNode(category);
+                demoTreeTop.add(categoryNode);
+            }
+            logger.log(Level.FINEST,"adding demo:" +
+                    (demo != null? demo.getName() : "NULL") + "in category: "+category);
+            
+            categoryNode.add(new DefaultMutableTreeNode(demo != null? demo :
+                Demo.deriveNameFromClassName(demoClassName)));
         }
-        
-        if (categoryNode == null) {
-            // create new category
-            categoryNode = new DefaultMutableTreeNode(category);
-            demoTreeTop.add(categoryNode);
-        }
-        logger.log(Level.FINEST,"adding demo:" +
-                (demo != null? demo.getName() : "NULL") + "in category: "+category);
-        
-        categoryNode.add(new DefaultMutableTreeNode(demo != null? demo :
-            Demo.deriveNameFromClassName(demoClassName)));
         
     }
     
@@ -453,11 +377,15 @@ public class SwingSet3 extends SingleFrameApplication  {
     
     @Override 
     protected void startup() {
+        
         initColorPalette();
         
         View view = getMainView();
         view.setComponent(createMainPanel());
         view.setMenuBar(createMenuBar());
+        
+        // application framework should handle this!
+        getMainFrame().setIconImage(resourceMap.getImageIcon("Application.icon").getImage());
         
         initAnimation();
         
@@ -465,6 +393,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     } 
     
     protected void initColorPalette() {
+        
         // Color palette algorithm courtesy of Jasper Potts
         Color controlColor = UIManager.getColor("control");
         float[] controlHSB = Color.RGBtoHSB(
@@ -485,30 +414,30 @@ public class SwingSet3 extends SingleFrameApplication  {
     
     protected JComponent createMainPanel() {
         
-        // Create vertical splitpane with demos on top, source on bottom
+        // Create content panel with demos on top, source on bottom
         //vertSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         // Temporarily replaced splitpane with panel because animation fails with splitpane
-        vertSplitPane = new JPanel();
-        vertSplitPane.setLayout(new BorderLayout());
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
         
-        // Create top panel to hold demo-selection-tree and current demo
+        // Create top panel to hold demo selector tree and current demo
         upperPanel = new JPanel();
         upperPanel.setLayout(new BorderLayout());
         //vertSplitPane.setTopComponent(upperPanel);
         upperPanel.setBorder(new EmptyBorder(UPPER_PANEL_INSETS));
-        vertSplitPane.add(upperPanel, BorderLayout.CENTER);
+        contentPanel.add(upperPanel, BorderLayout.CENTER);
 
-        // Create demo selection tree
+        // Create demo selector tree
         UIManager.put("Tree.paintLines", Boolean.FALSE);
         // We must set these icons here because they will be initialized when TreeUI installs
         // and cannot be replaced afterwards (without touching the TreeUI direction)
-        UIManager.put("Tree.expandedIcon", resourceMap.getImageIcon("demoSelectorTree.expandedIcon"));
-        UIManager.put("Tree.collapsedIcon", resourceMap.getImageIcon("demoSelectorTree.collapsedIcon"));
+        UIManager.put("Tree.expandedIcon", resourceMap.getImageIcon("selectionTree.expandedIcon"));
+        UIManager.put("Tree.collapsedIcon", resourceMap.getImageIcon("selectionTree.collapsedIcon"));
         demoSelectorTree = new DemoSelectorTree(demoTreeModel);
         demoSelectorTree.setName("demoSelectorTree");
         demoSelectorTree.setShowsRootHandles(false);
         demoSelectorTree.setBorder(new EmptyBorder(TREE_INSETS));
-        demoSelectorTree.setRowHeight(28);
+        demoSelectorTree.setRowHeight(getTreeRowHeight());
         demoSelectorTree.addMouseListener(new DemoTreeClickListener());
         JScrollPane scrollPane = new JScrollPane(demoSelectorTree);
         scrollPane.setPreferredSize(new Dimension(TREE_WIDTH,DEMO_HEIGHT)); // wide enough to avoid horiz scrollbar
@@ -516,10 +445,9 @@ public class SwingSet3 extends SingleFrameApplication  {
         upperPanel.add(scrollPane, BorderLayout.WEST);
         expandAllCategories(new TreePath(demoTreeTop)); // expand all demos in tree
 
-
         // Create pane to contain running demo
         upperPanel.add(demoPlaceholder, BorderLayout.CENTER);
-        activePanel = demoPlaceholder;
+        activeDemoPanel = demoPlaceholder;
                 
         // Create collapsible source code pane 
         codeViewer = new CodeViewer();
@@ -533,7 +461,7 @@ public class SwingSet3 extends SingleFrameApplication  {
                 }
             }
         });
-        vertSplitPane.add(sourceCodePane, BorderLayout.SOUTH);
+        contentPanel.add(sourceCodePane, BorderLayout.SOUTH);
         
         addPropertyChangeListener(new SwingSetPropertyListener());
         
@@ -545,7 +473,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         popup.add(new EditPropertiesAction());
         popup.add(new ViewCodeSnippetAction());
 
-        return vertSplitPane;
+        return contentPanel;
     }
     
     protected JMenuBar createMenuBar() {
@@ -611,23 +539,26 @@ public class SwingSet3 extends SingleFrameApplication  {
         lafItem.setText(lafName);
         lafItem.setActionCommand(lafClassName);
         lookAndFeelRadioGroup.add(lafItem);
+        
         return lafItem;
     }
     
     protected void initAnimation() {
-        loadAnimator = new LoadAnimator();
         
-        // Initialize Animation
-        // Set up non-linear timing behavior on animator. Accelerate for
-        // first 20%, decelerate for final 30%.
-        // first animation is 500ms longer, because it needs that warmup adjustment
-        animator = new Animator(1500);
-        animator.setAcceleration(.2f);
-        animator.setDeceleration(.3f);
-        // Create the screen transition. It uses 'this' as the container that
-        // we are transitioning, 'this' as the target for the callback
-        // 'setupNextScreen()', and animator as the underlying animation.
-        transition = new ScreenTransition(upperPanel, loadAnimator, animator);         
+        // Initialize animated transition for when demos launch
+        launchTransitionTarget = new LaunchTransitionTarget();
+        launchAnimator = new Animator(1500);
+        launchAnimator.setAcceleration(.2f);
+        launchAnimator.setDeceleration(.3f);
+        launchTransition = new ScreenTransition(upperPanel, launchTransitionTarget, launchAnimator);
+        
+        // Initialize animated transition (cross-fade) when look and feel is switched
+        lafTransitionTarget = new LafTransitionTarget();
+        lafAnimator = new Animator(2000);
+        lafAnimator.setAcceleration(.3f);
+        lafAnimator.setAcceleration(.5f);
+        lafTransition = new CrossFadeTransition((JComponent)getMainFrame().getRootPane().getLayeredPane(),
+                lafTransitionTarget, lafAnimator);
 
     }
     
@@ -657,7 +588,15 @@ public class SwingSet3 extends SingleFrameApplication  {
             }
         }
         return null;
-    }  
+    } 
+    
+    // For displaying error messages to user
+    protected void displayErrorMessage(String message) {
+        
+        JOptionPane.showMessageDialog(getMainFrame(), message, "SwingSet3 Error",
+                JOptionPane.ERROR_MESSAGE);
+                
+    }
     
     public void setDemoPlaceholder(JComponent demoPlaceholder) {
         if (this.demoPlaceholder == demoPlaceholder) {
@@ -668,57 +607,34 @@ public class SwingSet3 extends SingleFrameApplication  {
         firePropertyChange("demoPlaceholder", oldDemoPlaceholder, demoPlaceholder);
     }
     
+    public JComponent getDemoPlaceholder() {
+        return demoPlaceholder;
+    }
+    
     public void setCurrentDemo(Demo demo) {
         if (currentDemo == demo) {
             return; // already there
         }
         Demo oldCurrentDemo = currentDemo;        
-
-        if (oldCurrentDemo != null) {
-            oldCurrentDemo.stop();
-        }
         currentDemo = demo;
         DemoPanel demoPanel = null;
         if (demo != null) {
             demoPanel = demoCache.get(demo.getName());
-            if (demoPanel == null || demo.getDemoComponent() == null) {                
+            if (demoPanel == null || demo.getDemoComponent() == null) {
                 demo.startInitializing();
                 demoPanel = new DemoPanel(demo);  
-                demoPanel.setPreferredSize(activePanel.getPreferredSize());
+                demoPanel.setPreferredSize(activeDemoPanel.getPreferredSize());
                 demoCache.put(demo.getName(), demoPanel);
-            } else {
-                currentDemo.start();
-            }
+            } 
             if (isAnimationOn()) {
-                if (nextPanel != null) {
-                    animator.setDuration(1000);
-                }
-                nextPanel = demoPanel;
-                TreePath demoPath = getTreePathForDemo(demo);
-                Rectangle nodeBounds = demoSelectorTree.getRowBounds(
-                        demoSelectorTree.getRowForPath(demoPath));
-                transition.start();
-                
-                // Now, create a new ScaleMoveIn effect based on the tree node
-                scaler = new ScaleMoveIn();
-                scaler.setStartLocation(nodeBounds.x + nodeBounds.width/2,
-                        nodeBounds.y + nodeBounds.height/2);
-                // Now, create a Composite effect that combines our custom effect
-                // with a standard FadeIn effect
-                
-                FadeIn fader = new FadeIn();
-                effect = new CompositeEffect(scaler);
-                effect.addEffect(fader);
-                //sourcePaneLocation = vertSplitPane.getDividerLocation();
-                
-                EffectsManager.setEffect(nextPanel, effect, EffectsManager.TransitionType.APPEARING);
+                animateLaunchingDemo(demo, demoPanel);
 
             } else {
                 // no animated transition between demos
-                nextPanel = demoPanel;
-                upperPanel.remove(activePanel);
-                upperPanel.add(nextPanel, BorderLayout.CENTER);
-                activePanel = nextPanel;
+                nextDemoPanel = demoPanel;
+                upperPanel.remove(activeDemoPanel);
+                upperPanel.add(nextDemoPanel, BorderLayout.CENTER);
+                activeDemoPanel = nextDemoPanel;
             }
         }
 
@@ -730,31 +646,75 @@ public class SwingSet3 extends SingleFrameApplication  {
             codeViewer.setSourceFiles(currentDemo != null?
                 currentDemo.getSourceFiles() : null);
         }
+
         firePropertyChange("currentDemo", oldCurrentDemo, demo);
+    }
+    
+    protected void animateLaunchingDemo(Demo demo, JComponent demoPanel) {
+        
+        if (nextDemoPanel != null) {
+            // Remove initialization padding from animator
+            launchAnimator.setDuration(1000);
+        }
+        nextDemoPanel = demoPanel;
+        TreePath demoPath = getTreePathForDemo(demo);
+        Rectangle nodeBounds = demoSelectorTree.getRowBounds(
+                demoSelectorTree.getRowForPath(demoPath));
+        // Must convert from tree's to frame's coordinate system
+        nodePoint.x = nodeBounds.x;
+        nodePoint.y = nodeBounds.y;
+        Point p = SwingUtilities.convertPoint(demoSelectorTree, nodePoint, getMainFrame());
+
+        launchTransition.start();
+        
+        // Create a new ScaleMoveEffect based on the launching demo's tree node
+        scaleMoveEffect = new ScaleMoveEffect();
+        scaleMoveEffect.setStartLocation(p.x + nodeBounds.width/2, p.y + nodeBounds.height/2);
+        
+        // Now create a Composite effect that combines our custom effect
+        // with a standard FadeIn effect
+        launchEffect = new CompositeEffect(scaleMoveEffect);
+        launchEffect.addEffect(new FadeIn());
+        //sourcePaneLocation = vertSplitPane.getDividerLocation();
+        
+        EffectsManager.setEffect(nextDemoPanel, launchEffect, EffectsManager.TransitionType.APPEARING);
+
     }
     
     public Demo getCurrentDemo() {
         return currentDemo;
     }
     
-    public void setLookAndFeel(String lookAndFeel) {
+    public void setLookAndFeel(String lookAndFeel) throws ClassNotFoundException,
+        InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+        
         String oldLookAndFeel = this.lookAndFeel;
+        
 	if (oldLookAndFeel != lookAndFeel) {
+            UIManager.setLookAndFeel(lookAndFeel);
             this.lookAndFeel = lookAndFeel;
-            try {
-                UIManager.setLookAndFeel(lookAndFeel);
-                SwingUtilities.updateComponentTreeUI(getMainFrame());
-                firePropertyChange("lookAndFeel", oldLookAndFeel, lookAndFeel);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "unable to set look and feel: "+lookAndFeel, e);               
-            }            
+            
+            if (isAnimationOn()) {                
+                lafTransition.start();                
+            } else {
+                // Update all GUI components with new look and feel
+                SwingUtilities.updateComponentTreeUI(getMainFrame());     
+            }
+            firePropertyChange("lookAndFeel", oldLookAndFeel, lookAndFeel);                     
 	}
     }
     
     @Action 
     public void setLookAndFeel() {
         ButtonModel model = lookAndFeelRadioGroup.getSelection();
-        setLookAndFeel(model.getActionCommand());
+        String lookAndFeelName = model.getActionCommand();
+        try {
+            setLookAndFeel(lookAndFeelName);
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "exception setting look and feel", ex);
+            displayErrorMessage("Unable to change the Look and Feel\n"+
+                    "to "+lookAndFeelName);
+        }
     }
     
     public String getLookAndFeel() {
@@ -780,8 +740,23 @@ public class SwingSet3 extends SingleFrameApplication  {
     public boolean isAnimationOn() {
         return animationOn;
     }
+    
+    public void setTreeRowHeight(int rowHeight) {
+        int oldTreeRowHeight = this.treeRowHeight;
+        this.treeRowHeight = treeRowHeight;
+        demoSelectorTree.setRowHeight(treeRowHeight);
+        demoSelectorTree.repaint();
+        firePropertyChange("treeRowHeight", oldTreeRowHeight, treeRowHeight);
+    }
+    
+    public int getTreeRowHeight() {
+        return treeRowHeight;
+    }
 
+    // hook used to detect if any components in the demo have registered a
+    // code snippet key for the their creation code inside the source
     private void registerPopups(Component component) {
+        
         if (component instanceof Container) {
             Component children[] = ((Container)component).getComponents();
             for(Component child: children) {
@@ -799,6 +774,8 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
     }    
     
+    // Event handler which launches the demo when the user clicks on its node
+    // in the demo selector tree.
     private class DemoTreeClickListener extends MouseAdapter {
         public void mousePressed(MouseEvent e) {
             final JTree demoTree = (JTree)e.getSource();
@@ -818,28 +795,18 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
     }            
             
-    private class LoadAnimator implements TransitionTarget {
+    private class LaunchTransitionTarget implements TransitionTarget {
         private int startX = 0;
         private int startY = 0;
-        
-        public LoadAnimator() {            
-        }
         
         public void setStartLocation(int x, int y) {
             this.startX = x;
             this.startY = y;
         }
-        
-        /**
-         * This is the single callback of TransitionTarget. It will be called
-         * after the call totransition.start(). We set up the GUI that we are
-         * transitioning to here.  In this case, we simply remove the old
-         * ColoredPanel and add the new one selected
-         */
         public void setupNextScreen() {
-            upperPanel.remove(activePanel);
-            upperPanel.add(nextPanel, BorderLayout.CENTER);
-            activePanel = nextPanel;
+            upperPanel.remove(activeDemoPanel);
+            upperPanel.add(nextDemoPanel, BorderLayout.CENTER);
+            activeDemoPanel = nextDemoPanel;
             //vertSplitPane.setDividerLocation(sourcePaneLocation);
         }        
     }
@@ -848,15 +815,15 @@ public class SwingSet3 extends SingleFrameApplication  {
      * Custom effect: scales and moves a component in to its end location
      * from a specified starting point
      */
-    private class ScaleMoveIn extends Effect {
+    private class ScaleMoveEffect extends Effect {
         
         private Point startLocation = new Point();
         
-        public ScaleMoveIn() {
+        public ScaleMoveEffect() {
             this(0,0);
         }
         
-        public ScaleMoveIn(int x, int y) {
+        public ScaleMoveEffect(int x, int y) {
             setStartLocation(x, y);
         }
         
@@ -871,8 +838,6 @@ public class SwingSet3 extends SingleFrameApplication  {
             PropertySetter ps;
             ComponentState starts = getStart();
             ComponentState ends = getEnd();
-            if (starts != null) System.out.println("start="+ starts.getX()+","+starts.getY()+" "+starts.getWidth()+"x"+starts.getHeight());
-            if (ends != null) System.out.println("end="+ ends.getX()+","+ends.getY()+" "+ends.getWidth()+"x"+ends.getHeight());
             
             ps = new PropertySetter(targetEffect, "location",
                     startLocation, new Point(getEnd().getX(), getEnd().getY()));
@@ -887,6 +852,13 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
     }
     
+    private class LafTransitionTarget implements TransitionTarget {
+        public void setupNextScreen() {
+            // Update all GUI components with new look and feel
+            SwingUtilities.updateComponentTreeUI(getMainFrame());           
+        }
+    }
+    
     // registered on Demo to detect when the demo component is instantiated.
     // we need this because when we embed the demo inside an HTML description pane,
     // we don't have control over the demo component's instantiation
@@ -895,17 +867,30 @@ public class SwingSet3 extends SingleFrameApplication  {
             String propertyName = e.getPropertyName();
             if (propertyName.equals("demoComponent")) {
                 Demo demo = (Demo)e.getSource();
-                Component demoComponent = (Component)e.getNewValue();
+                JComponent demoComponent = (JComponent)e.getNewValue();
                 if (demoComponent != null) {
-                    if (demo == currentDemo) {
-                        currentDemo.start();
-                    }
-                    registerPopups((Component)e.getNewValue());
+                    demoComponent.putClientProperty("swingset3.demo", demo);
+                    demoComponent.addHierarchyListener(new DemoVisibilityListener());
+                    registerPopups(demoComponent);
                 }
             } else if (propertyName.equals("state")) {
                 demoSelectorTree.repaint();
             }
         }
+    }
+    
+    private class DemoVisibilityListener implements HierarchyListener {
+        public void hierarchyChanged(HierarchyEvent event) {
+            if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) > 0) {
+                JComponent component = (JComponent)event.getComponent();
+                Demo demo = (Demo)component.getClientProperty("swingset3.demo");
+                if (!component.isShowing()) {
+                    demo.stop();
+                } else {
+                    demo.start();
+                }
+            }            
+        }        
     }
     
     private class SourceVisibilityChangeListener implements ChangeListener {
@@ -972,7 +957,7 @@ public class SwingSet3 extends SingleFrameApplication  {
             if (snippetKey != null) {
                 codeViewer.highlightSnippetSet(snippetKey);
             } else {
-                System.out.println("can't find source code snippet for target component");
+                logger.log(Level.WARNING, "can't find source code snippet for:" + snippetKey);
             }                                    
         }
     }

@@ -50,6 +50,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -59,6 +60,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -77,6 +80,7 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import swingset3.Utilities;
@@ -128,6 +132,8 @@ import swingset3.Utilities;
  * @author aim
  */
 public class CodeViewer extends JPanel {
+    static final Logger logger = Logger.getLogger(CodeViewer.class.getName());
+    
     private static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(255,255,176); 
     private static BufferedImage SNIPPET_GLYPH;
     private static Insets CODE_INSETS;
@@ -200,7 +206,7 @@ public class CodeViewer extends JPanel {
     }
     
     protected void initCodeTabbedPane() {
-        codeTabbedPane = new JTabbedPane();
+        codeTabbedPane = new CodeTabbedPane();
         add(BorderLayout.CENTER, codeTabbedPane);
     }
     
@@ -296,13 +302,14 @@ public class CodeViewer extends JPanel {
                     // Store code info no matter what
                     codeCache.put(codeFileInfo.url, codeFileInfo);
                     
-                    // It's possible that by now another demo has been made the "current" demo,
+                    // It's possible that by now another set of source files has been loaded.
                     // so check first before adding the source tab;'
                     if (currentCodeFilesInfo == codeFileInfos) {
                         registerSnippets(codeFileInfo);
                         createCodeFileTab(codeFileInfo);
                     } else {
-                        System.out.println("Demo was switched!!!!");
+                        logger.log(Level.FINEST, "source files changed before " + 
+                                Utilities.getURLFileName(codeFileInfo.url) + "was processed.");
                     }
                     
                 } // processOneFile
@@ -323,7 +330,7 @@ public class CodeViewer extends JPanel {
                 // Do it on a separate thread
                 new SourceProcessor(sourceFiles, currentCodeFilesInfo).execute();
             } else {
-                //System.out.println("Just grabbing from cache!");
+                logger.log(Level.FINEST, "Grabbing source file info from cache.");
                 for(CodeFileInfo codeFileInfo: currentCodeFilesInfo) {
                     registerSnippets(codeFileInfo);
                     createCodeFileTab(codeFileInfo);
@@ -351,7 +358,6 @@ public class CodeViewer extends JPanel {
         
         // MUST parse AFTER textPane Document has been created to ensure
         // snippet offsets are relative to the editor pane's Document model
-        //System.out.println("initializing CodeFileInfo="+sourceFile.getPath());
         CodeFileInfo.snippets = SnippetParser.parse(CodeFileInfo.textPane.getDocument());
         return CodeFileInfo;
     }
@@ -560,7 +566,7 @@ public class CodeViewer extends JPanel {
             String snippetKey = (String)snippetSetsComboBox.getSelectedItem();
             if (!snippetKey.equals(NO_SNIPPET_SELECTED)) {
                 String key = snippetKey.substring(0, snippetKey.indexOf("(")-1);
-                System.out.println("snippet:"+key+".");
+                logger.log(Level.FINEST, "highlighting new snippet:"+key+".");
                 highlightSnippetSet(key);
             } else {
                 clearAllSnippetHighlights();
@@ -641,6 +647,28 @@ public class CodeViewer extends JPanel {
         } 
     }
     
+    private class CodeTabbedPane extends JTabbedPane {
+        private String emptyMessage = "no code loaded";
+                
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (getTabCount() == 0) {
+                Rectangle bounds = getBounds();
+                Font font = g.getFont();
+                g.setFont(font.deriveFont(24f));
+                FontMetrics metrics = g.getFontMetrics();
+                Rectangle2D msgBounds = metrics.getStringBounds(emptyMessage, g);
+                
+                g.setColor(UIManager.getColor("textInactiveText"));
+                g.drawString(emptyMessage, (bounds.width - msgBounds.getBounds().width)/2,
+                        (bounds.height - msgBounds.getBounds().height)/2 +
+                        metrics.getAscent());                
+                
+            }
+        }            
+    }
+    
     private class CodeVeneer extends JPanel {        
         CodeFileInfo codeFileInfo;
         
@@ -652,6 +680,7 @@ public class CodeViewer extends JPanel {
             setLayout(null);            
         }
         
+        @Override
         protected void paintComponent(Graphics g) {
 
             String snippetKey = getCurrentSnippetKey();
@@ -703,8 +732,7 @@ public class CodeViewer extends JPanel {
                             
                             String glyphLabel = snippetIndex++ + "/" + snippetTotal;
                             Rectangle labelRect = metrics.getStringBounds(glyphLabel, g2).getBounds();
-                            //System.out.println(Utilities.getURLFileName(code.url) + " glyph " + glyphLabel +
-                            //        " at " + snipRect.x + "," + snipRect.y);
+      
                             g2.drawImage(SNIPPET_GLYPH, 0, snipRect.y, this);
                             g2.drawString(glyphLabel,
                                     0 + (SNIPPET_GLYPH.getWidth(this) - labelRect.width)/2,
