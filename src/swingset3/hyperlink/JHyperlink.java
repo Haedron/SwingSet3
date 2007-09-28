@@ -49,6 +49,7 @@ import javax.swing.ButtonModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 
 /**
@@ -69,19 +70,27 @@ public class JHyperlink extends JButton {
 
     //remind(aim): lookup colors instead of hardcoding them
     private Color normalForeground;
-    private Color visitedForeground = new Color(85, 145, 90);
-    private Color activeForeground = Color.red;
+    private Color activeForeground;
+    private Color visitedForeground;
     private boolean drawUnderline = true;
     
+    static {
+        UIManager.put("Hyperlink.foreground", Color.blue);
+        UIManager.put("Hyperlink.activeForeground", Color.red);
+        UIManager.put("Hyperlink.visitedForeground", new Color(85, 145, 90));        
+    }    
     
     /**
      * Creates a new instance of JHyperlink
      */
     public JHyperlink() {
         super();
+        normalForeground = UIManager.getColor("Hyperlink.foreground");
+        activeForeground = UIManager.getColor("Hyperlink.activeForeground");
+        visitedForeground = UIManager.getColor("Hyperlink.visitedForeground");
         setBorderPainted(false);
         setContentAreaFilled(false);
-        setForeground(Color.blue);
+        setForeground(normalForeground);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         setMargin(new Insets(0,0,0,0));
         setAction(defaultBrowseAction);
@@ -147,18 +156,18 @@ public class JHyperlink extends JButton {
         return visited;
     }
     
+    @Override
+    public void setForeground(Color foreground) {
+        normalForeground = foreground;
+        super.setForeground(foreground);
+    }
+    
     public void setDrawUnderline(boolean drawUnderline) {
         this.drawUnderline = drawUnderline;
     }
     
     public boolean getDrawUnderline() {
         return drawUnderline;
-    }
-    
-    @Override
-    public void setForeground(Color foreground) {
-        normalForeground = foreground;
-        super.setForeground(foreground);
     }
     
     @Override
@@ -188,9 +197,9 @@ public class JHyperlink extends JButton {
                     getVerticalTextPosition(), getHorizontalTextPosition(),
                     viewRect, iconRect, textRect, getIconTextGap());
 
-            g.setColor(new Color(200,200,200,200));
-            g.drawRect(textRect.x, textRect.y + textRect.height, 
-                    textRect.width, textRect.height);
+            //g.setColor(new Color(200,200,200,200));
+            //g.drawRect(textRect.x, textRect.y + textRect.height, 
+            //        textRect.width, textRect.height);
             
             g.setColor(getForeground());
             g.drawLine(textRect.x,

@@ -57,9 +57,10 @@ public class DemoSelectorTree extends JTree {
     /** Creates a new instance of DemoSelectorTree */
     public DemoSelectorTree(TreeModel model) {
         super(model);
-        setCellRenderer(new DemoSelectorTreeRenderer());
+        setCellRenderer(new DemoSelectorTreeRenderer(getCellRenderer()));
         setShowsRootHandles(false);
         ToolTipManager.sharedInstance().registerComponent(this);
+        
     }
     
     public DemoSelectorTree(TreeModel model, Color gradientColor1, Color gradientColor2) {
@@ -89,7 +90,8 @@ public class DemoSelectorTree extends JTree {
     }
     
     
-    public class DemoSelectorTreeRenderer extends JLabel implements TreeCellRenderer {
+    public class DemoSelectorTreeRenderer implements TreeCellRenderer {
+        private JLabel delegate;
         
         protected Color visitedForeground;
         protected Color errorForeground;
@@ -99,8 +101,9 @@ public class DemoSelectorTree extends JTree {
         
         protected Demo demo;
         
-        public DemoSelectorTreeRenderer() {
-            setHorizontalAlignment(JLabel.LEFT);
+        public DemoSelectorTreeRenderer(TreeCellRenderer delegate) {
+            this.delegate = (JLabel)delegate;
+            this.delegate.setHorizontalAlignment(JLabel.LEFT);
             visitedForeground = new Color(85, 145, 90);
             errorForeground = Color.RED;
             //setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));
@@ -116,7 +119,7 @@ public class DemoSelectorTree extends JTree {
         public void setFont(Font font) {
             if (font instanceof FontUIResource)
                 font = null;
-            super.setFont(font);
+            delegate.setFont(font);
         }
         
         public Component getTreeCellRendererComponent(
@@ -128,111 +131,61 @@ public class DemoSelectorTree extends JTree {
                 int row,
                 boolean hasFocus) {
             
-            String         stringValue = tree.convertValueToText(value, isSelected,
+            JLabel renderer = (JLabel)((TreeCellRenderer)delegate).getTreeCellRendererComponent(tree,
+                    value, isSelected, isExpanded, isLeaf, row, hasFocus);
+            
+            String stringValue = tree.convertValueToText(value, isSelected,
                     isExpanded, isLeaf, row, hasFocus);
 
             this.hasFocus = hasFocus;
-            setText(stringValue);
+            renderer.setText(stringValue);
             
-            setComponentOrientation(tree.getComponentOrientation());
-            setEnabled(tree.isEnabled());
+            renderer.setComponentOrientation(tree.getComponentOrientation());
+            renderer.setEnabled(tree.isEnabled());
             selected = false;
             
             if (isLeaf) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-                Object demoNode = node.getUserObject();
-                if (demoNode instanceof String) {
-                    // Demo class listed, but class doesn't exist yet
-                    setText((String)demoNode);
-                    setBackground(UIManager.getColor("Tree.textBackground"));
-                    setIcon(null);
-                    setEnabled(false);
-                    setOpaque(false);
-                    setToolTipText("not yet implemented");
-                    
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;                
+                demo = (Demo)node.getUserObject();
+                
+                String demoName = demo.getName();
+                if (demoName.endsWith("Demo")) {
+                    renderer.setText(demoName.substring(0, demoName.indexOf("Demo")));
                 } else {
-                    demo = (Demo)node.getUserObject();
-                    
-                    String demoName = demo.getName();
-                    if (demoName.endsWith("Demo")) {
-                        setText(demoName.substring(0, demoName.indexOf("Demo")));
-                    } else {
-                        setText(demoName);
-                    }
-                    if (isEnabled()) {
-                        setIcon(demo.getIcon());
-                    } else {
-                        setDisabledIcon(demo.getIcon());
-                    }
-                    setToolTipText(demo.getShortDescription());
-                    
-                    Demo.State demoState = demo.getState();
-                    selected = demoState == Demo.State.RUNNING ||
-                            demoState == Demo.State.INITIALIZING;
-                    setBackground(selected? UIManager.getColor("Tree.selectionBackground") : 
-                        UIManager.getColor("Tree.textBackground"));
-                    setOpaque(true);
-                    Color foreground = UIManager.getColor("Tree.textForeground");
-                    switch(demoState) {
-                        case FAILED:
-                            foreground = errorForeground;
-                            break;
-                        case RUNNING:
-                        case INITIALIZING:
-                            foreground = UIManager.getColor("Tree.selectionForeground");
-                            break;
-                        case STOPPED:
-                            foreground = visitedForeground;
-                            break;
-                    }
-                    setForeground(foreground);                    
+                    renderer.setText(demoName);
                 }
+                if (isEnabled()) {
+                    renderer.setIcon(demo.getIcon());
+                } else {
+                    renderer.setDisabledIcon(demo.getIcon());
+                }
+                renderer.setToolTipText(demo.getShortDescription());
+                
+                Demo.State demoState = demo.getState();
+                selected = demoState == Demo.State.RUNNING ||
+                        demoState == Demo.State.INITIALIZING;
+
+                Color foreground = renderer.getForeground();
+                switch(demoState) {
+                    case FAILED:
+                        foreground = errorForeground;
+                        break;
+                    case STOPPED:
+                        foreground = visitedForeground;
+                        break;
+                }
+                renderer.setForeground(foreground);
+                
                 
             } else {
                 // don't display icon for categories
                 demo = null;
-                setOpaque(false);
-                setBackground(UIManager.getColor("Tree.textBackground"));
-                setForeground(UIManager.getColor("Tree.textForeground"));
-                setIcon(null);
+                renderer.setIcon(null);
                 // remind: Need to figure out how to get tooltip text on "category" node
-                setToolTipText(null);
+                renderer.setToolTipText(null);
             }
-            return this;
+            //renderer.setOpaque(selected);
+            return renderer;
         }
-        
-        public void validate() {}
-        public void invalidate() {}
-        public void revalidate() {}
-        public void repaint(long tm, int x, int y, int width, int height) {}
-        public void repaint(Rectangle r) {}
-        public void repaint() {}
-        
-        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-            // Strings get interned...
-            if (propertyName == "text"
-                    || ((propertyName == "font" || propertyName == "foreground")
-                    && oldValue != newValue
-                    && getClientProperty(javax.swing.plaf.basic.BasicHTML.propertyKey) != null)) {
-                
-                super.firePropertyChange(propertyName, oldValue, newValue);
-            }
-        }
-        
-        /**
-         * Overridden for performance reasons.
-         * See the <a href="#override">Implementation Note</a>
-         * for more information.
-         */
-        public void firePropertyChange(String propertyName, byte oldValue, byte newValue) {}
-        public void firePropertyChange(String propertyName, char oldValue, char newValue) {}
-        public void firePropertyChange(String propertyName, short oldValue, short newValue) {}
-        public void firePropertyChange(String propertyName, int oldValue, int newValue) {}
-        public void firePropertyChange(String propertyName, long oldValue, long newValue) {}
-        public void firePropertyChange(String propertyName, float oldValue, float newValue) {}
-        public void firePropertyChange(String propertyName, double oldValue, double newValue) {}
-        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
-        
-    }
-    
+    }   
 }

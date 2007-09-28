@@ -32,29 +32,28 @@
 package swingset3;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTarget;
 
 import org.jdesktop.animation.timing.TimingTargetAdapter;
-import org.jdesktop.animation.timing.interpolation.PropertySetter;
-import org.jdesktop.animation.transitions.ScreenTransition;
 import org.jdesktop.animation.transitions.TransitionTarget;
 
 /**
  *
+ * Class loosely based on org.jdesktop.animation.ScreenTransition which
+ * simplifies the task of implementing a crossfade transition for
+ * a GUI contained in a RootPane.
+ *
  * @author aim
  */
 public class CrossFadeTransition {
-    
-    
+        
     /**
      * The component where the transition animation occurs.  This
      * component (which is set to be the glass pane) is visible
@@ -71,12 +70,6 @@ public class CrossFadeTransition {
      */
     private JComponent containerLayer;
     
-    /**
-     * Image used to store the current state of the transition
-     * animation.  This image will be rendered to during
-     * timingEvent() and then copied into the glass pane during
-     * the repaint cycle.
-     */
     private BufferedImage transitionImage;
     private BufferedImage beforeImage;
     private BufferedImage afterImage;
@@ -88,12 +81,6 @@ public class CrossFadeTransition {
      */
     private TransitionTarget transitionTarget;
 
-    /**
-     * If the application has already set their own custom glass pane,
-     * we save that component here before using the glass pane for our
-     * own purposes, and then we restore the original glass pane when
-     * the animation has completed.
-     */
     private Component savedGlassPane;
     
     /**
@@ -102,7 +89,7 @@ public class CrossFadeTransition {
     private Animator animator = null;
 
     /**
-     * Constructor for ScreenTransition.  The application must supply the
+     * Constructor for CrossFadeTransition.  The application must supply the
      * JComponent that they wish to transition and the TransitionTarget
      * which supplies the callback methods called during the transition
      * process.
@@ -112,16 +99,14 @@ public class CrossFadeTransition {
      * interface which will be called during transition process.
      */
     private CrossFadeTransition(JComponent transitionComponent,
-                            TransitionTarget transitionTarget)
-    {
+                            TransitionTarget transitionTarget) {
+        
         this.containerLayer = transitionComponent;
 	this.transitionTarget = transitionTarget;
         this.animationLayer = new AnimationLayer();
         this.animationLayer.setVisible(false);
-        
-       
-    }
-    
+               
+    }    
 
     /**`
      * Constructor that takes an Animator that will be used to drive the
@@ -243,14 +228,10 @@ public class CrossFadeTransition {
             transitionTarget.setupNextScreen();
             containerLayer.revalidate();
             containerLayer.paint(afterImage.getGraphics());
-            
-            //new ImageViewer(beforeImage, "Before");
-            //new ImageViewer(afterImage, "After");
 
             // Validating the container layer component ensures correct layout
             // for the next screen of the application
             containerLayer.validate();
-
 
             // Now that we have recorded (and rendered) the initial state, make
             // the container invisible for the duration of the transition

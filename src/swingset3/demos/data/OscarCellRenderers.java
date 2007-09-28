@@ -110,8 +110,8 @@ public class OscarCellRenderers {
             
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             
-            String year = (String)table.getValueAt(row,
-                    table.convertColumnIndexToView(OscarTableModel.YEAR_COLUMN));
+            String year = table.getValueAt(row,
+                    table.convertColumnIndexToView(OscarTableModel.YEAR_COLUMN)).toString();
             if (year != null && year.length() == 4) {
                 String era = ((String)year).substring(0, 3);
                 Font eraFont = eraFonts.get(era);
@@ -125,13 +125,16 @@ public class OscarCellRenderers {
     //<snip>Render "nominee" table column with special icon for winners
     public static class NomineeRenderer extends RowRenderer {
         private ImageIcon winnerIcon;
+        private ImageIcon nomineeIcon; // nice way of saying "loser" :)
         
         private boolean isWinner;
         
         public NomineeRenderer() {
             winnerIcon = new ImageIcon(
-                    getClass().getResource("resources/images/goldstar.png")); 
-            setHorizontalTextPosition(JLabel.LEADING);
+                    getClass().getResource("resources/images/goldstar.png"));
+            nomineeIcon = new ImageIcon(
+                    getClass().getResource("resources/images/nominee.png"));
+            setHorizontalTextPosition(JLabel.TRAILING);
         }
         
         public NomineeRenderer(Color colors[]) {
@@ -164,7 +167,7 @@ public class OscarCellRenderers {
                 setToolTipText(isWinner? "Winner!" : "Nominee");
             }           
 
-            setIcon(isWinner? winnerIcon : null);
+            setIcon(isWinner? winnerIcon : nomineeIcon);
             
             return this;
         }        

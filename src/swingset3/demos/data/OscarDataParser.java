@@ -33,14 +33,17 @@ package swingset3.demos.data;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public abstract class OscarDataParser extends DefaultHandler {
@@ -86,13 +89,16 @@ public abstract class OscarDataParser extends DefaultHandler {
                 
         //get a factory
         SAXParserFactory spf = SAXParserFactory.newInstance();
+        InputStream is;
         try {
             
             //get a new instance of parser
             SAXParser sp = spf.newSAXParser();
             
             //parse the file and also register this class for call backs
-            sp.parse(oscarURL.openStream(), this);
+            is = new BufferedInputStream(oscarURL.openStream());
+            sp.parse(is, this);
+            is.close();
             
         }catch(SAXException se) {
             se.printStackTrace();
@@ -100,7 +106,7 @@ public abstract class OscarDataParser extends DefaultHandler {
             pce.printStackTrace();
         }catch (IOException ie) {
             ie.printStackTrace();
-        }
+        } 
         return candidates;
     }
         
@@ -112,7 +118,7 @@ public abstract class OscarDataParser extends DefaultHandler {
         for(int i = 0; i < categoriesIn.length; i++) {            
             if(qName.equalsIgnoreCase(categoriesIn[i])) {
                 tempOscarCandidate = new OscarCandidate(categoriesOut[i]);
-                tempOscarCandidate.setYear(attributes.getValue("year"));
+                tempOscarCandidate.setYear(Integer.parseInt(attributes.getValue("year")));
                 return;
             }
         }
@@ -129,7 +135,7 @@ public abstract class OscarDataParser extends DefaultHandler {
         } else if (qName.equalsIgnoreCase("lost")) {
             tempOscarCandidate.setWinner(false);
         } else if (qName.equalsIgnoreCase("movie")) {
-            tempOscarCandidate.setMovie(tempVal);
+            tempOscarCandidate.setMovieTitle(tempVal);
         } else if (qName.equalsIgnoreCase("person")) {
             tempOscarCandidate.getPersons().add(tempVal);
         } else {
@@ -138,9 +144,30 @@ public abstract class OscarDataParser extends DefaultHandler {
                 if (qName.equalsIgnoreCase(category)) {
                     //add it to the list
                     addCandidate(tempOscarCandidate);
+                    break;
                 }
             }            
         }        
+    }
+    
+    @Override
+    public void error(SAXParseException ex) throws SAXException {
+        AdvancedTableDemo.logger.log(Level.SEVERE, "error parsing oscar data ", ex);
+    }
+    
+    @Override
+    public void fatalError(SAXParseException ex) throws SAXException {
+        AdvancedTableDemo.logger.log(Level.SEVERE, "fatal error parsing oscar data ", ex);        
+    }
+    
+    @Override
+    public void warning(SAXParseException ex) {
+        AdvancedTableDemo.logger.log(Level.WARNING, "warning occurred while parsing oscar data ", ex);
+    }
+    
+    @Override
+    public void endDocument() throws SAXException {
+        AdvancedTableDemo.logger.log(Level.FINER, "parsed to end of oscar data.");
     }
     
     protected abstract void addCandidate(OscarCandidate candidate);

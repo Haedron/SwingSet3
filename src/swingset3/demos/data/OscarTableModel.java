@@ -87,7 +87,7 @@ public class OscarTableModel extends AbstractTableModel {
             case YEAR_COLUMN:
                 return oscarCandidate.getYear();
             case MOVIE_COLUMN:
-                return oscarCandidate.getMovieLink();
+                return oscarCandidate.getMovieTitle();
             case WINNER_COLUMN:
                 return oscarCandidate.isWinner()? Boolean.TRUE : Boolean.FALSE;
             case PERSONS_COLUMN:

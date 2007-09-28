@@ -72,7 +72,8 @@ public class Link {
     }
 
     public String getDescription() {
-        return description != null? description : uri.getPath();
+        return description != null? description : 
+            uri != null? uri.getPath() : null;
     }
 
     public void setDescription(String description) {

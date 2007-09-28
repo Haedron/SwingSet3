@@ -33,31 +33,26 @@ package swingset3.codeview;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.URL;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import swingset3.Utilities;
+import swingset3.codeview.SnippetNavigator.ArrowIcon.Direction;
 
 /**
  *
  * @author aim
  */
 public class SnippetNavigator extends JComponent {
-    private static final String NO_SNIPPET = "No Code Snippet highlight selected.";
-    private static final String SHOWING_SNIPPET = " Showing Code Snippet: ";
-    private static final String NO_SNIPPETS_IN_FILE = "No highlighted Code Snippets in ";
+    private static final String NO_SNIPPET = "No Code highlight selected";
+    private static final String SHOWING_SNIPPET = " Showing ";
             
-    private URL sourceFile;
     private SnippetMap snippetMap;
     
     JLabel statusLabel;
@@ -67,8 +62,7 @@ public class SnippetNavigator extends JComponent {
     JButton lastButton;
     
     /** Creates a new instance of SnippetNavigator */
-    public SnippetNavigator(SnippetMap snippetMap, URL sourceFile) {
-        this.sourceFile = sourceFile;
+    public SnippetNavigator(SnippetMap snippetMap) {
         this.snippetMap = snippetMap;
         snippetMap.addPropertyChangeListener(new SnippetHighlightListener());
         
@@ -129,31 +123,27 @@ public class SnippetNavigator extends JComponent {
         }
         
         private void setComponentState(String currentKey) {
-            boolean showButtons = false;
+
             if (currentKey == null) {
                 statusLabel.setText(NO_SNIPPET);
                 
             } else {
-                Snippet snippets[] = snippetMap.getSnippetsForFile(currentKey, sourceFile);
-                if (snippets != null && snippets.length > 0) {
-                    String place = snippetMap.getIndexForSnippet(snippetMap.getCurrentSnippet()) +
-                            " of " + snippetMap.getSnippetCountForSet(currentKey) + " ";
-                    statusLabel.setText(SHOWING_SNIPPET + place);
-                    showButtons = true;
-                } else {
-                    statusLabel.setText(NO_SNIPPETS_IN_FILE + Utilities.getURLFileName(sourceFile));
-                }
+                
+                String place = snippetMap.getIndexForSnippet(snippetMap.getCurrentSnippet()) +
+                        " of " + snippetMap.getSnippetCountForSet(currentKey) + " ";
+                statusLabel.setText(SHOWING_SNIPPET + place);
+                
             }
             boolean moreThanOne = snippetMap.getSnippetCountForSet(currentKey) > 1;
             boolean previousExists = snippetMap.previousSnippetExists();
             boolean nextExists = snippetMap.nextSnippetExists();
-            firstButton.setVisible(showButtons);
+            firstButton.setVisible(moreThanOne);
             firstButton.setEnabled(moreThanOne && previousExists);
-            prevButton.setVisible(showButtons);
+            prevButton.setVisible(moreThanOne);
             prevButton.setEnabled(previousExists);
-            nextButton.setVisible(showButtons);
+            nextButton.setVisible(moreThanOne);
             nextButton.setEnabled(nextExists);
-            lastButton.setVisible(showButtons);
+            lastButton.setVisible(moreThanOne);
             lastButton.setEnabled(moreThanOne && nextExists);
         }
     }

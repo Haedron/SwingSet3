@@ -31,6 +31,7 @@
 
 package swingset3.demos.data;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import swingset3.hyperlink.Link;
@@ -42,10 +43,10 @@ import swingset3.hyperlink.Link;
 public class OscarCandidate {
     
     private String category;
-    private String year;
+    private Integer year;
     private boolean winner = false;
     private String movie;
-    private Link movieLink;
+    private URI imdbURI;
     private ArrayList<String> persons;
     
     /** Creates a new instance of OscarCandidate */
@@ -62,11 +63,11 @@ public class OscarCandidate {
         this.category = category;
     }
 
-    public String getYear() {
+    public Integer getYear() {
         return year;
     }
 
-    public void setYear(String year) {
+    public void setYear(Integer year) {
         this.year = year;
     }
 
@@ -78,19 +79,20 @@ public class OscarCandidate {
         this.winner = winner;
     }
 
-    public String getMovie() {
+    public String getMovieTitle() {
         return movie;
     }
 
-    public void setMovie(String movie) {
+    public void setMovieTitle(String movie) {
         this.movie = movie;
     }
     
-    public Link getMovieLink() {
-        if (movieLink == null) {
-            movieLink = new Link(movie);
-        }
-        return movieLink;
+    public URI getIMDBMovieURI() {
+        return imdbURI;
+    }
+    
+    public void setIMDBMovieURI(URI uri) {
+        this.imdbURI = uri;
     }
 
     public List<String> getPersons() {

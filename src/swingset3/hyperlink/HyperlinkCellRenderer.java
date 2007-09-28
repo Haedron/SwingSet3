@@ -59,8 +59,9 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
     private ArrayList columnModelIndeces;
     private Action action;
     
-    private Color selectionBackground;
-    private Color selectionForeground;
+    private Color selectedBackground;
+    private Color selectedForeground;
+    private Color unselectedForeground;
     private Color rowColors[];
     
     private boolean underlineOnRollover = true;
@@ -75,8 +76,9 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
         setOpaque(true);
         setAction(action);
         setHorizontalAlignment(JHyperlink.LEFT);
-        selectionBackground = UIManager.getColor("Table.selectionBackground");
-        selectionForeground = UIManager.getColor("Table.selectionForeground");
+        selectedBackground = UIManager.getColor("Table.selectionBackground");
+        selectedForeground = UIManager.getColor("Table.selectionForeground");
+        unselectedForeground = getForeground();
         rowColors = new Color[1];
         rowColors[0] = UIManager.getColor("Table.background");
         columnModelIndeces = new ArrayList();
@@ -109,14 +111,14 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
         }
         setVisited(isCellLinkVisited(value, row, column));            
         setDrawUnderline(!underlineOnRollover ||
-                (row == hitRowIndex && column == hitColumnIndex) ||
-                hasFocus);
+                (row == hitRowIndex && column == hitColumnIndex));
         
         if (!isSelected) {
             setBackground(rowColors[row % rowColors.length]);
+            setForeground(unselectedForeground);
         } else {
-            setBackground(selectionBackground);
-            setForeground(selectionForeground);
+            setBackground(selectedBackground);
+            setForeground(selectedForeground);
         }
         return this;
     }
@@ -231,13 +233,15 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
         @Override
         public void mouseClicked(MouseEvent event) {
             if (checkIfPointInsideHyperlink(event.getPoint())) {
-                //remind(aim): this is a real hack at the moment; need cleaner mapping
-                Object value = table.getValueAt(hitRowIndex, hitColumnIndex);
-  
-                ActionEvent actionEvent = new ActionEvent(value, ActionEvent.ACTION_PERFORMED,
+   
+                ActionEvent actionEvent = new ActionEvent(new Integer(hitRowIndex), 
+                        ActionEvent.ACTION_PERFORMED,
                         "hyperlink");
                     
                 HyperlinkCellRenderer.this.fireActionPerformed(actionEvent);
+                
+                setCellLinkVisited(table.getValueAt(hitRowIndex, hitColumnIndex),
+                        hitRowIndex, hitColumnIndex);
                 
             }
         }

@@ -53,12 +53,7 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -67,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.jar.Attributes;
-import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -95,8 +89,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.jdesktop.animation.transitions.ComponentState;
@@ -106,7 +102,6 @@ import org.jdesktop.animation.transitions.ScreenTransition;
 import org.jdesktop.animation.transitions.TransitionTarget;
 import org.jdesktop.animation.transitions.effects.CompositeEffect;
 import org.jdesktop.animation.transitions.effects.FadeIn;
-import org.jdesktop.animation.transitions.effects.FadeOut;
 import swingset3.codeview.CodeViewer;
 
 
@@ -439,6 +434,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         demoSelectorTree.setBorder(new EmptyBorder(TREE_INSETS));
         demoSelectorTree.setRowHeight(getTreeRowHeight());
         demoSelectorTree.addMouseListener(new DemoTreeClickListener());
+        demoSelectorTree.setSelectionModel(new DemoTreeSelectionModel());
         JScrollPane scrollPane = new JScrollPane(demoSelectorTree);
         scrollPane.setPreferredSize(new Dimension(TREE_WIDTH,DEMO_HEIGHT)); // wide enough to avoid horiz scrollbar
         scrollPane.setMinimumSize(new Dimension(TREE_WIDTH,DEMO_HEIGHT));
@@ -793,7 +789,31 @@ public class SwingSet3 extends SingleFrameApplication  {
                 }
             }
         }
-    }            
+    }
+    
+    // Selection model which prevents non-leaf nodes from becoming selected
+    private class DemoTreeSelectionModel extends DefaultTreeSelectionModel {
+        
+        public DemoTreeSelectionModel() {
+            setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        }
+        
+        @Override
+        public void setSelectionPath(TreePath path) {
+            if (path == null ||
+                    ((TreeNode)path.getLastPathComponent()).isLeaf()) {
+                super.setSelectionPath(path);
+            } 
+        }
+        
+        @Override
+        public void setSelectionPaths(TreePath[] pPaths) {
+            if (pPaths == null ||
+                    ((TreeNode)pPaths[0].getLastPathComponent()).isLeaf()) {
+                super.setSelectionPaths(pPaths);
+            } 
+        }        
+    }
             
     private class LaunchTransitionTarget implements TransitionTarget {
         private int startX = 0;
@@ -818,6 +838,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     private class ScaleMoveEffect extends Effect {
         
         private Point startLocation = new Point();
+        private PropertySetter ps[];
         
         public ScaleMoveEffect() {
             this(0,0);
@@ -835,20 +856,28 @@ public class SwingSet3 extends SingleFrameApplication  {
         @Override
         public void init(Animator animator, Effect parentEffect) {
             Effect targetEffect = (parentEffect == null) ? this : parentEffect;
-            PropertySetter ps;
+
             ComponentState starts = getStart();
             ComponentState ends = getEnd();
             
-            ps = new PropertySetter(targetEffect, "location",
+            ps = new PropertySetter[3];
+            
+            ps[0] = new PropertySetter(targetEffect, "location",
                     startLocation, new Point(getEnd().getX(), getEnd().getY()));
-            animator.addTarget(ps);
-            ps = new PropertySetter(targetEffect, "width", 0,
+            animator.addTarget(ps[0]);
+            ps[1] = new PropertySetter(targetEffect, "width", 0,
                     getEnd().getWidth());
-            animator.addTarget(ps);
-            ps = new PropertySetter(targetEffect, "height", 0,
+            animator.addTarget(ps[1]);
+            ps[2] = new PropertySetter(targetEffect, "height", 0,
                     getEnd().getHeight());
-            animator.addTarget(ps);
+            animator.addTarget(ps[2]);
             super.init(animator, parentEffect);
+        }
+        @Override
+        public void cleanup(Animator animator) {
+            for(PropertySetter p: ps) {
+                animator.removeTarget(p);
+            }
         }
     }
     
