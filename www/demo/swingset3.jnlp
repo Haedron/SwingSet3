@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- JNLP File for SwingSet3 Demo Application -->
-<jnlp codebase="  http://download.java.net/javadesktop/swingset3" href="swingset3.jnlp" spec="6.0+">
+<jnlp codebase="http://download.java.net/javadesktop/swingset3" href="swingset3.jnlp" spec="6.0+">
   <information>
     <title>SwingSet3 Demo Application</title>
     <vendor>Sun Microsystems, Inc.</vendor>
     <homepage href="https://swingset3.dev.java.net"/>
     <description>SwingSet3 Demo Application</description>
-    <description kind="short">Showing off the capabilities of Swing in Java6 and beyond.</description>
+    <description kind="short">Showing off the capabilities of Swing in Java6.</description>
     <!--icon href="resources/images/splash3.png"/> -->
-    <icon href="/swingset3/resources/images/splash3.png" kind="splash"/>
+    <icon href="swingset3/resources/images/splash3.png" kind="splash"/>
     <shortcut online="true"/>
   </information>
   <offline-allowed/>
@@ -19,11 +19,10 @@
     <j2se java-vm-args="-esa -Xnoclassgc" version="1.6+"/>
     <jar href="swingset3.jar"/>
     <jar href="lib/jlfgr-1_0.jar"/>
-    <jar href="lib/TimingFramework.jar"/>
     <jar href="lib/AnimatedTransitions.jar"/>
+    <jar href="lib/TimingFramework.jar"/>
     <jar href="lib/AppFramework.jar"/>
     <jar href="lib/swing-worker.jar"/>
   </resources>
-  <application-desc main-class="swingset3.SwingSet3">
-  </application-desc>
+  <application-desc main-class="swingset3.SwingSet3"/>
 </jnlp>
