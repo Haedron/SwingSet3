@@ -48,6 +48,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -55,6 +57,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,7 +68,9 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -79,8 +85,6 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import swingset3.Utilities;
@@ -137,7 +141,7 @@ public class CodeViewer extends JPanel {
     private static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(255,255,176); 
     private static BufferedImage SNIPPET_GLYPH;
     private static Insets CODE_INSETS;
-    private static final String NO_SNIPPET_SELECTED = "Select One";
+    private static String NO_SNIPPET_SELECTED;
     
     private static final Rectangle scrollRect = new Rectangle(5,5,50,50);
     
@@ -159,6 +163,7 @@ public class CodeViewer extends JPanel {
     private Color highlightColor;
     private Highlighter.HighlightPainter snippetPainter;
     
+    private ResourceBundle bundle;
 
     // Current code file set
     private URL currentCodeFiles[] = null;
@@ -191,9 +196,13 @@ public class CodeViewer extends JPanel {
         
         Box box = Box.createHorizontalBox();
         
-        box.add(Box.createHorizontalGlue());  
+        box.add(Box.createHorizontalGlue());
+        
+        NO_SNIPPET_SELECTED = getString("CodeViewer.snippets.selectOne", 
+                                        "Select One");
        
-        JLabel snippetSetsLabel = new JLabel("Highlight code to: ");
+        JLabel snippetSetsLabel = new JLabel(getString("CodeViewer.snippets.highlightCode",
+                                                       "Highlight code to: "));
         snippetSetsComboBox = new JComboBox();
         snippetSetsComboBox.setAlignmentY(.51f);
         snippetSetsComboBox.setMaximumRowCount(20);
@@ -208,10 +217,8 @@ public class CodeViewer extends JPanel {
         box.add(Box.createHorizontalStrut(8));
             
         SnippetNavigator snippetNavigator = new SnippetNavigator(snippetMap);
-        snippetNavigator.setNavigateFirstAction(firstSnippetAction);
         snippetNavigator.setNavigateNextAction(nextSnippetAction);
         snippetNavigator.setNavigatePreviousAction(previousSnippetAction);
-        snippetNavigator.setNavigateLastAction(lastSnippetAction);
         box.add(snippetNavigator);
         
         box.add(Box.createHorizontalGlue());
@@ -222,6 +229,22 @@ public class CodeViewer extends JPanel {
     protected void initCodeTabbedPane() {
         codeTabbedPane = new CodeTabbedPane();
         add(BorderLayout.CENTER, codeTabbedPane);
+    }
+    
+    protected String getString(String key, String fallback) {
+        String value = fallback;
+        if (bundle == null) {
+            String bundleName = getClass().getPackage().getName()+".resources."+getClass().getSimpleName();
+            bundle = ResourceBundle.getBundle(bundleName);
+        }
+        try {
+            value = bundle != null? bundle.getString(key) : fallback;
+        
+        } catch (MissingResourceException e) {
+            logger.log(Level.WARNING, "missing String resource " + key + 
+                    "; using fallback \"" +fallback + "\"");
+        }
+        return value;
     }
     
     protected void initActions() {
@@ -257,8 +280,7 @@ public class CodeViewer extends JPanel {
         if (currentCodeFiles != null && currentCodeFiles.equals(sourceFiles)) {
             // already loaded
             return;
-        }
-        
+        }        
         currentCodeFiles = sourceFiles;
         
         codeTabbedPane.removeAll();
@@ -574,7 +596,8 @@ public class CodeViewer extends JPanel {
         public FirstSnippetAction() {
             super("FirstSnippet");
             putValue(AbstractAction.SHORT_DESCRIPTION, 
-                    "move to first code snippet within highlighted set");
+                    getString("CodeViewer.snippets.navigateFirst",
+                              "move to first code snippet within highlighted set"));
         } 
         public void actionPerformed(ActionEvent e) {
             moveToFirstSnippet();
@@ -585,7 +608,8 @@ public class CodeViewer extends JPanel {
         public NextSnippetAction() {
             super("NextSnippet");
             putValue(AbstractAction.SHORT_DESCRIPTION, 
-                    "move to next code snippet within highlighted set");
+                    getString("CodeViewer.snippets.navigateNext",
+                              "move to next code snippet within highlighted set"));
         } 
         public void actionPerformed(ActionEvent e) {
             moveToNextSnippet();
@@ -596,7 +620,8 @@ public class CodeViewer extends JPanel {
         public PreviousSnippetAction() {
             super("PreviousSnippet");
             putValue(AbstractAction.SHORT_DESCRIPTION, 
-                    "move to previous code fragment within highlighted sections");
+                    getString("CodeViewer.snippets.navigatePrevious",
+                              "move to previous code fragment within highlighted set"));
         }
         public void actionPerformed(ActionEvent e) {
             moveToPreviousSnippet();
@@ -607,7 +632,8 @@ public class CodeViewer extends JPanel {
         public LastSnippetAction() {
             super("LastSnippet");
             putValue(AbstractAction.SHORT_DESCRIPTION, 
-                    "move to last code snippet within highlighted set");
+                    getString("CodeViewer.snippets.navigateLast",
+                              "move to last code snippet within highlighted set"));
         } 
         public void actionPerformed(ActionEvent e) {
             moveToLastSnippet();
@@ -632,13 +658,98 @@ public class CodeViewer extends JPanel {
             int count = snippetMap.getSnippetCountForSet((String)value);
             
             String text = "<html>" + value + "<font color=\"#3b3b3b\">" +
-                (count > 0? " (" + count + (count > 1? " snippets)" : " snippet)") : "") +
+                    (count > 0? " (" + count + (count > 1? " snippets)" : " snippet)") : "") +
                     "</font></html>";
             renderer.setText(text);
-            return renderer;            
+            return renderer;
         }
     }
     
+    private class SnippetNavigator extends JComponent {
+        private String NO_SNIPPET;
+        private String SHOWING_SNIPPET;
+        
+        private SnippetMap snippetMap;
+        
+        private JLabel statusLabel;
+        private JButton prevButton;
+        private JButton nextButton;
+        
+        public SnippetNavigator(SnippetMap snippetMap) {
+            this.snippetMap = snippetMap;
+            snippetMap.addPropertyChangeListener(new SnippetHighlightListener());
+            
+            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            
+            NO_SNIPPET = getString("CodeViewer.snippets.noCodeHighlighted",
+                                   "No Code highlight selected");
+            
+            SHOWING_SNIPPET = getString("CodeViewer.snippets.showing",
+                                        " Showing ");
+            
+            prevButton = (JButton)add(new JButton(
+                    new ImageIcon(getClass().getResource("resources/images/previous.png"))));
+            prevButton.setVisible(false);
+            
+            statusLabel = new JLabel(NO_SNIPPET);
+            add(statusLabel);
+            
+            nextButton = (JButton)add(new JButton(
+                    new ImageIcon(getClass().getResource("resources/images/next.png"))));
+            nextButton.setVisible(false);
+            
+        }
+        
+        public void setNavigatePreviousAction(Action action) {
+            setButtonAction(prevButton, action);
+        }
+        
+        public void setNavigateNextAction(Action action) {
+            setButtonAction(nextButton, action);
+        }
+        
+        private void setButtonAction(JButton button, Action action) {
+            Icon icon = button.getIcon();
+            button.setAction(action);
+            button.setHideActionText(true);
+            button.setIcon(icon); // icon gets obliterated when action set!
+        }
+        
+        private class SnippetHighlightListener implements PropertyChangeListener {
+            public void propertyChange(PropertyChangeEvent e) {
+                String propertyName = e.getPropertyName();
+                if (propertyName.equals("currentSet")) {
+                    String key = (String)e.getNewValue();
+                    setComponentState(key);
+                    
+                } else if (propertyName.equals("currentSnippet")) {
+                    setComponentState(snippetMap.getCurrentSet());
+                }
+            }
+            
+            private void setComponentState(String currentKey) {
+                
+                if (currentKey == null) {
+                    statusLabel.setText(NO_SNIPPET);
+                    
+                } else {
+                    
+                    String place = snippetMap.getIndexForSnippet(snippetMap.getCurrentSnippet()) +
+                            " of " + snippetMap.getSnippetCountForSet(currentKey) + " ";
+                    statusLabel.setText(SHOWING_SNIPPET + place);
+                    
+                }
+                boolean moreThanOne = snippetMap.getSnippetCountForSet(currentKey) > 1;
+                
+                prevButton.setVisible(moreThanOne);
+                prevButton.setEnabled(snippetMap.previousSnippetExists());
+                nextButton.setVisible(moreThanOne);
+                nextButton.setEnabled(snippetMap.nextSnippetExists());
+            }
+        }
+    }
+    
+ 
     private class CodeFileInfo {
         public URL url;
         public String styled;
@@ -671,7 +782,13 @@ public class CodeViewer extends JPanel {
     }
     
     private class CodeTabbedPane extends JTabbedPane {
-        private String emptyMessage = "no code loaded";
+        private String emptyMessage;
+        
+        public CodeTabbedPane() {
+            super();
+            emptyMessage = getString("CodeViewer.noCodeLoaded",
+                                     "no code loaded");
+        }
                 
         @Override
         protected void paintComponent(Graphics g) {
