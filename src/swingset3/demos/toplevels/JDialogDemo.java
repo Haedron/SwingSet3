@@ -31,9 +31,12 @@
 
 package swingset3.demos.toplevels;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -57,6 +60,8 @@ public class JDialogDemo extends JPanel {
     private JDialog dialog;
     
     private JButton showButton;
+    
+    private boolean locationSet = false;
         
     public JDialogDemo() {        
         initComponents();
@@ -70,7 +75,9 @@ public class JDialogDemo extends JPanel {
         // Create button to control visibility of frame
         showButton = new JButton("Show JDialog...");
         showButton.addActionListener(new ShowActionListener());
-        add(showButton);        
+        add(showButton); 
+        
+        addComponentListener(new SizeInitListener());
     }
     
     protected JDialog createDialog() {
@@ -95,10 +102,11 @@ public class JDialogDemo extends JPanel {
     }
     
     public void start() {
-        Utilities.setToplevelLocation(dialog, this, Utilities.SOUTH);
-        //<snip>Show dialog
-        dialog.setVisible(true);
-        //</snip>
+        // If location hasn't been initialed yet from SizeInitListener, then
+        // defer visibility of dialog        
+        if (locationSet) {
+            dialog.setVisible(true);
+        }
     };
     
     public void stop() {
@@ -114,12 +122,27 @@ public class JDialogDemo extends JPanel {
             if (dialog.isShowing()) {
                 dialog.toFront();
             } else {
-                Utilities.setToplevelLocation(dialog, showButton, Utilities.SOUTH_EAST);
                 dialog.setVisible(true);
             }
             //</snip>
         }
     }
-    
+
+    // This is a hack to deal with the asynchronous instantiation of this
+    // demo component when embedded in HTML;   at the time start() is called,
+    // we don't necessarily have the size/location of the demo, hence cannot
+    // determine a reasonable relative location for the dialog.  So we wait
+    // until the demo's size is initialized to set the location of the dialog.
+    private class SizeInitListener extends ComponentAdapter {        
+        public void componentResized(ComponentEvent event) {
+            Component component = event.getComponent();
+            if (component.getWidth() > 0 && component.getHeight() > 0) {
+                Utilities.setToplevelLocation(dialog, component, Utilities.SOUTH);
+                locationSet = true;
+                dialog.setVisible(true);
+                component.removeComponentListener(this);                
+            }
+        }        
+    } // SizeInitListener
 
 }

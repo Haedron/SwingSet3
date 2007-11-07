@@ -33,9 +33,13 @@ package swingset3.demos.toplevels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.net.URL;
 import javax.swing.BoxLayout;
@@ -74,7 +78,9 @@ public class JFrameDemo extends JPanel {
     static {
         // Property must be set *early* due to Apple Bug#3909714
         // ignored on other platforms
-        System.setProperty("apple.laf.useScreenMenuBar", "true");              
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true"); 
+        }
     }
     //</snip>
     
@@ -84,6 +90,8 @@ public class JFrameDemo extends JPanel {
     
     // Toplevel frame component    
     private JFrame frame;
+    
+    private boolean locationSet = false;
             
     public JFrameDemo() {        
         initComponents();
@@ -104,6 +112,8 @@ public class JFrameDemo extends JPanel {
         busyCheckBox.setSelected(false);
         busyCheckBox.addChangeListener(new BusyChangeListener());
         add(busyCheckBox);
+        
+        addComponentListener(new SizeInitListener());
         
     }
     
@@ -141,7 +151,7 @@ public class JFrameDemo extends JPanel {
         //</snip>
         
         //<snip>Add the content area
-        JLabel label = new JLabel("I'm content and a little blue.");
+        JLabel label = new JLabel("I'm content but a little blue.");
         label.setHorizontalAlignment(JLabel.CENTER);
         label.setPreferredSize(new Dimension(400,200));
         label.setBackground(new Color(197, 216, 236));
@@ -177,11 +187,11 @@ public class JFrameDemo extends JPanel {
     }    
 
     public void start() {
-        Utilities.setToplevelLocation(frame, this, Utilities.SOUTH);
-        
-        //<snip>Show frame
-        frame.setVisible(true);
-        //</snip>
+        // If location hasn't been initialed yet from SizeInitListener, then
+        // defer visibility of frame        
+        if (locationSet) {
+            frame.setVisible(true);
+        }
     };
     
     public void stop() {
@@ -191,12 +201,11 @@ public class JFrameDemo extends JPanel {
     };
     
     public void showFrame() {
-        //<snip>Make frame visible
+        //<snip>Show frame
         // if frame already visible, then bring to the front
         if (frame.isShowing()) {
             frame.toFront();
         } else {
-            Utilities.setToplevelLocation(frame, showButton, Utilities.SOUTH_EAST);
             frame.setVisible(true);
         }
         //</snip>
@@ -214,6 +223,23 @@ public class JFrameDemo extends JPanel {
         return frame.getGlassPane().isVisible();
     }
     //</snip>
+    
+    // This is a hack to deal with the asynchronous instantiation of this
+    // demo component when embedded in HTML;   at the time start() is called,
+    // we don't necessarily have the size/location of the demo, hence cannot
+    // determine a reasonable relative location for the frame.  So we wait
+    // until the demo's size is initialized to set the location of the frame.
+    private class SizeInitListener extends ComponentAdapter {        
+        public void componentResized(ComponentEvent event) {
+            Component component = event.getComponent();
+            if (component.getWidth() > 0 && component.getHeight() > 0) {
+                Utilities.setToplevelLocation(frame, component, Utilities.SOUTH);
+                locationSet = true;
+                frame.setVisible(true);
+                component.removeComponentListener(this);                
+            }
+        }        
+    } // SizeInitListener
     
     
 }
