@@ -40,9 +40,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -87,6 +89,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
@@ -115,6 +118,8 @@ public class SwingSet3 extends SingleFrameApplication  {
     
     private static ServiceLoader<LookAndFeel> lookAndFeelLoader = ServiceLoader.load(LookAndFeel.class); 
     private static ServiceLoader<DemoList> demoListLoader = ServiceLoader.load(DemoList.class);
+    
+    public static String title;
 
     public static final String controlVeryLightShadowKey = "controlVeryLightShadowColor";
     public static final String controlLightShadowKey = "controlLightShadowColor";
@@ -124,15 +129,17 @@ public class SwingSet3 extends SingleFrameApplication  {
 
     public static final int DEMO_WIDTH = 650;
     public static final int DEMO_HEIGHT = 500;
-    public static final int TREE_WIDTH = 200;
+    public static final int TREE_WIDTH = 230;
     public static final int SOURCE_HEIGHT = 250;
     public static final Insets UPPER_PANEL_INSETS = new Insets(12,12,8,12);
-    public static final Insets TREE_INSETS = new Insets(2,8,2,8);
+    public static final Insets TREE_INSETS = new Insets(0,8,0,0);
     public static final Insets SOURCE_PANE_INSETS = new Insets(4,8,8,8);
         
     static {
         // Property must be set *early* due to Apple Bug#3909714
-        System.setProperty("apple.laf.useScreenMenuBar", "true");                
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true"); 
+        }
     }
     
     public static void main(String[] args) {
@@ -142,10 +149,6 @@ public class SwingSet3 extends SingleFrameApplication  {
     public static boolean onMac() {
         return System.getProperty("os.name").equals("Mac OS X");
     } 
-    
-    public static boolean runningFromWebStart() {
-        return ServiceManager.getServiceNames() != null;        
-    }
     
     private static List<String> readDemoClassNames(Reader reader) throws IOException {
         ArrayList<String> demoClassNames = new ArrayList();
@@ -240,6 +243,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     @Override
     protected void initialize(String args[]) {        
         resourceMap = getContext().getResourceMap();
+        title = resourceMap.getString("mainFrame.title");
         demoCache = new HashMap();
         setDemoPlaceholder(new IntroPanel(DEMO_WIDTH, DEMO_HEIGHT));
         setDemos(resourceMap.getString("demos.title"), getDemoList(args));
@@ -404,6 +408,26 @@ public class SwingSet3 extends SingleFrameApplication  {
                 Color.getHSBColor(controlHSB[0], controlHSB[1], controlHSB[2] - 0.5f));
         UIManager.put(controlDarkShadowKey, 
                 Color.getHSBColor(controlHSB[0], controlHSB[1], controlHSB[2] - 0.32f));
+        
+        /*
+         * At the moment setting the background of the tree to "mac tree blue" on
+         * aqua laf causes painting problems;   the tree first flashes a white background
+         * before the blue is painted and the tree's renderer also paints white
+         * if non-opaque ! ?  bug in OSX/Java6?
+         *
+        if (onMac() && UIManager.getLookAndFeel().isNativeLookAndFeel()) {
+            UIManager.put("Tree.background", new ColorUIResource(229, 237, 247));
+        }
+        */
+        
+        UIManager.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent event) {
+                if (event.getPropertyName().equals("lookAndFeel")) {
+                    initColorPalette();
+                }
+            }
+        });
+       
 
     }  
     
@@ -419,7 +443,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         upperPanel = new JPanel();
         upperPanel.setLayout(new BorderLayout());
         //vertSplitPane.setTopComponent(upperPanel);
-        upperPanel.setBorder(new EmptyBorder(UPPER_PANEL_INSETS));
+        //upperPanel.setBorder(new EmptyBorder(UPPER_PANEL_INSETS));
         contentPanel.add(upperPanel, BorderLayout.CENTER);
 
         // Create demo selector tree
@@ -430,7 +454,8 @@ public class SwingSet3 extends SingleFrameApplication  {
         UIManager.put("Tree.collapsedIcon", resourceMap.getImageIcon("selectionTree.collapsedIcon"));
         demoSelectorTree = new DemoSelectorTree(demoTreeModel);
         demoSelectorTree.setName("demoSelectorTree");
-        demoSelectorTree.setShowsRootHandles(false);
+        demoSelectorTree.setRootVisible(false);
+        demoSelectorTree.setShowsRootHandles(true);
         demoSelectorTree.setBorder(new EmptyBorder(TREE_INSETS));
         demoSelectorTree.setRowHeight(getTreeRowHeight());
         demoSelectorTree.addMouseListener(new DemoTreeClickListener());
@@ -449,7 +474,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         codeViewer = new CodeViewer();
         codeViewer.setPreferredSize(new Dimension(TREE_WIDTH+DEMO_WIDTH, SOURCE_HEIGHT));
         sourceCodePane = new CollapsiblePanel("Demo Source Code", codeViewer);
-        sourceCodePane.setBorder(new EmptyBorder(SOURCE_PANE_INSETS));
+        //sourceCodePane.setBorder(new EmptyBorder(SOURCE_PANE_INSETS));
         sourceCodePane.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getPropertyName().equals("expanded")) {
@@ -543,14 +568,14 @@ public class SwingSet3 extends SingleFrameApplication  {
         
         // Initialize animated transition for when demos launch
         launchTransitionTarget = new LaunchTransitionTarget();
-        launchAnimator = new Animator(1500);
+        launchAnimator = new Animator(1000);
         launchAnimator.setAcceleration(.2f);
         launchAnimator.setDeceleration(.3f);
         launchTransition = new ScreenTransition(upperPanel, launchTransitionTarget, launchAnimator);
         
         // Initialize animated transition (cross-fade) when look and feel is switched
         lafTransitionTarget = new LafTransitionTarget();
-        lafAnimator = new Animator(2000);
+        lafAnimator = new Animator(1000);
         lafAnimator.setAcceleration(.3f);
         lafAnimator.setAcceleration(.5f);
         lafTransition = new CrossFadeTransition((JComponent)getMainFrame().getRootPane().getLayeredPane(),
@@ -631,6 +656,9 @@ public class SwingSet3 extends SingleFrameApplication  {
                 upperPanel.remove(activeDemoPanel);
                 upperPanel.add(nextDemoPanel, BorderLayout.CENTER);
                 activeDemoPanel = nextDemoPanel;
+                upperPanel.revalidate();
+                upperPanel.repaint();
+                getMainFrame().validate();
             }
         }
 
@@ -642,7 +670,9 @@ public class SwingSet3 extends SingleFrameApplication  {
             codeViewer.setSourceFiles(currentDemo != null?
                 currentDemo.getSourceFiles() : null);
         }
-
+        getMainFrame().setTitle(title +
+                (currentDemo != null? (" :: " + currentDemo.getName()) : ""));
+                
         firePropertyChange("currentDemo", oldCurrentDemo, demo);
     }
     
@@ -650,7 +680,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         
         if (nextDemoPanel != null) {
             // Remove initialization padding from animator
-            launchAnimator.setDuration(1000);
+            launchAnimator.setDuration(700);
         }
         nextDemoPanel = demoPanel;
         TreePath demoPath = getTreePathForDemo(demo);
@@ -689,13 +719,15 @@ public class SwingSet3 extends SingleFrameApplication  {
 	if (oldLookAndFeel != lookAndFeel) {
             UIManager.setLookAndFeel(lookAndFeel);
             this.lookAndFeel = lookAndFeel;
-            
+            /*
             if (isAnimationOn()) {                
                 lafTransition.start();                
             } else {
                 // Update all GUI components with new look and feel
-                SwingUtilities.updateComponentTreeUI(getMainFrame());     
+                updateLookAndFeel();
             }
+             */
+            updateLookAndFeel();
             firePropertyChange("lookAndFeel", oldLookAndFeel, lookAndFeel);                     
 	}
     }
@@ -747,6 +779,14 @@ public class SwingSet3 extends SingleFrameApplication  {
     
     public int getTreeRowHeight() {
         return treeRowHeight;
+    }
+    
+    private void updateLookAndFeel() {
+        Window windows[] = Frame.getWindows();
+        System.out.println("updating look and feels");
+        for(Window window : windows) {
+            SwingUtilities.updateComponentTreeUI(window);
+        }
     }
 
     // hook used to detect if any components in the demo have registered a
@@ -884,7 +924,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     private class LafTransitionTarget implements TransitionTarget {
         public void setupNextScreen() {
             // Update all GUI components with new look and feel
-            SwingUtilities.updateComponentTreeUI(getMainFrame());           
+            updateLookAndFeel();       
         }
     }
     

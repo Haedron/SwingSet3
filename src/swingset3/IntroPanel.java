@@ -56,7 +56,7 @@ import org.jdesktop.animation.timing.triggers.TimingTriggerEvent;
  *
  * @author aim
  */
-//remind(aim): this class needs to be converted to use Components instead of Glyph
+//remind(aim): this class needs to be converted to use Components instead of Node
 public class IntroPanel extends JComponent {
     private static final int GLEAM_X = 55;
     private static final int GLEAM_Y = 122;
@@ -67,11 +67,11 @@ public class IntroPanel extends JComponent {
     
     protected Color gradientColors[];
     protected BufferedImage backgroundImage;
-    protected Glyph title;
-    protected Glyph glowingTitle;
-    protected Glyph gleam;
-    protected Glyph sparkle;
-    protected Glyph message;
+    protected Node title;
+    protected Node glowingTitle;
+    protected Node gleam;
+    protected Node sparkle;
+    protected Node message;
     
     protected Animator gleamAnimator;
     protected Animator glowAnimator;
@@ -97,11 +97,11 @@ public class IntroPanel extends JComponent {
     
     protected void initialize() {
         try {
-            title = new ImageGlyph("resources/images/splash_graphics.png", 0, 0);
-            glowingTitle = new ImageGlyph("resources/images/swingset3_glow.png", 0, 0, 0.0f);
-            gleam = new ImageGlyph("resources/images/gleam.png", GLEAM_X, GLEAM_Y, 0.0f);
-            sparkle = new ImageGlyph("resources/images/sparkle2.png", HELMET_X, HELMET_Y, 0.0f);
-            message = new ImageGlyph("resources/images/message2.png", 0, 0, 0.0f);
+            title = new ImageNode("resources/images/splash_graphics.png", 0, 0);
+            glowingTitle = new ImageNode("resources/images/swingset3_glow.png", 0, 0, 0.0f);
+            gleam = new ImageNode("resources/images/gleam.png", GLEAM_X, GLEAM_Y, 0.0f);
+            sparkle = new ImageNode("resources/images/sparkle2.png", HELMET_X, HELMET_Y, 0.0f);
+            message = new ImageNode("resources/images/message2.png", 0, 0, 0.0f);
              
         } catch (IOException e) {
             
@@ -136,7 +136,7 @@ public class IntroPanel extends JComponent {
             PropertySetter gleamer = new PropertySetter(gleam, "x", GLEAM_X, GLEAM_X_MAX);
             gleamAnimator = new Animator(500, gleamer);
             gleamAnimator.setStartDelay(20);
-            gleamAnimator.setAcceleration(.3f);
+            gleamAnimator.setAcceleration(.9f);
             gleamAnimator.setDeceleration(.1f);  
             
             PropertySetter sparkler = new PropertySetter(sparkle, "alpha", 0.0f, 1.0f);
@@ -184,8 +184,8 @@ public class IntroPanel extends JComponent {
   
     }
     
-    protected void initFadeAnimator(Glyph glyph) {
-        PropertySetter fader = new PropertySetter(glyph, "alpha", glyph.getAlpha(), 0.0f);
+    protected void initFadeAnimator(Node node) {
+        PropertySetter fader = new PropertySetter(node, "alpha", node.getAlpha(), 0.0f);
         Animator fadeAnimator = new Animator(1000, fader);
         fadeAnimator.setAcceleration(.3f);
         fadeAnimator.setDeceleration(.1f);
@@ -199,14 +199,14 @@ public class IntroPanel extends JComponent {
     }
     
     // remind(aim): could just use java.awt.Component. ?
-    public abstract class Glyph {
+    public abstract class Node {
         protected int x;
         protected int y;
         protected int width;
         protected int height;
         protected float alpha;
         
-        public Glyph(int x, int y, int width, int height, float alpha) {
+        public Node(int x, int y, int width, int height, float alpha) {
             this.x = x;
             this.y = y;
             this.width = width;
@@ -277,15 +277,15 @@ public class IntroPanel extends JComponent {
         public abstract void paint(Graphics g);
     }
         
-    public class ImageGlyph extends Glyph {
+    public class ImageNode extends Node {
         
         BufferedImage image;
         
-        public ImageGlyph(String imageURL, int x, int y) throws IOException {
+        public ImageNode(String imageURL, int x, int y) throws IOException {
             this(imageURL, x, y, 1.0f);
         }
         
-        public ImageGlyph(String imageURL, int x, int y, float alpha) throws IOException {
+        public ImageNode(String imageURL, int x, int y, float alpha) throws IOException {
             super(x, y, 0, 0, alpha);
             image = ImageIO.read(IntroPanel.class.getResource(imageURL));
             this.width = image.getWidth();

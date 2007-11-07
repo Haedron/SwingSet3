@@ -31,98 +31,66 @@
 
 package swingset3;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Level;
 import javax.imageio.ImageIO;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
+import org.jdesktop.animation.timing.Animator;
+import org.jdesktop.animation.timing.interpolation.PropertySetter;
+import org.jdesktop.animation.timing.triggers.TimingTrigger;
+import org.jdesktop.animation.timing.triggers.TimingTriggerEvent;
+import org.jdesktop.swingx.JXPanel;
 
 /**
  *
  * @author aim
  */
-public class DemoPanel extends JPanel {
-    
-    private HTMLPanel descriptionPane;    
+public class DemoPanel extends JXPanel {
+    private HTMLPanel descriptionPane; // used when resources/[DemoClassName].html is supplied
     private Demo demo;
-    private boolean demoAdded = false;
+    private LoadAnimationPanel loadAnimationPanel;
     
-    public DemoPanel(Demo demo) {  
+    public DemoPanel(Demo demo) {
         this.demo = demo;
-                
+        
         setLayout(new BorderLayout()); // ensure components fills panel
-        setBorder(new CompoundBorder(new EmptyBorder(8,2,8,2),
-                                     new TitledBorder(new EmptyBorder(0,0,0,0), demo.getName())));
-                
+        setBorder(new EmptyBorder(4,4,4,4));
+        loadAnimationPanel = new LoadAnimationPanel();
+        add(loadAnimationPanel);
+        loadAnimationPanel.setAnimating(true);
+        
         // Instantiate demo component on separate thread...
         new DemoLoader().execute();
-
+        
     }
     
     public Demo getDemo() {
         return demo;
     }
-        
-    private void printComponent(Component c, String indent) {
-        SwingSet3.logger.log(Level.FINEST, indent+ c.getClass().getSimpleName()+ "  visible="+c.isVisible());
-        if (c instanceof Container) {
-            Container p = (Container)c;
-            Component children[] = p.getComponents();
-            for(Component child: children) {
-                printComponent(child, indent+"  ");
-            }            
-        }
-    }
-    
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-//printComponent(this,"");
-        if (!demoAdded) {
-            Graphics2D g2 = (Graphics2D)g;
-            Insets insets = getInsets();
-            Rectangle bounds = getBounds(); 
-            int thickness = 24;
-            int diameter = (int)(Math.min(bounds.width - insets.left - insets.right - thickness, 
-                    bounds.height - insets.top - insets.bottom - thickness) * .75);
-            g2.setColor(UIManager.getColor(SwingSet3.controlMidShadowKey));
-            g2.setStroke(new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            
-            int x = insets.left + (bounds.width - insets.left - insets.right - diameter)/2;
-            int y = insets.top + (bounds.height - insets.top - insets.bottom - diameter)/2;
-            g2.drawOval(x, y, diameter, diameter);
-            g2.drawLine(x + (diameter/2), y + (diameter/2),
-                    x + (diameter/2) + 70, y + (int)((diameter/2) * .4));
-            g2.drawLine(x + (diameter/2), y + (diameter/2),
-                    x + diameter - 70, y + (diameter/2));
-        } else {
-            
-        }
-        
-    }
     
     protected class DemoLoader extends SwingWorker<Component, Object> {
-        
-        public DemoLoader() {
+        private Animator fadeAnimator;
+        public DemoLoader() {            
         }
         public Component doInBackground() {
-            //try {Thread.currentThread().sleep(10000);} catch (Exception e) {}
+            //try {Thread.currentThread().sleep(2000);} catch (Exception e) {}
             // If demo has HTML description, load with embedded demo component
             URL descriptionURL = DemoPanel.this.demo.getHTMLDescription();
             if (descriptionURL != null) {
@@ -149,22 +117,176 @@ public class DemoPanel extends JPanel {
             }
         }
         protected void done() {
-            try {               
-                add(get());
-                demoAdded = true;
-                revalidate();
+            try {
+                loadAnimationPanel.setAnimating(false);
+                Fader fader = new Fader(DemoPanel.this, loadAnimationPanel, (JComponent)get());
+                fadeAnimator = new Animator(400,fader);
+                fadeAnimator.setAcceleration(.2f);
+                fadeAnimator.setDeceleration(.3f);
+                Animator fadeOut = new Animator(400,
+                        new PropertySetter(DemoPanel.this, "alpha", 0.0f, 1.0f));
+                TimingTrigger trigger =
+                        TimingTrigger.addTrigger(fadeAnimator, fadeOut, TimingTriggerEvent.STOP);
+                fadeAnimator.start();
+                //remove(loadAnimationPanel);
+                //add(get());
+                
                 
             } catch (Exception ignore) {
                 System.err.println(ignore);
             }
         }
+        
+        
     } // DemoLoader
     
-    protected class ComponentCreationListener implements HTMLPanel.ComponentCreationListener {
+    private class Fader extends PropertySetter {
+        JXPanel parent;
+        JComponent out;
+        JComponent in;
+        public Fader(JXPanel parent, JComponent out, JComponent in) {
+            super(out, "alpha", 1.0f, 0.0f);
+            this.parent = parent;
+            this.out = out;
+            this.in = in;
+        }
+        public void end() {
+            parent.remove(out);
+            parent.setAlpha(0.0f);
+            parent.add(in);cdcd
+            parent.revalidate();
+        }
+    } // Fader
+    
+    private class ComponentCreationListener implements HTMLPanel.ComponentCreationListener {
         public void componentCreated(HTMLPanel panel, Component component) {
             Component demoComponent = (Component)component;
             demo.setDemoComponent(demoComponent);
         }
+    } // ComponentCreationListener
+    
+    public static class LoadAnimationPanel extends JXPanel {
+        private final String message = "loading demo";
+        private BufferedImage gearAImage;
+        private BufferedImage gearBImage;
+        
+        private boolean animating = false;
+        private int rotation = 0;
+        private Animator animator;
+        
+        public LoadAnimationPanel() {
+            try {
+                gearAImage = /*GraphicsUtilities.createCompatibleImage(*/
+                        ImageIO.read(getClass().getResource("resources/images/gearA.png"))/*)*/;
+                gearBImage = /*GraphicsUtilities.createCompatibleImage(*/
+                        ImageIO.read(getClass().getResource("resources/images/gearB.png"))/*)*/;
+                
+            } catch (IOException ioe) {
+                System.out.println(ioe);
+            }
+            setForeground(UIManager.getColor("textInactiveText"));
+            setFont(UIManager.getFont("Label.font").deriveFont(36f));
+            setPreferredSize(new Dimension(gearAImage.getWidth() + gearBImage.getWidth(),
+                    gearAImage.getHeight() + gearBImage.getHeight()));
+            
+            PropertySetter rotator = new PropertySetter(this, "rotation", 0, 360);
+            animator = new Animator(1000, Animator.INFINITE,
+                    Animator.RepeatBehavior.LOOP, rotator);
+            // Don't animate gears if loading is quick
+            animator.setStartDelay(200);
+            
+        }
+        
+        public void setAnimating(boolean animating) {
+            this.animating = animating;
+            if (animating) {
+                animator.start();
+            } else {
+                animator.stop();
+            }
+        }
+        
+        public boolean isAnimating() {
+            return animating;
+        }
+        
+        public void setRotation(int rotation) {
+            this.rotation = rotation;
+            repaint();
+        }
+        
+        public int getRotation() {
+            return rotation;
+        }
+        
+        public void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D)g;
+            super.paintComponent(g2);
+            
+            Dimension size = getSize();
+            
+            if (false) {
+                int xoffset = 53;
+                int yoffset = 53;
+                
+                int gearAWidth = gearAImage.getWidth();
+                int gearAHeight = gearAImage.getHeight();
+                int gearBWidth = gearBImage.getWidth();
+                int gearBHeight = gearBImage.getHeight();
+                
+                int gearsWidth = gearAWidth + gearBWidth - xoffset;
+                int gearsHeight = gearAHeight + gearBHeight - yoffset;
+                
+                int gearsX = (size.width - gearsWidth)/2;
+                int gearsY = (size.height - gearsHeight)/2;
+                
+                if (rotation > 0) {
+                    AffineTransform tA = new AffineTransform();
+                    tA.translate(gearsX, gearsY);
+                    tA.rotate(rotation, gearAWidth/2,gearAHeight/2);
+                    AffineTransform tB = new AffineTransform();
+                    tB.translate(gearsX + gearAWidth - xoffset, gearsY + gearAHeight - yoffset);
+                    tB.rotate(-rotation, gearBWidth/2, gearBHeight/2);
+                    g2.drawImage(gearAImage, tA, null);
+                    g2.drawImage(gearBImage, tB, null);
+                    
+                } else {
+                    g2.drawImage(gearAImage, gearsX, gearsY, null);
+                    g2.drawImage(gearBImage, gearsX + gearAWidth - xoffset,
+                            gearsY + gearAHeight - yoffset, null);
+                }
+            }
+            Color textColor = getForeground();
+            Color dotColor = textColor.darker();
+            g2.setColor(textColor);
+            g2.setFont(getFont());
+            FontMetrics metrics = g2.getFontMetrics();
+            Rectangle2D rect = metrics.getStringBounds(message, g2);
+            Rectangle2D dotRect = metrics.getStringBounds(".", g2);
+            float x = (float)(size.width - (rect.getWidth() + 3*dotRect.getWidth()))/2;
+            float y = (float)(size.height - rect.getHeight())/2;
+            g2.drawString(message, x, y);
+            int tri = rotation / 120;
+            float dx = 0;
+            for(int i = 0; i < 3; i++) {
+                g2.setColor(animator.isRunning() && i == tri? 
+                    dotColor : 
+                    textColor);
+                g2.drawString(".", x + (float)(rect.getWidth() + dx), y);
+                dx += dotRect.getWidth();
+            }
+            
+        }
+    } // LoadAnimationPanel
+    
+    public static void main(String args[]) {
+        JFrame frame = new JFrame();
+        LoadAnimationPanel p = new LoadAnimationPanel();
+        p.setAnimating(true);
+        frame.add(p);
+        frame.setSize(new Dimension(500,400));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
     }
     
 }

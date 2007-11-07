@@ -43,6 +43,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 
@@ -51,62 +52,44 @@ import javax.swing.tree.TreeModel;
  * @author aim
  */
 public class DemoSelectorTree extends JTree {
-    private Color gradientColors[];
-    private Image gradientImage;
     
     /** Creates a new instance of DemoSelectorTree */
     public DemoSelectorTree(TreeModel model) {
         super(model);
         setCellRenderer(new DemoSelectorTreeRenderer(getCellRenderer()));
-        setShowsRootHandles(false);
         ToolTipManager.sharedInstance().registerComponent(this);
         
     }
     
-    public DemoSelectorTree(TreeModel model, Color gradientColor1, Color gradientColor2) {
-        this(model);
-        gradientColors = new Color[2];
-        gradientColors[0] = gradientColor1;
-        gradientColors[1] = gradientColor2;
-        setOpaque(false);
-    }
-    
-    @Override
-    protected void paintComponent(Graphics g) {
-        if (gradientColors != null) {
-            Rectangle bounds = getBounds();
-            if (gradientImage == null || 
-                    gradientImage.getWidth(this) != bounds.width ||
-                    gradientImage.getHeight(this) != bounds.height) {
-                
-                gradientImage = Utilities.createGradientImage(bounds.width, bounds.height,
-                        gradientColors[0], gradientColors[1]);
-                
-            }
-            g.drawImage(gradientImage, 0, 0, null);
+    public void updateUI() {
+        super.updateUI();
+        TreeCellRenderer renderer = getCellRenderer();
+        if (renderer instanceof DemoSelectorTreeRenderer) {
+            ((DemoSelectorTreeRenderer)renderer).updateUI();
         }
-        
-        super.paintComponent(g);
-    }
-    
+    }    
     
     public class DemoSelectorTreeRenderer implements TreeCellRenderer {
         private JLabel delegate;
+        private Class delegateClass;
         
         protected Color visitedForeground;
-        protected Color errorForeground;
-                
-        protected boolean selected;
-        protected boolean hasFocus;
+        protected Color errorForeground;        
         
-        protected Demo demo;
-        
-        public DemoSelectorTreeRenderer(TreeCellRenderer delegate) {
-            this.delegate = (JLabel)delegate;
+        public DemoSelectorTreeRenderer(TreeCellRenderer renderer) {
+            this.delegate = (JLabel)renderer;
+            this.delegateClass = renderer.getClass();
             this.delegate.setHorizontalAlignment(JLabel.LEFT);
             visitedForeground = new Color(85, 145, 90);
             errorForeground = Color.RED;
             //setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));
+        }
+        
+        public void updateUI() {
+            try {
+                delegate = (JLabel)delegateClass.newInstance();
+            } catch (Exception iex) {                
+            }
         }
         
         /**
@@ -137,16 +120,14 @@ public class DemoSelectorTree extends JTree {
             String stringValue = tree.convertValueToText(value, isSelected,
                     isExpanded, isLeaf, row, hasFocus);
 
-            this.hasFocus = hasFocus;
             renderer.setText(stringValue);
             
             renderer.setComponentOrientation(tree.getComponentOrientation());
             renderer.setEnabled(tree.isEnabled());
-            selected = false;
             
             if (isLeaf) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;                
-                demo = (Demo)node.getUserObject();
+                Demo demo = (Demo)node.getUserObject();
                 
                 String demoName = demo.getName();
                 if (demoName.endsWith("Demo")) {
@@ -162,9 +143,7 @@ public class DemoSelectorTree extends JTree {
                 renderer.setToolTipText(demo.getShortDescription());
                 
                 Demo.State demoState = demo.getState();
-                selected = demoState == Demo.State.RUNNING ||
-                        demoState == Demo.State.INITIALIZING;
-
+                
                 Color foreground = renderer.getForeground();
                 switch(demoState) {
                     case FAILED:
@@ -179,13 +158,15 @@ public class DemoSelectorTree extends JTree {
                 
             } else {
                 // don't display icon for categories
-                demo = null;
                 renderer.setIcon(null);
                 // remind: Need to figure out how to get tooltip text on "category" node
                 renderer.setToolTipText(null);
             }
             //renderer.setOpaque(selected);
+            
+          
             return renderer;
         }
+        
     }   
 }

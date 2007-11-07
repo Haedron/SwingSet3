@@ -33,16 +33,21 @@ package swingset3;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.Desktop;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Transparency;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
+import javax.jnlp.BasicService;
+import javax.jnlp.ServiceManager;
+import javax.jnlp.UnavailableServiceException;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -54,6 +59,10 @@ import javax.swing.SwingUtilities;
 public class Utilities implements SwingConstants {
     
     private Utilities() {} // never instantiate
+    
+    public static boolean runningFromWebStart() {
+        return ServiceManager.getServiceNames() != null;        
+    }
     
     public static void setToplevelLocation(Window toplevel, Component component,
                                            int relativePosition) {
@@ -130,6 +139,13 @@ public class Utilities implements SwingConstants {
 
     }
     
+    public static BufferedImage createTranslucentImage(int width, int height) {
+        
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().
+                    getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+               
+    }
+    
     public static BufferedImage createGradientImage(int width, int height, Color gradient1, Color gradient2) {
                    
             BufferedImage gradientImage = Utilities.createCompatibleImage(width, height);
@@ -141,6 +157,26 @@ public class Utilities implements SwingConstants {
             
             return gradientImage;
     }
+    
+    public static boolean browse(URI uri) throws IOException, UnavailableServiceException {
+        // Try using the Desktop api first
+        try {
+            Desktop desktop = Desktop.getDesktop();
+            desktop.browse(uri);
+            return true;
+            
+        } catch (SecurityException sex) {
+            // Running in sandbox, try using WebStart service
+            BasicService basicService = 
+                        (BasicService)ServiceManager.lookup("javax.jnlp.BasicService");
+                
+            if (basicService.isWebBrowserSupported()) {
+                return basicService.showDocument(uri.toURL());
+            } 
+        }
+        return false;
+    }
+    
     
     private static void testSetToplevelLocation(Window base, int relativePosition) {        
         JFrame frame = new JFrame("frame "+ relativePosition);

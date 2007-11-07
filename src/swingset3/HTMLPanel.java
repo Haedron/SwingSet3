@@ -162,9 +162,8 @@ public class HTMLPanel extends JEditorPane {
             JEditorPane descriptionPane = (JEditorPane)event.getSource();
             HyperlinkEvent.EventType type = event.getEventType();
             if (type == HyperlinkEvent.EventType.ACTIVATED) {                    
-                Desktop desktop = Desktop.getDesktop();
                 try {
-                    desktop.browse(event.getURL().toURI());
+                    Utilities.browse(event.getURL().toURI());
                        
                 } catch (Exception e) {
                     e.printStackTrace();
