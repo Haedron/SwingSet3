@@ -49,6 +49,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
+import swingset3.Utilities;
 
 /**
  * Table renderer which renders cell value as hyperlink with optional rollover underline.
@@ -292,10 +293,8 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
             Object source = event.getSource();
             if (source instanceof Link) {
                 Link link = (Link)source;
-                try {
-                    
-                    Desktop desktop = Desktop.getDesktop();
-                    desktop.browse(link.getUri());
+                try {                    
+                    Utilities.browse(link.getUri());
                     
                 } catch (Exception ex) {
                     ex.printStackTrace();

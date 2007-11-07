@@ -50,6 +50,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import swingset3.Utilities;
 
 
 /**
@@ -220,13 +221,12 @@ public class JHyperlink extends JButton {
             
             URI targetURI = hyperlink.getTarget();
             if (targetURI != null) {
-                Desktop desktop = Desktop.getDesktop();
                 try {
-                    desktop.browse(targetURI);
+                    Utilities.browse(targetURI);
                     hyperlink.setVisited(true);
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                    System.err.println(ioe);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    System.err.println(ex);
                 }
                 
             }
