@@ -139,7 +139,7 @@ public class JButtonDemo extends JPanel {
         // Image is from the Java Look and Feel Graphics Repository:
         // http://java.sun.com/developer/techDocs/hi/repository 
         JButton button = new JButton(new ImageIcon(getClass().
-                getResource("/toolbarButtonGraphics/general/Print24.gif")));
+                getResource("resources/images/document-print.png")));
         button.setToolTipText("image button");
         //</snip>
         button.putClientProperty("snippetKey", "Create image button");
@@ -150,7 +150,7 @@ public class JButtonDemo extends JPanel {
         // http://java.sun.com/developer/techDocs/hi/repository 
         button = new JButton("Find", 
                      new ImageIcon(getClass().
-                      getResource("/toolbarButtonGraphics/general/Search24.gif")));
+                      getResource("resources/images/edit-find.png")));
         button.setToolTipText("button with text and image");
         button.setHorizontalTextPosition(JButton.LEADING);
         button.setIconTextGap(6);
