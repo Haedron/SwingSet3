@@ -98,7 +98,6 @@ public class IMDBLink  {
                             line.substring(index+len, index+len+10);
 
                     if (!matches.contains(imdbURL)) {
-                        System.out.println("adding "+imdbURL);
                         matches.add(imdbURL);
                     }
                 }
@@ -110,7 +109,6 @@ public class IMDBLink  {
         // use the year to find the right entry
         if (matches.size() > 1) {
             for(String matchURL: matches) {
-                System.out.println("match:"+matchURL);
                 if (verifyYear(matchURL, movieTitle, year)) {
                     return matchURL;
                 }
@@ -137,8 +135,6 @@ public class IMDBLink  {
                 // looking for "<title>movie title (YEAR)</title>"                
                 try {
                     int year = Integer.parseInt(line.substring(index-5, index-1));
-                    System.out.println(line);
-                    System.out.println("comparing years: "+ movieYear+" or " + (movieYear-1) +" to made in "+ year);
                     // Movie may have been made the year prior to oscar award
                     yearMatches = year == movieYear || year == movieYear-1;
 
@@ -152,5 +148,4 @@ public class IMDBLink  {
                
         return yearMatches;
     }
-
 }

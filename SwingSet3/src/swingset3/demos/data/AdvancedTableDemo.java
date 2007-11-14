@@ -64,6 +64,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -151,6 +152,7 @@ public class AdvancedTableDemo extends JPanel {
         oscarTable.setAutoCreateRowSorter(true);
         oscarTable.setRowHeight(26);
         oscarTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+        oscarTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         oscarTable.setIntercellSpacing(new Dimension(0,0));
         //</snip>
         
@@ -508,9 +510,10 @@ public class AdvancedTableDemo extends JPanel {
             OscarDataParser parser = new OscarDataParser() {
                 @Override
                 protected void addCandidate(OscarCandidate candidate) {
-                    candidates.add(candidate);                    
+                    candidates.add(candidate); 
+                    try{ Thread.currentThread().sleep(1); } catch (Exception ex) {}
                     publish(candidate);
-                    setProgress(100 * candidates.size() / /*8430 remind:parser hangs?!*/ 8330);                    
+                    setProgress(100 * candidates.size() / /*8430 remind:parser hangs?!*/ 8430);                    
                 }
             };
             parser.parseDocument(oscarData);

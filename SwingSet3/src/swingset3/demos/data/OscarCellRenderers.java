@@ -56,12 +56,14 @@ public class OscarCellRenderers {
         protected Color rowColors[];
         
         public RowRenderer() {
+            super();
             // initialize default colors from look-and-feel
             rowColors = new Color[1];
             rowColors[0] = UIManager.getColor("Table.background");
         }
         
         public RowRenderer(Color colors[]) {
+            super();
             setRowColors(colors);
         }
         
@@ -79,25 +81,33 @@ public class OscarCellRenderers {
             }
             return this;
         }
+        
+        public boolean isOpaque() {
+            return true;
+        }
     }
     //<snip>
     
     //<snip>Render "year" table column with font representing style of decade
+    // currently only used on OS X because fonts are Mac centric.
     public static class YearRenderer extends RowRenderer {
-        HashMap<String,Font> eraFonts = new HashMap();
+        HashMap<String,Font> eraFonts;
         
         public YearRenderer() {
             setHorizontalAlignment(JLabel.CENTER);
             
-            eraFonts.put("192"/*1920's*/, new Font("Jazz LET", Font.PLAIN, 12));
-            eraFonts.put("193"/*1930's*/, new Font("Mona Lisa Solid ITC TT", Font.BOLD, 18));
-            eraFonts.put("194"/*1940's*/, new Font("American Typewriter", Font.BOLD, 12));
-            eraFonts.put("195"/*1950's*/, new Font("Britannic Bold", Font.PLAIN, 12));
-            eraFonts.put("196"/*1960's*/, new Font("Cooper Black", Font.PLAIN, 14));
-            eraFonts.put("197"/*1970's*/, new Font("Syncro LET", Font.PLAIN, 14));
-            eraFonts.put("198"/*1980's*/, new Font("Mistral", Font.PLAIN, 18));
-            eraFonts.put("199"/*1990's*/, new Font("Papyrus", Font.BOLD, 14));
-            eraFonts.put("200"/*2000's*/, new Font("Calisto MT", Font.PLAIN, 14));
+            if (System.getProperty("os.name").equals("Mac OS X")) {
+                eraFonts = new HashMap();
+                eraFonts.put("192"/*1920's*/, new Font("Jazz LET", Font.PLAIN, 12));
+                eraFonts.put("193"/*1930's*/, new Font("Mona Lisa Solid ITC TT", Font.BOLD, 18));
+                eraFonts.put("194"/*1940's*/, new Font("American Typewriter", Font.BOLD, 12));
+                eraFonts.put("195"/*1950's*/, new Font("Britannic Bold", Font.PLAIN, 12));
+                eraFonts.put("196"/*1960's*/, new Font("Cooper Black", Font.PLAIN, 14));
+                eraFonts.put("197"/*1970's*/, new Font("Syncro LET", Font.PLAIN, 14));
+                eraFonts.put("198"/*1980's*/, new Font("Mistral", Font.PLAIN, 18));
+                eraFonts.put("199"/*1990's*/, new Font("Papyrus", Font.BOLD, 14));
+                eraFonts.put("200"/*2000's*/, new Font("Calisto MT", Font.PLAIN, 14));
+            }
         }
         
         public YearRenderer(Color colors[]) {
@@ -112,7 +122,7 @@ public class OscarCellRenderers {
             
             String year = table.getValueAt(row,
                     table.convertColumnIndexToView(OscarTableModel.YEAR_COLUMN)).toString();
-            if (year != null && year.length() == 4) {
+            if (eraFonts != null && year != null && year.length() == 4) {
                 String era = ((String)year).substring(0, 3);
                 Font eraFont = eraFonts.get(era);
                 setFont(eraFont);
