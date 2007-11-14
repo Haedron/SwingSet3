@@ -34,7 +34,7 @@ package swingset3.hyperlink;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Desktop;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -48,6 +48,8 @@ import javax.swing.Action;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 import swingset3.Utilities;
 
@@ -60,10 +62,8 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
     private ArrayList columnModelIndeces;
     private Action action;
     
-    private Color selectedBackground;
-    private Color selectedForeground;
-    private Color unselectedForeground;
     private Color rowColors[];
+    private Border noFocusBorder;
     
     private boolean underlineOnRollover = true;
     
@@ -75,11 +75,9 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
     public HyperlinkCellRenderer(Action action, boolean underlineOnRollover) {
         super();
         setOpaque(true);
+        setBorderPainted(true);
         setAction(action);
         setHorizontalAlignment(JHyperlink.LEFT);
-        selectedBackground = UIManager.getColor("Table.selectionBackground");
-        selectedForeground = UIManager.getColor("Table.selectionForeground");
-        unselectedForeground = getForeground();
         rowColors = new Color[1];
         rowColors[0] = UIManager.getColor("Table.background");
         columnModelIndeces = new ArrayList();
@@ -88,6 +86,21 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
     
     public void setRowColors(Color[] colors) {
         this.rowColors = colors;
+    }
+    
+    public void updateUI() {
+        super.updateUI(); 
+	setForeground(null);
+	setBackground(null);
+        
+        // Make sure border used on non-focussed cells is same size as focussed border
+        Border focusBorder = UIManager.getBorder("Table.focusCellHighlightBorder");
+        if (focusBorder != null) {
+            Insets insets = focusBorder.getBorderInsets(this);
+            noFocusBorder = new EmptyBorder(insets.top, insets.left, insets.bottom, insets.right);
+        } else {
+            noFocusBorder = new EmptyBorder(1,1,1,1);
+        }
     }
     
     public Component getTableCellRendererComponent(JTable table, Object value,
@@ -116,11 +129,23 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
         
         if (!isSelected) {
             setBackground(rowColors[row % rowColors.length]);
-            setForeground(unselectedForeground);
+            //setForeground(table.getForeground());
         } else {
-            setBackground(selectedBackground);
-            setForeground(selectedForeground);
+            setBackground(table.getSelectionBackground());
+            //setForeground(table.getSelectionForeground());
         }
+        
+        Border border = null;
+        if (hasFocus) {
+            if (isSelected) {
+                border = UIManager.getBorder("Table.focusSelectedCellHighlightBorder");
+            }
+            if (border == null) {
+                border = UIManager.getBorder("Table.focusCellHighlightBorder");
+            }
+        } 
+        setBorder(border != null? border : noFocusBorder);
+        
         return this;
     }
     
@@ -177,7 +202,14 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
                 ((ActionListener)listeners[i+1]).actionPerformed(event);
             }          
         }
-    }      
+    }  
+    
+    public void invalidate() {}
+    public void validate() {}
+    public void revalidate() {}
+    public void repaint(long tm, int x, int y, int width, int height) {}
+    public void repaint(Rectangle r) {}
+    public void repaint() {}
 
     private class HyperlinkMouseListener extends MouseAdapter {
         private transient Rectangle cellRect;

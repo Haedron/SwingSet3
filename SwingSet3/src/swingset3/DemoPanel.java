@@ -52,6 +52,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.jdesktop.animation.timing.triggers.TimingTrigger;
@@ -71,7 +72,6 @@ public class DemoPanel extends JXPanel {
         this.demo = demo;
         
         setLayout(new BorderLayout()); // ensure components fills panel
-        setBorder(new EmptyBorder(4,4,4,4));
         loadAnimationPanel = new LoadAnimationPanel();
         add(loadAnimationPanel);
         loadAnimationPanel.setAnimating(true);

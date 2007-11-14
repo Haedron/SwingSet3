@@ -186,9 +186,11 @@ public class JHyperlink extends JButton {
         super.paintComponent(g);
         
         if (drawUnderline) {
-            viewRect.x = viewRect.y = 0;
-            viewRect.width = getWidth();
-            viewRect.height = getHeight();
+            Insets insets = getInsets();
+            viewRect.x = insets.left;
+            viewRect.y = insets.top;
+            viewRect.width = getWidth() - insets.left - insets.right;
+            viewRect.height = getHeight() - insets.top - insets.bottom;
             int baseline = getBaseline(viewRect.width, viewRect.height);
             
             iconRect.x = iconRect.y = iconRect.width = iconRect.height = 0;
@@ -197,10 +199,6 @@ public class JHyperlink extends JButton {
                     getIcon(), getVerticalAlignment(), getHorizontalAlignment(),
                     getVerticalTextPosition(), getHorizontalTextPosition(),
                     viewRect, iconRect, textRect, getIconTextGap());
-
-            //g.setColor(new Color(200,200,200,200));
-            //g.drawRect(textRect.x, textRect.y + textRect.height, 
-            //        textRect.width, textRect.height);
             
             g.setColor(getForeground());
             g.drawLine(textRect.x,

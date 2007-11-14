@@ -134,7 +134,7 @@ public class IntroPanel extends JPanel {
         
         TimingTrigger.addTrigger(gleamAnimator, glowAnimator, TimingTriggerEvent.STOP);
         
-        PropertySetter glowFader = new PropertySetter(glowingTitle, "alpha", 1.0f, 0.6f);
+        PropertySetter glowFader = new PropertySetter(glowingTitle, "alpha", 1.0f, 0.0f);
         glowFadeAnimator = new Animator(600, glowFader);
         glowFadeAnimator.setAcceleration(.3f);
         glowFadeAnimator.setDeceleration(.1f);
