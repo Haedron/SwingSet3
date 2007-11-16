@@ -66,4 +66,8 @@
     nbproject/build-impl.xml file. 
 
     -->
+    
+    <target name="-post-jar">
+        <copy file="${jnlp.file}" todir="${dist.dir}"/>
+    </target>
 </project>
