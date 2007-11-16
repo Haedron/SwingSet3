@@ -62,6 +62,12 @@ public class OscarTableModel extends AbstractTableModel {
         fireTableRowsInserted(first, last);
     }
     
+    public void add(OscarCandidate candidate) {
+        int index = candidates.size();
+        candidates.add(candidate);
+        fireTableRowsInserted(index, index);
+    }
+    
     public int getRowCount() {
         return candidates.size();
     }
