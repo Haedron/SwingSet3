@@ -528,9 +528,16 @@ public class AdvancedTableDemo extends JPanel {
             }
         }*/
         
-        @Override
+        //@Override
         protected void process(List<OscarCandidate> moreCandidates) {
             oscarModel.add(moreCandidates);
+        }
+        
+        // For older Java 6 on OS X
+        protected void process(OscarCandidate... moreCandidates) {
+            for(OscarCandidate candidate: moreCandidates) {
+                oscarModel.add(candidate);
+            }
         }
         
         @Override
