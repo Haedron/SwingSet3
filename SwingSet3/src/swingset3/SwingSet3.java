@@ -283,7 +283,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         if (demoList.isEmpty()) {
             JOptionPane.showMessageDialog(getMainFrame(),
                     resourceMap.getString("error.noDemosLoaded"),
-                    resourceMap.getString("error.title"), JOptionPane.ERROR);
+                    resourceMap.getString("error.title"), JOptionPane.ERROR_MESSAGE);
         }        
         return demoList;
   
