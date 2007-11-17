@@ -35,7 +35,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -48,11 +47,10 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.jdesktop.animation.timing.triggers.TimingTrigger;
@@ -63,17 +61,22 @@ import org.jdesktop.swingx.JXPanel;
  *
  * @author aim
  */
-public class DemoPanel extends JXPanel {
+public class DemoPanel extends JPanel {
+    private JXPanel jxPanel;
     private HTMLPanel descriptionPane; // used when resources/[DemoClassName].html is supplied
     private Demo demo;
     private LoadAnimationPanel loadAnimationPanel;
     
     public DemoPanel(Demo demo) {
         this.demo = demo;
+        setLayout(new BorderLayout()); 
         
-        setLayout(new BorderLayout()); // ensure components fills panel
+        jxPanel = new JXPanel();
+        jxPanel.setLayout(new BorderLayout());
+        add(jxPanel);
+        
         loadAnimationPanel = new LoadAnimationPanel();
-        add(loadAnimationPanel);
+        jxPanel.add(loadAnimationPanel);
         loadAnimationPanel.setAnimating(true);
         
         // Instantiate demo component on separate thread...
@@ -119,40 +122,41 @@ public class DemoPanel extends JXPanel {
         protected void done() {
             try {
                 loadAnimationPanel.setAnimating(false);
-                Fader fader = new Fader(DemoPanel.this, loadAnimationPanel, (JComponent)get());
-                fadeAnimator = new Animator(400,fader);
-                fadeAnimator.setAcceleration(.2f);
-                fadeAnimator.setDeceleration(.3f);
-                Animator fadeOut = new Animator(400,
-                        new PropertySetter(DemoPanel.this, "alpha", 0.0f, 1.0f));
+                Animator fadeOutAnimator = new Animator(400, 
+                        new FadeOut(jxPanel, loadAnimationPanel, (JComponent)get()));
+                fadeOutAnimator.setAcceleration(.2f);
+                fadeOutAnimator.setDeceleration(.3f);
+                Animator fadeInAnimator = new Animator(400,
+                        new PropertySetter(jxPanel, "alpha", 0.3f, 1.0f));
                 TimingTrigger trigger =
-                        TimingTrigger.addTrigger(fadeAnimator, fadeOut, TimingTriggerEvent.STOP);
-                fadeAnimator.start();
+                        TimingTrigger.addTrigger(fadeOutAnimator, fadeInAnimator, TimingTriggerEvent.STOP);
+                fadeOutAnimator.start();
                 //remove(loadAnimationPanel);
                 //add(get());
                 
                 
             } catch (Exception ignore) {
                 System.err.println(ignore);
+                ignore.printStackTrace();
             }
         }
         
         
     } // DemoLoader
     
-    private class Fader extends PropertySetter {
+    private class FadeOut extends PropertySetter {
         JXPanel parent;
         JComponent out;
         JComponent in;
-        public Fader(JXPanel parent, JComponent out, JComponent in) {
-            super(out, "alpha", 1.0f, 0.0f);
+        public FadeOut(JXPanel parent, JComponent out, JComponent in) {
+            super(out, "alpha", 1.0f, 0.3f);
             this.parent = parent;
             this.out = out;
             this.in = in;
         }
         public void end() {
+            parent.setAlpha(0.3f);
             parent.remove(out);
-            parent.setAlpha(0.0f);
             parent.add(in);
             parent.revalidate();
         }
@@ -161,7 +165,10 @@ public class DemoPanel extends JXPanel {
     private class ComponentCreationListener implements HTMLPanel.ComponentCreationListener {
         public void componentCreated(HTMLPanel panel, Component component) {
             Component demoComponent = (Component)component;
-            demo.setDemoComponent(demoComponent);
+            System.out.println("demoComponent="+demoComponent.getClass().getName());
+            if (demoComponent.getClass().equals(demo.getDemoClass())) {
+                demo.setDemoComponent(demoComponent);
+            }
         }
     } // ComponentCreationListener
     

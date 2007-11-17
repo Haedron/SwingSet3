@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -129,8 +128,6 @@ public class AdvancedTableDemo extends JPanel {
     private ResourceBundle bundle = null;
     
     public AdvancedTableDemo() { 
-        logger.setLevel(Level.FINEST);
-        logger.addHandler(new ConsoleHandler());
         initModel();
         initComponents();
         initSortingFiltering();
@@ -476,6 +473,7 @@ public class AdvancedTableDemo extends JPanel {
                 if (event.getPropertyName().equals("progress")) {
                     int progress = ((Integer)event.getNewValue()).intValue();
                     progressBar.setValue(progress);
+                         
                     if (progress == 100) {
                         statusBarLeft.remove(progressBar);
                         actionStatus.setText("");

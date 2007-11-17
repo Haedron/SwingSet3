@@ -214,7 +214,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     private List availableLookAndFeels;
     private String lookAndFeel;
     private boolean sourceVisible = true;
-    private boolean animationOn = true;
+    private boolean animationOn = false;
     private int treeRowHeight = 32;
     
     // GUI state
