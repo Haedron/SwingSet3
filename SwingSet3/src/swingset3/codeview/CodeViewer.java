@@ -85,9 +85,10 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
-import swingset3.Utilities;
+import swingset3.utilities.Utilities;
 
 /**
  * GUI component for viewing a set of one or more Java source code files,
@@ -195,8 +196,9 @@ public class CodeViewer extends JPanel {
     protected JComponent createCodeHighlightBar() {
         
         Box box = Box.createHorizontalBox();
+        box.setBorder(new EmptyBorder(10, 0, 10, 0));
         
-        box.add(Box.createHorizontalGlue());
+        box.add(Box.createHorizontalStrut(2));        
         
         NO_SNIPPET_SELECTED = getString("CodeViewer.snippets.selectOne", 
                                         "Select One");
@@ -214,14 +216,14 @@ public class CodeViewer extends JPanel {
         box.add(snippetSetsLabel);
         box.add(snippetSetsComboBox);
        
-        box.add(Box.createHorizontalStrut(8));
+        box.add(Box.createHorizontalGlue());
             
         SnippetNavigator snippetNavigator = new SnippetNavigator(snippetMap);
         snippetNavigator.setNavigateNextAction(nextSnippetAction);
         snippetNavigator.setNavigatePreviousAction(previousSnippetAction);
         box.add(snippetNavigator);
         
-        box.add(Box.createHorizontalGlue());
+        box.add(Box.createHorizontalStrut(2));
         
         return box;              
     }

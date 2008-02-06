@@ -50,7 +50,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import swingset3.Utilities;
+import swingset3.utilities.Utilities;
 
 
 /**

@@ -56,7 +56,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import swingset3.DemoProperties;
-import swingset3.Utilities;
+import swingset3.utilities.Utilities;
 import swingset3.demos.toplevels.BusyGlass;
 
 /**
@@ -70,7 +70,7 @@ import swingset3.demos.toplevels.BusyGlass;
       sourceFiles = {
         "swingset3/demos/toplevels/JFrameDemo.java",
         "swingset3/demos/toplevels/BusyGlass.java",
-        "swingset3/Utilities.java"       
+        "swingset3/utilities/Utilities.java"       
       }
 )
 public class JFrameDemo extends JPanel {

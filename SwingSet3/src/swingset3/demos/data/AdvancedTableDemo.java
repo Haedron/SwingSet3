@@ -563,7 +563,7 @@ public class AdvancedTableDemo extends JPanel {
                     }
                 }
                 if (imdbURI != null) {
-                    boolean browsed = swingset3.Utilities.browse(imdbURI);
+                    boolean browsed = swingset3.utilities.Utilities.browse(imdbURI);
                     
                 } else {                    
                     showMessage("IMDB Link",

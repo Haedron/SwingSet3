@@ -31,6 +31,8 @@
 
 package swingset3;
 
+import swingset3.utilities.AnimatingSplitPane;
+import swingset3.utilities.Utilities;
 import application.Action;
 import application.ResourceMap;
 import application.SingleFrameApplication;
@@ -40,16 +42,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -57,7 +56,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -68,7 +66,6 @@ import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jnlp.ServiceManager;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
@@ -81,7 +78,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
-import javax.swing.JTree;
+import javax.swing.JSplitPane;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -89,22 +86,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.ColorUIResource;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.DefaultTreeSelectionModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-import org.jdesktop.animation.timing.Animator;
-import org.jdesktop.animation.timing.interpolation.PropertySetter;
-import org.jdesktop.animation.transitions.ComponentState;
-import org.jdesktop.animation.transitions.Effect;
-import org.jdesktop.animation.transitions.EffectsManager;
-import org.jdesktop.animation.transitions.ScreenTransition;
-import org.jdesktop.animation.transitions.TransitionTarget;
-import org.jdesktop.animation.transitions.effects.CompositeEffect;
-import org.jdesktop.animation.transitions.effects.FadeIn;
 import swingset3.codeview.CodeViewer;
 
 
@@ -126,13 +107,16 @@ public class SwingSet3 extends SingleFrameApplication  {
     public static final String controlMidShadowKey = "controlMidShadowColor";
     public static final String controlVeryDarkShadowKey = "controlVeryDarkShadowColor";
     public static final String controlDarkShadowKey = "controlDarkShadowColor";
+    public static final String titleGradientColor1Key = "SwingSet3.titleGradientColor1";
+    public static final String titleGradientColor2Key = "SwingSet3.titleGradientColor2";
+    public static final String titleForegroundKey = "SwingSet3.titleForegroundColor";
+    public static final String titleFontKey = "SwingSet3.titleFont";
+    public static final String subPanelBackgroundColorKey = "SwingSet3.subPanelBackgroundColor";
 
     public static final int DEMO_WIDTH = 650;
     public static final int DEMO_HEIGHT = 500;
-    public static final int TREE_WIDTH = 230;
     public static final int SOURCE_HEIGHT = 250;
     public static final Insets UPPER_PANEL_INSETS = new Insets(12,12,8,12);
-    public static final Insets TREE_INSETS = new Insets(0,8,0,0);
     public static final Insets SOURCE_PANE_INSETS = new Insets(4,8,8,8);
         
     static {
@@ -140,6 +124,16 @@ public class SwingSet3 extends SingleFrameApplication  {
         if (System.getProperty("os.name").equals("Mac OS X")) {
             System.setProperty("apple.laf.useScreenMenuBar", "true"); 
         }
+        
+        UIManager.LookAndFeelInfo lafInfo[] = UIManager.getInstalledLookAndFeels();
+        for(int i = 0; i < lafInfo.length; i++) {
+            if (lafInfo[i].getName().equals("Nimbus")) {
+                lafInfo[i] = new UIManager.LookAndFeelInfo("Nimbus",
+                        "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+                break;
+            }
+        }
+        UIManager.setInstalledLookAndFeels(lafInfo);
     }
     
     public static void main(String[] args) {
@@ -149,6 +143,10 @@ public class SwingSet3 extends SingleFrameApplication  {
     public static boolean onMac() {
         return System.getProperty("os.name").equals("Mac OS X");
     } 
+    
+    public static boolean usingNimbus() {
+        return UIManager.getLookAndFeel().getName().equals("Nimbus");
+    }
     
     private static List<String> readDemoClassNames(Reader reader) throws IOException {
         ArrayList<String> demoClassNames = new ArrayList();
@@ -190,22 +188,21 @@ public class SwingSet3 extends SingleFrameApplication  {
     private ResourceMap resourceMap;
     
     // Application models
-    private DefaultTreeModel demoTreeModel; // all available demos
-    private DefaultMutableTreeNode demoTreeTop; 
+    private Map<String,List<Demo>> demoMap;
     private PropertyChangeListener demoPropertyChangeListener;
     private Map<String, DemoPanel> demoCache;
     private Demo currentDemo;
 
     // GUI components
-    //private JSplitPane vertSplitPane; //JSplitPane has trouble with animation
-    private JPanel contentPanel;
-    private JPanel upperPanel;
-    private DemoSelectorTree demoSelectorTree;
+    private JPanel mainPanel;
+    private DemoSelectorPanel demoSelectorPanel;
+    private AnimatingSplitPane demoSplitPane;
+    private JPanel demoContainer;
+    private JComponent currentDemoPanel;
     private JComponent demoPlaceholder;
-    private CollapsiblePanel sourceCodePane;
+    private JPanel codeContainer;
     private CodeViewer codeViewer;    
     private JCheckBoxMenuItem sourceCodeCheckboxItem;
-    private JCheckBoxMenuItem animationCheckboxItem;
     private ButtonGroup lookAndFeelRadioGroup;
     
     private JPopupMenu popup;
@@ -214,42 +211,29 @@ public class SwingSet3 extends SingleFrameApplication  {
     private List availableLookAndFeels;
     private String lookAndFeel;
     private boolean sourceVisible = true;
-    private boolean animationOn = false;
-    private int treeRowHeight = 32;
     
     // GUI state
     private int sourcePaneLocation;
     private int dividerSize;
     private int codeViewerHeight;    
     
-    // Demo transition animation
-    private Animator launchAnimator;
-    private ScreenTransition launchTransition;
-    private LaunchTransitionTarget launchTransitionTarget;
-    private CompositeEffect launchEffect;
-    private ScaleMoveEffect scaleMoveEffect;
-    private JComponent activeDemoPanel;
-    private JComponent nextDemoPanel;
-    
-    // Look and Feel Change animation
-    private Animator lafAnimator;
-    private CrossFadeTransition lafTransition;
-    private LafTransitionTarget lafTransitionTarget;
-
-    
-    // Transient variables
-    private transient Point nodePoint = new Point();
-    
     @Override
     protected void initialize(String args[]) {        
+        try {
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+        } catch (Exception ex) {
+            // not catestrophic
+        }
         resourceMap = getContext().getResourceMap();
         title = resourceMap.getString("mainFrame.title");
+        demoMap = new HashMap();
         demoCache = new HashMap();
-        setDemoPlaceholder(new IntroPanel(DEMO_WIDTH, DEMO_HEIGHT));
-        setDemos(resourceMap.getString("demos.title"), getDemoList(args));
+        addDemoSet(resourceMap.getString("demos.title"), getDemoClassNames(args));
+        setDemoPlaceholder(new JPanel());
+
     }
     
-    private List<String>getDemoList(String args[]) {
+    private List<String>getDemoClassNames(String args[]) {
         final ArrayList<String> demoList = new ArrayList();
         boolean augment = false;
 
@@ -289,82 +273,30 @@ public class SwingSet3 extends SingleFrameApplication  {
   
     }
 
-    /**
-     * Establish the set of demos available inside swingset.
-     * Note that the demo classes will be instantiated lazily, 
-     * when/if the user clicks on them.
-     * @param demosTitle the title of this demo set
-     * @param demoClassNamesList the list of demo class names
-     */
-    public void setDemos(String demosTitle, List<String> demoClassNamesList) {
-        
-        demoTreeTop = new DefaultMutableTreeNode(demosTitle); 
-        
-        if (demoTreeModel == null) {
-            demoTreeModel = new DefaultTreeModel(demoTreeTop);
-        } else {
-            // reset root 
-            demoTreeModel.setRoot(demoTreeTop);
+    public void addDemoSet(String demoSetTitle, List<String> demoClassNamesList) {              
+        ArrayList demoList = new ArrayList();
+        for(String demoClassName: demoClassNamesList) {
+            demoList.add(createDemo(demoClassName));
         }
-                
-        for(String demoClassName : demoClassNamesList) {
-            addDemo(demoClassName);            
-        }
+        demoMap.put(demoSetTitle, demoList);
     }
     
     /**
-     * Adds a list of demos to the currently available set.
-     * @param demoClassNamesList the list of demo class names
      */
-    public void addDemos(List<String> demoClassNamesList) {
-        for(String demoClassName : demoClassNamesList) {
-            addDemo(demoClassName);
-        }
-    }
-    
-    /**
-     * Adds a single demo to the currently available set.
-     * @param demoClassName the name of the demo class
-     */
-    public void addDemo(String demoClassName) {        
+    protected Demo createDemo(String demoClassName) {        
         Class<?> demoClass = null;
         Demo demo = null;
-        String category = null;
         try {
             demoClass = Class.forName(demoClassName);
         } catch (ClassNotFoundException cnfe) {
             logger.log(Level.WARNING, "demo class not found:"+ demoClassName);
-        }
-        
+        }        
         if (demoClass != null) {
             // Wrap Demo 
             demo = new Demo(demoClass);            
-            demo.addPropertyChangeListener(getDemoPropertyChangeListener());
-            
-            // Place demo in appropriate category node in tree
-            category = demo.getCategory();           
-            Enumeration categories = demoTreeTop.children();
-            DefaultMutableTreeNode categoryNode = null;
-            while (categories.hasMoreElements()) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode)categories.nextElement();
-                if (node.getUserObject().equals(category)) {
-                    categoryNode = node;
-                    break; // category already exists
-                }
-            }
-            
-            if (categoryNode == null) {
-                // create new category
-                categoryNode = new DefaultMutableTreeNode(category);
-                demoTreeTop.add(categoryNode);
-            }
-            logger.log(Level.FINEST,"adding demo:" +
-                    (demo != null? demo.getName() : "NULL") + "in category: "+category);
-            
-            categoryNode.add(new DefaultMutableTreeNode(demo != null? demo :
-                Demo.deriveNameFromClassName(demoClassName)));
+            demo.addPropertyChangeListener(getDemoPropertyChangeListener());          
         }
-        
+        return demo;
     }
     
     protected PropertyChangeListener getDemoPropertyChangeListener() {
@@ -377,7 +309,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     @Override 
     protected void startup() {
         
-        initColorPalette();
+        initUIDefaults();
         
         View view = getMainView();
         view.setComponent(createMainPanel());
@@ -386,115 +318,99 @@ public class SwingSet3 extends SingleFrameApplication  {
         // application framework should handle this!
         getMainFrame().setIconImage(resourceMap.getImageIcon("Application.icon").getImage());
         
-        initAnimation();
-        
         show(view);
     } 
     
-    protected void initColorPalette() {
+    protected void initUIDefaults() {
         
         // Color palette algorithm courtesy of Jasper Potts
         Color controlColor = UIManager.getColor("control");
-        float[] controlHSB = Color.RGBtoHSB(
-                controlColor.getRed(), controlColor.getGreen(),
-                controlColor.getBlue(), null);
+        
 	UIManager.put(controlVeryLightShadowKey, 
-                Color.getHSBColor(controlHSB[0], controlHSB[1], controlHSB[2] - 0.02f));
+                Utilities.deriveColorHSB(controlColor, 0, 0, -0.02f));
         UIManager.put(controlLightShadowKey, 
-                Color.getHSBColor(controlHSB[0], controlHSB[1], controlHSB[2] - 0.06f));
+                Utilities.deriveColorHSB(controlColor, 0, 0, -0.06f));
         UIManager.put(controlMidShadowKey, 
-                Color.getHSBColor(controlHSB[0], controlHSB[1], controlHSB[2] - 0.16f));
+                Utilities.deriveColorHSB(controlColor, 0, 0, -0.16f));
         UIManager.put(controlVeryDarkShadowKey, 
-                Color.getHSBColor(controlHSB[0], controlHSB[1], controlHSB[2] - 0.5f));
+                Utilities.deriveColorHSB(controlColor, 0, 0, -0.5f));
         UIManager.put(controlDarkShadowKey, 
-                Color.getHSBColor(controlHSB[0], controlHSB[1], controlHSB[2] - 0.32f));
+                Utilities.deriveColorHSB(controlColor, 0, 0, -0.32f));
         
-        /*
-         * At the moment setting the background of the tree to "mac tree blue" on
-         * aqua laf causes painting problems;   the tree first flashes a white background
-         * before the blue is painted and the tree's renderer also paints white
-         * if non-opaque ! ?  bug in OSX/Java6?
-         *
-        if (onMac() && UIManager.getLookAndFeel().isNativeLookAndFeel()) {
-            UIManager.put("Tree.background", new ColorUIResource(229, 237, 247));
-        }
-        */
-        
+        // Calculate gradient colors for title panels
+        Color titleColor = UIManager.getColor(usingNimbus()? "nimbusBase" : "activeCaption");        
+        float hsb[] = Color.RGBtoHSB(
+                titleColor.getRed(), titleColor.getGreen(), titleColor.getBlue(), null);
+        UIManager.put(titleGradientColor1Key, 
+                Color.getHSBColor(hsb[0]-.013f, .15f, .85f));
+        UIManager.put(titleGradientColor2Key, 
+                Color.getHSBColor(hsb[0]-.005f, .24f, .80f));
+        UIManager.put(titleForegroundKey, 
+                Color.getHSBColor(hsb[0], .54f, .40f));
+       
+        Font labelFont = UIManager.getFont("Label.font");
+        UIManager.put(titleFontKey, labelFont.deriveFont(Font.BOLD, labelFont.getSize()+4f));        
+ 
+        Color panelColor = UIManager.getColor("Panel.background");
+        UIManager.put(subPanelBackgroundColorKey, 
+                Utilities.deriveColorHSB(panelColor, 0, .02f, -.08f));
+                
+       
         UIManager.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getPropertyName().equals("lookAndFeel")) {
-                    initColorPalette();
+                    initUIDefaults();
                 }
             }
         });
-       
-
     }  
     
     protected JComponent createMainPanel() {
         
-        // Create content panel with demos on top, source on bottom
-        //vertSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        // Temporarily replaced splitpane with panel because animation fails with splitpane
-        contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout());
+        // Create main panel with demo selection on left and demo/source on right
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+       
+        // Create demo selector panel on left
+        demoSelectorPanel = new DemoSelectorPanel(demoMap);
+        demoSelectorPanel.addPropertyChangeListener(new DemoSelectionListener());
+        JScrollPane scrollPane = new JScrollPane(demoSelectorPanel);
+        scrollPane.setBorder(null);
+        mainPanel.add(scrollPane, BorderLayout.WEST);
         
-        // Create top panel to hold demo selector tree and current demo
-        upperPanel = new JPanel();
-        upperPanel.setLayout(new BorderLayout());
-        //vertSplitPane.setTopComponent(upperPanel);
-        //upperPanel.setBorder(new EmptyBorder(UPPER_PANEL_INSETS));
-        contentPanel.add(upperPanel, BorderLayout.CENTER);
-
-        // Create demo selector tree
-        UIManager.put("Tree.paintLines", Boolean.FALSE);
-        // We must set these icons here because they will be initialized when TreeUI installs
-        // and cannot be replaced afterwards (without touching the TreeUI direction)
-        UIManager.put("Tree.expandedIcon", resourceMap.getImageIcon("selectionTree.expandedIcon"));
-        UIManager.put("Tree.collapsedIcon", resourceMap.getImageIcon("selectionTree.collapsedIcon"));
-        demoSelectorTree = new DemoSelectorTree(demoTreeModel);
-        demoSelectorTree.setName("demoSelectorTree");
-        demoSelectorTree.setRootVisible(false);
-        demoSelectorTree.setShowsRootHandles(true);
-        demoSelectorTree.setBorder(new EmptyBorder(TREE_INSETS));
-        demoSelectorTree.setRowHeight(getTreeRowHeight());
-        demoSelectorTree.addMouseListener(new DemoTreeClickListener());
-        demoSelectorTree.setSelectionModel(new DemoTreeSelectionModel());
-        JScrollPane scrollPane = new JScrollPane(demoSelectorTree);
-        scrollPane.setPreferredSize(new Dimension(TREE_WIDTH,DEMO_HEIGHT)); // wide enough to avoid horiz scrollbar
-        scrollPane.setMinimumSize(new Dimension(TREE_WIDTH,DEMO_HEIGHT));
-        upperPanel.add(scrollPane, BorderLayout.WEST);
-        expandAllCategories(new TreePath(demoTreeTop)); // expand all demos in tree
+        // Create splitpane on right to hold demo and source code
+        demoSplitPane = new AnimatingSplitPane(JSplitPane.VERTICAL_SPLIT);
+        demoSplitPane.setDividerLocation(400);
+        mainPanel.add(demoSplitPane, BorderLayout.CENTER);
+        
+        demoContainer = new JPanel();
+        demoContainer.setLayout(new BorderLayout());
+        demoSplitPane.setTopComponent(demoContainer);
 
         // Create pane to contain running demo
-        upperPanel.add(demoPlaceholder, BorderLayout.CENTER);
-        activeDemoPanel = demoPlaceholder;
+        demoContainer.add(demoPlaceholder, BorderLayout.CENTER);
+        currentDemoPanel = demoPlaceholder;
                 
-        // Create collapsible source code pane 
+        // Create collapsible source code pane
+
         codeViewer = new CodeViewer();
-        codeViewer.setPreferredSize(new Dimension(TREE_WIDTH+DEMO_WIDTH, SOURCE_HEIGHT));
-        sourceCodePane = new CollapsiblePanel("Demo Source Code", codeViewer);
-        //sourceCodePane.setBorder(new EmptyBorder(SOURCE_PANE_INSETS));
-        sourceCodePane.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
-                if (event.getPropertyName().equals("expanded")) {
-                    setSourceCodeVisible(((Boolean)event.getNewValue()).booleanValue());
-                }
-            }
-        });
-        contentPanel.add(sourceCodePane, BorderLayout.SOUTH);
+        codeViewer.setPreferredSize(new Dimension(DEMO_WIDTH, SOURCE_HEIGHT));
+        codeContainer = new JPanel(new BorderLayout());
+        codeContainer.add(codeViewer);
+        codeContainer.setBorder(new EmptyBorder(10,10,10,10));
+        demoSplitPane.setBottomComponent(codeContainer);
         
         addPropertyChangeListener(new SwingSetPropertyListener());
         
-        //sourcePaneLocation = vertSplitPane.getDividerLocation();
-        //dividerSize = vertSplitPane.getDividerSize();        
+        sourcePaneLocation = demoSplitPane.getDividerLocation();
+        dividerSize = demoSplitPane.getDividerSize();        
         
         // Create shareable popup menu for demo actions
         popup = new JPopupMenu();
         popup.add(new EditPropertiesAction());
         popup.add(new ViewCodeSnippetAction());
 
-        return contentPanel;
+        return mainPanel;
     }
     
     protected JMenuBar createMenuBar() {
@@ -517,12 +433,6 @@ public class SwingSet3 extends SingleFrameApplication  {
         sourceCodeCheckboxItem.setName("sourceCodeCheckboxItem");
         sourceCodeCheckboxItem.addChangeListener(new SourceVisibilityChangeListener());
         viewMenu.add(sourceCodeCheckboxItem);
-        // View -> Animate Demos
-        animationCheckboxItem = new JCheckBoxMenuItem();
-        animationCheckboxItem.setSelected(isAnimationOn());
-        animationCheckboxItem.setName("animationCheckboxItem");
-        animationCheckboxItem.addChangeListener(new AnimationChangeListener());
-        viewMenu.add(animationCheckboxItem);
         // View -> Look and Feel       
         viewMenu.add(createLookAndFeelMenu());
         
@@ -539,7 +449,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         UIManager.LookAndFeelInfo lookAndFeelInfos[] = UIManager.getInstalledLookAndFeels();
         lookAndFeel = UIManager.getLookAndFeel().getClass().getName();
         lookAndFeelRadioGroup = new ButtonGroup();
-        for(UIManager.LookAndFeelInfo lafInfo: lookAndFeelInfos) {            
+        for(UIManager.LookAndFeelInfo lafInfo: lookAndFeelInfos) {
             menu.add(createLookAndFeelItem(lafInfo.getName(), lafInfo.getClassName()));
         }  
         // Now load any look and feels defined externally as service via java.util.ServiceLoader
@@ -563,57 +473,9 @@ public class SwingSet3 extends SingleFrameApplication  {
         
         return lafItem;
     }
-    
-    protected void initAnimation() {
-        
-        // Initialize animated transition for when demos launch
-        launchTransitionTarget = new LaunchTransitionTarget();
-        launchAnimator = new Animator(1000);
-        launchAnimator.setAcceleration(.2f);
-        launchAnimator.setDeceleration(.3f);
-        launchTransition = new ScreenTransition(upperPanel, launchTransitionTarget, launchAnimator);
-        
-        // Initialize animated transition (cross-fade) when look and feel is switched
-        lafTransitionTarget = new LafTransitionTarget();
-        lafAnimator = new Animator(1000);
-        lafAnimator.setAcceleration(.3f);
-        lafAnimator.setAcceleration(.5f);
-        lafTransition = new CrossFadeTransition((JComponent)getMainFrame().getRootPane().getLayeredPane(),
-                lafTransitionTarget, lafAnimator);
-
-    }
-    
-    protected void expandAllCategories(TreePath parent) {
-        // Traverse children
-        TreeNode node = (TreeNode)parent.getLastPathComponent();
-        if (node.getChildCount() >= 0) {
-            for (Enumeration e=node.children(); e.hasMoreElements(); ) {
-                TreeNode n = (TreeNode)e.nextElement();
-                TreePath path = parent.pathByAddingChild(n);
-                expandAllCategories(path);
-            }
-        }
-        demoSelectorTree.expandPath(parent);
-    } 
-    
-    protected TreePath getTreePathForDemo(Demo demo) {
-        DefaultMutableTreeNode nodes[] = new DefaultMutableTreeNode[3];
-        nodes[0] = demoTreeTop;
-        for(int i = 0; i < nodes[0].getChildCount(); i++) {
-            nodes[1] = (DefaultMutableTreeNode)nodes[0].getChildAt(i);
-            for(int j = 0; j < nodes[1].getChildCount(); j++) {
-                nodes[2] = (DefaultMutableTreeNode)nodes[1].getChildAt(j);
-                if (nodes[2].getUserObject() == demo) {
-                    return new TreePath(nodes);
-                }
-            }
-        }
-        return null;
-    } 
-    
+       
     // For displaying error messages to user
-    protected void displayErrorMessage(String message) {
-        
+    protected void displayErrorMessage(String message) {        
         JOptionPane.showMessageDialog(getMainFrame(), message, "SwingSet3 Error",
                 JOptionPane.ERROR_MESSAGE);
                 
@@ -644,26 +506,20 @@ public class SwingSet3 extends SingleFrameApplication  {
             if (demoPanel == null || demo.getDemoComponent() == null) {
                 demo.startInitializing();
                 demoPanel = new DemoPanel(demo);  
-                demoPanel.setPreferredSize(activeDemoPanel.getPreferredSize());
+                demoPanel.setPreferredSize(currentDemoPanel.getPreferredSize());
                 demoCache.put(demo.getName(), demoPanel);
             } 
-            if (isAnimationOn()) {
-                animateLaunchingDemo(demo, demoPanel);
-
-            } else {
-                // no animated transition between demos
-                nextDemoPanel = demoPanel;
-                upperPanel.remove(activeDemoPanel);
-                upperPanel.add(nextDemoPanel, BorderLayout.CENTER);
-                activeDemoPanel = nextDemoPanel;
-                upperPanel.revalidate();
-                upperPanel.repaint();
-                getMainFrame().validate();
-            }
+           
+            demoContainer.remove(currentDemoPanel);
+            currentDemoPanel = demoPanel;
+            demoContainer.add(currentDemoPanel, BorderLayout.CENTER);
+            demoContainer.revalidate();
+            demoContainer.repaint();
+            getMainFrame().validate();
         }
 
         if (currentDemo == null) {
-            upperPanel.add(BorderLayout.CENTER, demoPlaceholder);
+            demoContainer.add(BorderLayout.CENTER, demoPlaceholder);
         }
         
         if (isSourceCodeVisible()) {
@@ -675,37 +531,7 @@ public class SwingSet3 extends SingleFrameApplication  {
                 
         firePropertyChange("currentDemo", oldCurrentDemo, demo);
     }
-    
-    protected void animateLaunchingDemo(Demo demo, JComponent demoPanel) {
-        
-        if (nextDemoPanel != null) {
-            // Remove initialization padding from animator
-            launchAnimator.setDuration(700);
-        }
-        nextDemoPanel = demoPanel;
-        TreePath demoPath = getTreePathForDemo(demo);
-        Rectangle nodeBounds = demoSelectorTree.getRowBounds(
-                demoSelectorTree.getRowForPath(demoPath));
-        // Must convert from tree's to frame's coordinate system
-        nodePoint.x = nodeBounds.x;
-        nodePoint.y = nodeBounds.y;
-        Point p = SwingUtilities.convertPoint(demoSelectorTree, nodePoint, getMainFrame());
-
-        launchTransition.start();
-        
-        // Create a new ScaleMoveEffect based on the launching demo's tree node
-        scaleMoveEffect = new ScaleMoveEffect();
-        scaleMoveEffect.setStartLocation(p.x + nodeBounds.width/2, p.y + nodeBounds.height/2);
-        
-        // Now create a Composite effect that combines our custom effect
-        // with a standard FadeIn effect
-        launchEffect = new CompositeEffect(scaleMoveEffect);
-        launchEffect.addEffect(new FadeIn());
-        //sourcePaneLocation = vertSplitPane.getDividerLocation();
-        
-        EffectsManager.setEffect(nextDemoPanel, launchEffect, EffectsManager.TransitionType.APPEARING);
-
-    }
+   
     
     public Demo getCurrentDemo() {
         return currentDemo;
@@ -719,14 +545,6 @@ public class SwingSet3 extends SingleFrameApplication  {
 	if (oldLookAndFeel != lookAndFeel) {
             UIManager.setLookAndFeel(lookAndFeel);
             this.lookAndFeel = lookAndFeel;
-            /*
-            if (isAnimationOn()) {                
-                lafTransition.start();                
-            } else {
-                // Update all GUI components with new look and feel
-                updateLookAndFeel();
-            }
-             */
             updateLookAndFeel();
             firePropertyChange("lookAndFeel", oldLookAndFeel, lookAndFeel);                     
 	}
@@ -739,7 +557,6 @@ public class SwingSet3 extends SingleFrameApplication  {
         try {
             setLookAndFeel(lookAndFeelName);
         } catch (Exception ex) {
-            logger.log(Level.WARNING, "exception setting look and feel", ex);
             displayErrorMessage("Unable to change the Look and Feel\n"+
                     "to "+lookAndFeelName);
         }
@@ -758,28 +575,6 @@ public class SwingSet3 extends SingleFrameApplication  {
     public boolean isSourceCodeVisible() {
         return sourceVisible;       
     } 
-    
-    public void setAnimationOn(boolean animationOn) {
-        boolean oldAnimationOn = this.animationOn;
-        this.animationOn = animationOn;
-        firePropertyChange("animationOn", oldAnimationOn, animationOn);
-    }
-    
-    public boolean isAnimationOn() {
-        return animationOn;
-    }
-    
-    public void setTreeRowHeight(int rowHeight) {
-        int oldTreeRowHeight = this.treeRowHeight;
-        this.treeRowHeight = treeRowHeight;
-        demoSelectorTree.setRowHeight(treeRowHeight);
-        demoSelectorTree.repaint();
-        firePropertyChange("treeRowHeight", oldTreeRowHeight, treeRowHeight);
-    }
-    
-    public int getTreeRowHeight() {
-        return treeRowHeight;
-    }
     
     private void updateLookAndFeel() {
         Window windows[] = Frame.getWindows();
@@ -810,123 +605,14 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
     }    
     
-    // Event handler which launches the demo when the user clicks on its node
-    // in the demo selector tree.
-    private class DemoTreeClickListener extends MouseAdapter {
-        public void mousePressed(MouseEvent e) {
-            final JTree demoTree = (JTree)e.getSource();
-            final int selectedRow = demoTree.getRowForLocation(e.getX(), e.getY());            
-            if (selectedRow != -1) {
-                TreePath selPath = demoTree.getPathForLocation(e.getX(), e.getY());
-                if (e.getClickCount() == 1) {
-                    TreeNode node = (TreeNode)selPath.getLastPathComponent();
-                    Object demoObject = ((DefaultMutableTreeNode)node).getUserObject();
-                    if (node.isLeaf() && demoObject instanceof Demo) {
-                        // user clicked demo in tree, so run it
-                        final Demo demo = (Demo)demoObject;
-                        setCurrentDemo(demo);                       
-                    }
-                }
+    private class DemoSelectionListener implements PropertyChangeListener {
+        public void propertyChange(PropertyChangeEvent event) {
+            if (event.getPropertyName().equals("selectedDemo")) {
+                setCurrentDemo((Demo)event.getNewValue());
             }
         }
-    }
-    
-    // Selection model which prevents non-leaf nodes from becoming selected
-    private class DemoTreeSelectionModel extends DefaultTreeSelectionModel {
-        
-        public DemoTreeSelectionModel() {
-            setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        }
-        
-        @Override
-        public void setSelectionPath(TreePath path) {
-            if (path == null ||
-                    ((TreeNode)path.getLastPathComponent()).isLeaf()) {
-                super.setSelectionPath(path);
-            } 
-        }
-        
-        @Override
-        public void setSelectionPaths(TreePath[] pPaths) {
-            if (pPaths == null ||
-                    ((TreeNode)pPaths[0].getLastPathComponent()).isLeaf()) {
-                super.setSelectionPaths(pPaths);
-            } 
-        }        
-    }
-            
-    private class LaunchTransitionTarget implements TransitionTarget {
-        private int startX = 0;
-        private int startY = 0;
-        
-        public void setStartLocation(int x, int y) {
-            this.startX = x;
-            this.startY = y;
-        }
-        public void setupNextScreen() {
-            upperPanel.remove(activeDemoPanel);
-            upperPanel.add(nextDemoPanel, BorderLayout.CENTER);
-            activeDemoPanel = nextDemoPanel;
-            //vertSplitPane.setDividerLocation(sourcePaneLocation);
-        }        
     }
            
-    /**
-     * Custom effect: scales and moves a component in to its end location
-     * from a specified starting point
-     */
-    private class ScaleMoveEffect extends Effect {
-        
-        private Point startLocation = new Point();
-        private PropertySetter ps[];
-        
-        public ScaleMoveEffect() {
-            this(0,0);
-        }
-        
-        public ScaleMoveEffect(int x, int y) {
-            setStartLocation(x, y);
-        }
-        
-        public void setStartLocation(int x, int y) {
-            startLocation.x = x;
-            startLocation.y = y;
-        }
-        
-        @Override
-        public void init(Animator animator, Effect parentEffect) {
-            Effect targetEffect = (parentEffect == null) ? this : parentEffect;
-
-            ComponentState starts = getStart();
-            ComponentState ends = getEnd();
-            
-            ps = new PropertySetter[3];
-            
-            ps[0] = new PropertySetter(targetEffect, "location",
-                    startLocation, new Point(getEnd().getX(), getEnd().getY()));
-            animator.addTarget(ps[0]);
-            ps[1] = new PropertySetter(targetEffect, "width", 0,
-                    getEnd().getWidth());
-            animator.addTarget(ps[1]);
-            ps[2] = new PropertySetter(targetEffect, "height", 0,
-                    getEnd().getHeight());
-            animator.addTarget(ps[2]);
-            super.init(animator, parentEffect);
-        }
-        @Override
-        public void cleanup(Animator animator) {
-            for(PropertySetter p: ps) {
-                animator.removeTarget(p);
-            }
-        }
-    }
-    
-    private class LafTransitionTarget implements TransitionTarget {
-        public void setupNextScreen() {
-            // Update all GUI components with new look and feel
-            updateLookAndFeel();       
-        }
-    }
     
     // registered on Demo to detect when the demo component is instantiated.
     // we need this because when we embed the demo inside an HTML description pane,
@@ -942,9 +628,7 @@ public class SwingSet3 extends SingleFrameApplication  {
                     demoComponent.addHierarchyListener(new DemoVisibilityListener());
                     registerPopups(demoComponent);
                 }
-            } else if (propertyName.equals("state")) {
-                demoSelectorTree.repaint();
-            }
+            } 
         }
     }
     
@@ -961,32 +645,10 @@ public class SwingSet3 extends SingleFrameApplication  {
             }            
         }        
     }
-    
+    // activated when user selects/unselects checkbox menu item
     private class SourceVisibilityChangeListener implements ChangeListener {
         public void stateChanged(ChangeEvent event) {
             setSourceCodeVisible(sourceCodeCheckboxItem.isSelected());
-        }
-    }
-
-    private class SourceVisibilityListener implements PropertyChangeListener {       
-        public void propertyChange(PropertyChangeEvent event) {
-            if (event.getPropertyName().equals("sourceCodeVisible")) {
-                boolean sourceVisible = ((Boolean)event.getNewValue()).booleanValue();
-                if (sourceVisible) {
-                    // update codeViewer in case current demo changed while
-                    // source was invisible
-                    codeViewer.setSourceFiles(currentDemo != null?
-                        currentDemo.getSourceFiles() : null);
-                }
-                sourceCodePane.setExpanded(sourceVisible);
-                sourceCodeCheckboxItem.setSelected(sourceVisible);
-            }
-        }        
-    }
-    
-    private class AnimationChangeListener implements ChangeListener {
-        public void stateChanged(ChangeEvent event) {
-            setAnimationOn(animationCheckboxItem.isSelected());
         }
     }
 
@@ -1001,11 +663,9 @@ public class SwingSet3 extends SingleFrameApplication  {
                     codeViewer.setSourceFiles(currentDemo != null?
                         currentDemo.getSourceFiles() : null);
                 }
-                sourceCodePane.setExpanded(sourceVisible);
+                demoSplitPane.setFirstExpanded(!sourceVisible);
                 sourceCodeCheckboxItem.setSelected(sourceVisible);
-            } else if (propertyName.equals("animationOn")) {
-                animationCheckboxItem.setSelected(((Boolean)event.getNewValue()).booleanValue());
-            }
+            } 
         }        
     } 
  
@@ -1041,7 +701,5 @@ public class SwingSet3 extends SingleFrameApplication  {
         public void actionPerformed(ActionEvent actionEvent) {
             
         }
-    }
-                   
-    
+    } 
 }

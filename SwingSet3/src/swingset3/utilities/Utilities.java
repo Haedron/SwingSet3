@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3;
+package swingset3.utilities;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -177,6 +177,40 @@ public class Utilities implements SwingConstants {
         return false;
     }
     
+    /**
+     * Derives a color by adding the specified offsets to the base color's 
+     * hue, saturation, and brightness values.   The resulting hue, saturation,
+     * and brightness values will be contrained to be between 0 and 1.
+     * @param base the color to which the HSV offsets will be added
+     * @param dH the offset for hue
+     * @param dS the offset for saturation
+     * @param dB the offset for brightness
+     * @return Color with modified HSV values
+     */
+    public static Color deriveColorHSB(Color base, float dH, float dS, float dB) {
+        float hsb[] = Color.RGBtoHSB(
+                base.getRed(), base.getGreen(), base.getBlue(), null);
+
+        hsb[0] += dH;
+        hsb[1] += dS;
+        hsb[2] += dB;
+        return Color.getHSBColor(
+                hsb[0] < 0? 0 : (hsb[0] > 1? 1 : hsb[0]),
+                hsb[1] < 0? 0 : (hsb[1] > 1? 1 : hsb[1]),
+                hsb[2] < 0? 0 : (hsb[2] > 1? 1 : hsb[2]));
+                                               
+    }
+
+   public static void printColor(String key, Color color) {
+       float hsb[] = Color.RGBtoHSB(
+                color.getRed(), color.getGreen(),
+                color.getBlue(), null);
+       System.out.println(key+": RGB=" + 
+               color.getRed() + ","+ color.getGreen() + ","+ color.getBlue() + "  " +
+                "HSB=" + String.format("%.0f%n",hsb[0]*360) + "," + 
+                            String.format("%.3f%n",hsb[1]) + "," + 
+                            String.format("%.3f%n", hsb[2]));
+   }
     
     private static void testSetToplevelLocation(Window base, int relativePosition) {        
         JFrame frame = new JFrame("frame "+ relativePosition);

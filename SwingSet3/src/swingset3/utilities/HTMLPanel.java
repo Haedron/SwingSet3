@@ -29,8 +29,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3;
+package swingset3.utilities;
 
+import swingset3.utilities.Utilities;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;

@@ -31,6 +31,7 @@
 
 package swingset3;
 
+import swingset3.utilities.Utilities;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -51,7 +51,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
-import swingset3.Utilities;
+import swingset3.utilities.Utilities;
 
 /**
  * Table renderer which renders cell value as hyperlink with optional rollover underline.

@@ -31,6 +31,7 @@
 
 package swingset3;
 
+import swingset3.utilities.HTMLPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

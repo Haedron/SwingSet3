@@ -45,7 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.border.LineBorder;
 import swingset3.DemoProperties;
-import swingset3.Utilities;
+import swingset3.utilities.Utilities;
 
 /**
  *

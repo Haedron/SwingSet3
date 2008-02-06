@@ -44,7 +44,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import swingset3.DemoProperties;
-import swingset3.Utilities;
+import swingset3.utilities.Utilities;
 
 /**
  *
