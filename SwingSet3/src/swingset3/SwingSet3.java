@@ -149,10 +149,10 @@ public class SwingSet3 extends SingleFrameApplication  {
     }
     
     private static List<String> readDemoClassNames(Reader reader) throws IOException {
-        ArrayList<String> demoClassNames = new ArrayList();
+        List<String> demoClassNames = new ArrayList<String>();
         
         BufferedReader breader = new BufferedReader(reader);
-        String line = null;
+        String line;
         while((line = breader.readLine()) != null) {
             demoClassNames.add(line);
         }
@@ -160,25 +160,22 @@ public class SwingSet3 extends SingleFrameApplication  {
         return demoClassNames;
     }
     
-    private static List readDemoClassNames(Manifest manifest) throws IOException {
+    private static List<String> readDemoClassNames(Manifest manifest) throws IOException {
         // The problem with this approach is that with the entries map there is no way 
         // to specify the order that the demos should appear in the tree.
         // REMIND(aim): remove when sure this will not be supported
-        ArrayList demoClassNames = new ArrayList();
+        List<String> demoClassNames = new ArrayList<String>();
         
         Map<String,Attributes> entries = manifest.getEntries();
-        
-        Iterator keys = entries.keySet().iterator();
-        while(keys.hasNext()) {
-            String key = (String)keys.next();
+
+        for (String key : entries.keySet()) {
             Attributes attrs = entries.get(key);
             Iterator attrKeys = attrs.keySet().iterator();
-            
-            
+
             boolean isDemoClass = Boolean.parseBoolean(attrs.getValue("SwingSet3-Demo"));
             if (isDemoClass) {
                 String demoPath = key.replaceAll("/", ".");
-                demoClassNames.add(demoPath.replaceFirst(".class",""));
+                demoClassNames.add(demoPath.replaceFirst(".class", ""));
             }
         }
         return demoClassNames;
@@ -226,23 +223,22 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
         resourceMap = getContext().getResourceMap();
         title = resourceMap.getString("mainFrame.title");
-        demoMap = new HashMap();
-        demoCache = new HashMap();
+        demoMap = new HashMap<String,List<Demo>>();
+        demoCache = new HashMap<String, DemoPanel>();
         addDemoSet(resourceMap.getString("demos.title"), getDemoClassNames(args));
         setDemoPlaceholder(new JPanel());
 
     }
     
     private List<String>getDemoClassNames(String args[]) {
-        final ArrayList<String> demoList = new ArrayList();
+        List<String> demoList = new ArrayList<String>();
         boolean augment = false;
 
         // First look for any demo list files specified on the command-line
-        ArrayList userDemoList = new ArrayList();
+        List<String> userDemoList = new ArrayList<String>();
         for(String arg : args) {
             if (arg.equals("-a") || arg.equals("-augment")) {
                 augment = true;
-                
             } else {
                 // process argument as filename containing names of demo classes
                 try {
@@ -274,7 +270,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     }
 
     public void addDemoSet(String demoSetTitle, List<String> demoClassNamesList) {              
-        ArrayList demoList = new ArrayList();
+        List<Demo> demoList = new ArrayList<Demo>();
         for(String demoClassName: demoClassNamesList) {
             demoList.add(createDemo(demoClassName));
         }
@@ -500,9 +496,9 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
         Demo oldCurrentDemo = currentDemo;        
         currentDemo = demo;
-        DemoPanel demoPanel = null;
         if (demo != null) {
-            demoPanel = demoCache.get(demo.getName());
+            DemoPanel demoPanel = demoCache.get(demo.getName());
+
             if (demoPanel == null || demo.getDemoComponent() == null) {
                 demo.startInitializing();
                 demoPanel = new DemoPanel(demo);  
@@ -674,8 +670,7 @@ public class SwingSet3 extends SingleFrameApplication  {
             super("View Source Code");
         }
         public void actionPerformed(ActionEvent actionEvent) {
-            JComponent source = (JComponent)actionEvent.getSource();
-            Container popup = source;
+            Container popup = (JComponent)actionEvent.getSource();
             while(popup != null && !(popup instanceof JPopupMenu)) {
                 popup = popup.getParent();
             }
