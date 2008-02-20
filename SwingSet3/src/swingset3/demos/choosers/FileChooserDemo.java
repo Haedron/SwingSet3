@@ -33,11 +33,15 @@ package swingset3.demos.choosers;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Hashtable;
+import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import swingset3.DemoProperties;
@@ -55,22 +59,18 @@ import swingset3.demos.DemoBase;
         description = "Demonstrates JFileChooser, a component which allows the user to open and save files.",
         sourceFiles = {
                 "swingset3/demos/choosers/FileChooserDemo.java",
-                "swingset3/demos/DemoBase.java",
-                "swingset3/demos/choosers/ExampleFileView.java"
+                "swingset3/demos/choosers/ExampleFileView.java",
+                "swingset3/demos/choosers/JGridPanel.java",
+                "swingset3/demos/DemoBase.java"
                 }
 )
 public class FileChooserDemo extends DemoBase {
-    private JLabel theImage;
-    
-    private Icon jpgIcon;
-    
-    private Icon gifIcon;
-
     /**
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
         FileChooserDemo demo = new FileChooserDemo();
+
         demo.mainImpl();
     }
 
@@ -78,370 +78,218 @@ public class FileChooserDemo extends DemoBase {
      * FileChooserDemo Constructor
      */
     public FileChooserDemo() {
-        // Set the title for this demo, and an icon used to represent this
-        // demo inside the SwingSet2 app.
         super();
-        createFileChooserDemo();
+
+        add(new ImageEditor());
     }
 
-    public void createFileChooserDemo() {
-        theImage = new JLabel("");
-        jpgIcon = createImageIcon("filechooser/jpgIcon.jpg", "jpg image");
-        gifIcon = createImageIcon("filechooser/gifIcon.gif", "gif image");
-
-        JPanel demoPanel = getDemoPanel();
-        demoPanel.setLayout(new BoxLayout(demoPanel, BoxLayout.Y_AXIS));
-
-        JPanel innerPanel = new JPanel();
-        innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
-
-        demoPanel.add(Box.createRigidArea(VGAP20));
-        demoPanel.add(innerPanel);
-        demoPanel.add(Box.createRigidArea(VGAP20));
-
-        innerPanel.add(Box.createRigidArea(HGAP20));
-
-        // Create a panel to hold buttons
-        JPanel buttonPanel = new JPanel() {
-            public Dimension getMaximumSize() {
-                return new Dimension(getPreferredSize().width, super.getMaximumSize().height);
-            }
-        };
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-
-        buttonPanel.add(Box.createRigidArea(VGAP15));
-        buttonPanel.add(createPlainFileChooserButton());
-        buttonPanel.add(Box.createRigidArea(VGAP15));
-        buttonPanel.add(createPreviewFileChooserButton());
-        buttonPanel.add(Box.createRigidArea(VGAP15));
-        buttonPanel.add(createCustomFileChooserButton());
-        buttonPanel.add(Box.createVerticalGlue());
-
-        // Create a panel to hold the image
-        JPanel imagePanel = new JPanel();
-        imagePanel.setLayout(new BorderLayout());
-        imagePanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
-        JScrollPane scroller = new JScrollPane(theImage);
-        scroller.getVerticalScrollBar().setUnitIncrement(10);
-        scroller.getHorizontalScrollBar().setUnitIncrement(10);
-        imagePanel.add(scroller, BorderLayout.CENTER);
-
-        // add buttons and image panels to inner panel
-        innerPanel.add(buttonPanel);
-        innerPanel.add(Box.createRigidArea(HGAP30));
-        innerPanel.add(imagePanel);
-        innerPanel.add(Box.createRigidArea(HGAP20));
+    private enum State {
+        EMPTY,
+        FILE_SELECTING,
+        IMAGE_LOADED,
+        IMAGE_CHANGED
     }
 
-    public JFileChooser createFileChooser() {
-        // create a filechooser
-        JFileChooser fc = new JFileChooser();
-        /*
-        if (getSwingSet2() != null && getSwingSet2().isDragEnabled()) {
-            fc.setDragEnabled(true);
-        }*/
+    private class ImageEditor extends JGridPanel {
+        private final JLabel lbImage = new JLabel(getString("FileChooserDemo.image.text"), JLabel.CENTER);
 
-        // set the current directory to be the images directory
-        File swingFile = new File("resources/images/FileChooserDemo.gif");
-        if (swingFile.exists()) {
-            fc.setCurrentDirectory(swingFile);
-            fc.setSelectedFile(swingFile);
+        private final JScrollPane pnImage = new JScrollPane(lbImage);
+
+        private final JButton btnSelect = new JButton(getString("FileChooserDemo.select.text"));
+
+        private final JButton btnRotateLeft = new JButton("L"); // todo: add image
+
+        private final JButton btnRotateRight = new JButton("R"); // todo: add image
+
+        private final JButton btnFlipHorizontal = new JButton("H"); // todo: add image
+
+        private final JButton btnFlipVertical = new JButton("V"); // todo: add image
+
+        private final JButton btnApply = new JButton(getString("FileChooserDemo.apply.text"));
+
+        private final JButton btnCancel = new JButton(getString("FileChooserDemo.cancel.text"));
+
+        private final JFileChooser chooser = new JFileChooser();
+
+        private State state;
+
+        private File file;
+
+        private BufferedImage image;
+
+        private ImageEditor() {
+            super(1, 0, 0);
+
+            chooser.setControlButtonsAreShown(false);
+
+            chooser.addChoosableFileFilter(new FileNameExtensionFilter("JPEG images", "jpg"));
+
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("All supported images",
+                    ImageIO.getWriterFormatNames());
+
+            chooser.addChoosableFileFilter(filter);
+            chooser.setFileFilter(filter);
+
+            JGridPanel pnButtons = new JGridPanel(9, 1);
+
+            pnButtons.cell(btnSelect).
+                    cell().
+                    cell(btnRotateLeft).
+                    cell(btnRotateRight).
+                    cell(btnFlipHorizontal).
+                    cell(btnFlipVertical).
+                    cell().
+                    cell(btnApply).
+                    cell(btnCancel);
+
+            cell(pnImage, Layout.FILL, Layout.FILL);
+            cell(pnButtons);
+
+            chooser.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    file = chooser.getSelectedFile();
+
+                    loadFile();
+                }
+            });
+
+            btnSelect.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (state == State.FILE_SELECTING) {
+                        file = chooser.getSelectedFile();
+
+                        loadFile();
+                    } else {
+                        setState(State.FILE_SELECTING);
+                    }
+                }
+            });
+
+            btnRotateLeft.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    doAffineTransform(image.getHeight(), image.getWidth(),
+                            new AffineTransform(0, -1, 1, 0, 0, image.getWidth()));
+                }
+            });
+
+            btnRotateRight.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    doAffineTransform(image.getHeight(), image.getWidth(),
+                            new AffineTransform(0, 1, -1, 0, image.getHeight(), 0));
+                }
+            });
+
+            btnFlipHorizontal.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    doAffineTransform(image.getWidth(), image.getHeight(),
+                            new AffineTransform(-1, 0, 0, 1, image.getWidth(), 0));
+                }
+            });
+
+            btnFlipVertical.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    doAffineTransform(image.getWidth(), image.getHeight(),
+                            new AffineTransform(1, 0, 0, -1, 0, image.getHeight()));
+                }
+            });
+
+            btnApply.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    String fileName = file.getName();
+
+                    int i = fileName.lastIndexOf('.');
+
+                    try {
+                        ImageIO.write(image, fileName.substring(i + 1), file);
+
+                        setState(State.IMAGE_LOADED);
+                    } catch (IOException e1) {
+                        JOptionPane.showMessageDialog(ImageEditor.this,
+                                MessageFormat.format(getString("FileChooserDemo.errorsavefile.message"), e1),
+                                getString("FileChooserDemo.errorsavefile.title"),
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+
+            btnCancel.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    loadFile();
+                }
+            });
+
+            setState(State.EMPTY);
         }
 
-        return fc;
-    }
+        private void doAffineTransform(int width, int height, AffineTransform transform) {
+            BufferedImage newImage = new BufferedImage(image.getColorModel(),
+                    image.getRaster().createCompatibleWritableRaster(width, height),
+                    image.isAlphaPremultiplied(), new Hashtable<Object, Object>());
 
+            ((Graphics2D) newImage.getGraphics()).drawRenderedImage(image, transform);
 
-    public JButton createPlainFileChooserButton() {
-        Action a = new AbstractAction(getString("FileChooserDemo.plainbutton")) {
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = createFileChooser();
+            image = newImage;
 
-                // show the filechooser
-                int result = fc.showOpenDialog(getDemoPanel());
+            lbImage.setIcon(new ImageIcon(image));
 
-                // if we selected an image, load the image
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    loadImage(fc.getSelectedFile().getPath());
-                }
-            }
-        };
-        return createButton(a);
-    }
-
-    public JButton createPreviewFileChooserButton() {
-        Action a = new AbstractAction(getString("FileChooserDemo.previewbutton")) {
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = createFileChooser();
-
-                // Add filefilter & fileview
-                javax.swing.filechooser.FileFilter filter = createFileFilter(
-                        getString("FileChooserDemo.filterdescription"),
-                        "jpg", "gif");
-                ExampleFileView fileView = new ExampleFileView();
-                fileView.putIcon("jpg", jpgIcon);
-                fileView.putIcon("gif", gifIcon);
-                fc.setFileView(fileView);
-                fc.addChoosableFileFilter(filter);
-                fc.setFileFilter(filter);
-
-                // add preview accessory
-                fc.setAccessory(new FilePreviewer(fc));
-
-                // show the filechooser
-                int result = fc.showOpenDialog(getDemoPanel());
-
-                // if we selected an image, load the image
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    loadImage(fc.getSelectedFile().getPath());
-                }
-            }
-        };
-        return createButton(a);
-    }
-
-    JDialog dialog;
-    JFileChooser fc;
-
-    private javax.swing.filechooser.FileFilter createFileFilter(
-            String description, String... extensions) {
-        description = createFileNameFilterDescriptionFromExtensions(
-                description, extensions);
-        return new FileNameExtensionFilter(description, extensions);
-    }
-
-    private String createFileNameFilterDescriptionFromExtensions(
-            String description, String[] extensions) {
-        String fullDescription = (description == null) ?
-                "(" : description + " (";
-        // build the description from the extension list
-        fullDescription += "." + extensions[0];
-        for (int i = 1; i < extensions.length; i++) {
-            fullDescription += ", .";
-            fullDescription += extensions[i];
+            setState(State.IMAGE_CHANGED);
         }
-        fullDescription += ")";
-        return fullDescription;
-    }
 
-    public JButton createCustomFileChooserButton() {
-        Action a = new AbstractAction(getString("FileChooserDemo.custombutton")) {
-            public void actionPerformed(ActionEvent e) {
-                fc = createFileChooser();
-
-                // Add filefilter & fileview
-                javax.swing.filechooser.FileFilter filter = createFileFilter(
-                        getString("FileChooserDemo.filterdescription"),
-                        "jpg", "gif");
-                ExampleFileView fileView = new ExampleFileView();
-                fileView.putIcon("jpg", jpgIcon);
-                fileView.putIcon("gif", gifIcon);
-                fc.setFileView(fileView);
-                fc.addChoosableFileFilter(filter);
-
-                // add preview accessory
-                fc.setAccessory(new FilePreviewer(fc));
-
-                // remove the approve/cancel buttons
-                fc.setControlButtonsAreShown(false);
-
-                // make custom controls
-                //wokka
-                JPanel custom = new JPanel();
-                custom.setLayout(new BoxLayout(custom, BoxLayout.Y_AXIS));
-                custom.add(Box.createRigidArea(VGAP10));
-                JLabel description = new JLabel(getString("FileChooserDemo.description"));
-                description.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-                custom.add(description);
-                custom.add(Box.createRigidArea(VGAP10));
-                custom.add(fc);
-
-                Action okAction = createOKAction();
-                fc.addActionListener(okAction);
-
-                JPanel buttons = new JPanel();
-                buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
-                buttons.add(Box.createRigidArea(HGAP10));
-                buttons.add(createImageButton(createFindAction()));
-                buttons.add(Box.createRigidArea(HGAP10));
-                buttons.add(createButton(createAboutAction()));
-                buttons.add(Box.createRigidArea(HGAP10));
-                buttons.add(createButton(okAction));
-                buttons.add(Box.createRigidArea(HGAP10));
-                buttons.add(createButton(createCancelAction()));
-                buttons.add(Box.createRigidArea(HGAP10));
-                buttons.add(createImageButton(createHelpAction()));
-                buttons.add(Box.createRigidArea(HGAP10));
-
-                custom.add(buttons);
-                custom.add(Box.createRigidArea(VGAP10));
-
-                // show the filechooser
-                Frame parent = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, getDemoPanel());
-                dialog = new JDialog(parent, getString("FileChooserDemo.dialogtitle"), true);
-                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                dialog.getContentPane().add(custom, BorderLayout.CENTER);
-                dialog.pack();
-                dialog.setLocationRelativeTo(getDemoPanel());
-                dialog.setVisible(true);
+        private void loadFile() {
+            if (file == null) {
+                JOptionPane.showMessageDialog(ImageEditor.this,
+                        getString("FileChooserDemo.selectfile.message"),
+                        getString("FileChooserDemo.selectfile.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
             }
-        };
-        return createButton(a);
-    }
 
-    public Action createAboutAction() {
-        return new AbstractAction(getString("FileChooserDemo.about")) {
-            public void actionPerformed(ActionEvent e) {
-                File file = fc.getSelectedFile();
-                String text;
-                if (file == null) {
-                    text = getString("FileChooserDemo.nofileselected");
+            boolean error = false;
+
+            try {
+                image = ImageIO.read(file);
+
+                if (image == null) {
+                    error = true;
                 } else {
-                    text = "<html>" + getString("FileChooserDemo.thefile");
-                    text += "<br><font color=green>" + file.getName() + "</font><br>";
-                    text += getString("FileChooserDemo.isprobably") + "</html>";
+                    lbImage.setText(null);
+                    lbImage.setIcon(new ImageIcon(image));
+
+                    setState(State.IMAGE_LOADED);
                 }
-                JOptionPane.showMessageDialog(getDemoPanel(), text);
+            } catch (IOException e1) {
+                error = true;
             }
-        };
-    }
 
-    public Action createOKAction() {
-        return new AbstractAction(getString("FileChooserDemo.ok")) {
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-                if (!e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)
-                        && fc.getSelectedFile() != null) {
-
-                    loadImage(fc.getSelectedFile().getPath());
-                }
-            }
-        };
-    }
-
-    public Action createCancelAction() {
-        return new AbstractAction(getString("FileChooserDemo.cancel")) {
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-            }
-        };
-    }
-
-    public Action createFindAction() {
-        Icon icon = createImageIcon("filechooser/find.gif", getString("FileChooserDemo.find"));
-        return new AbstractAction("", icon) {
-            public void actionPerformed(ActionEvent e) {
-                String result = JOptionPane.showInputDialog(getDemoPanel(), getString("FileChooserDemo.findquestion"));
-                if (result != null) {
-                    JOptionPane.showMessageDialog(getDemoPanel(), getString("FileChooserDemo.findresponse"));
-                }
-            }
-        };
-    }
-
-    public Action createHelpAction() {
-        Icon icon = createImageIcon("filechooser/help.gif", getString("FileChooserDemo.help"));
-        return new AbstractAction("", icon) {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(getDemoPanel(), getString("FileChooserDemo.helptext"));
-            }
-        };
-    }
-
-    class MyImageIcon extends ImageIcon {
-        public MyImageIcon(String filename) {
-            super(filename);
-        }
-
-        public synchronized void paintIcon(Component c, Graphics g, int x, int y) {
-            g.setColor(Color.white);
-            g.fillRect(0, 0, c.getWidth(), c.getHeight());
-            if (getImageObserver() == null) {
-                g.drawImage(
-                        getImage(),
-                        c.getWidth() / 2 - getIconWidth() / 2,
-                        c.getHeight() / 2 - getIconHeight() / 2,
-                        c
-                );
-            } else {
-                g.drawImage(
-                        getImage(),
-                        c.getWidth() / 2 - getIconWidth() / 2,
-                        c.getHeight() / 2 - getIconHeight() / 2,
-                        getImageObserver()
-                );
-            }
-        }
-    }
-
-    public void loadImage(String filename) {
-        theImage.setIcon(new MyImageIcon(filename));
-    }
-
-    public JButton createButton(Action a) {
-        JButton b = new JButton(a) {
-            public Dimension getMaximumSize() {
-                int width = Short.MAX_VALUE;
-                int height = super.getMaximumSize().height;
-                return new Dimension(width, height);
-            }
-        };
-        return b;
-    }
-
-    public JButton createImageButton(Action a) {
-        JButton b = new JButton(a);
-        b.setMargin(new Insets(0, 0, 0, 0));
-        return b;
-    }
-    
-    private static class FilePreviewer extends JComponent implements PropertyChangeListener {
-        private ImageIcon thumbnail = null;
-
-        public FilePreviewer(JFileChooser fc) {
-            setPreferredSize(new Dimension(100, 50));
-            fc.addPropertyChangeListener(this);
-            setBorder(new BevelBorder(BevelBorder.LOWERED));
-        }
-
-        public void loadImage(File f) {
-            if (f == null) {
-                thumbnail = null;
-            } else {
-                ImageIcon tmpIcon = new ImageIcon(f.getPath());
-                if (tmpIcon.getIconWidth() > 90) {
-                    thumbnail = new ImageIcon(
-                            tmpIcon.getImage().getScaledInstance(90, -1, Image.SCALE_DEFAULT));
-                } else {
-                    thumbnail = tmpIcon;
-                }
+            if (error) {
+                JOptionPane.showMessageDialog(ImageEditor.this,
+                        getString("FileChooserDemo.errorloadfile.message"),
+                        getString("FileChooserDemo.errorloadfile.title"),
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
 
-        public void propertyChange(PropertyChangeEvent e) {
-            String prop = e.getPropertyName();
-            if (prop == JFileChooser.SELECTED_FILE_CHANGED_PROPERTY) {
-                if (isShowing()) {
-                    loadImage((File) e.getNewValue());
-                    repaint();
-                }
+        private void setState(State state) {
+            if (this.state != State.FILE_SELECTING && state == State.FILE_SELECTING) {
+                setComponent(chooser, 0, 0);
             }
-        }
 
-        public void paint(Graphics g) {
-            super.paint(g);
-            if (thumbnail != null) {
-                int x = getWidth() / 2 - thumbnail.getIconWidth() / 2;
-                int y = getHeight() / 2 - thumbnail.getIconHeight() / 2;
-                if (y < 0) {
-                    y = 0;
-                }
-
-                if (x < 5) {
-                    x = 5;
-                }
-                thumbnail.paintIcon(this, g, x, y);
+            if (this.state == State.FILE_SELECTING && state != State.FILE_SELECTING) {
+                setComponent(pnImage, 0, 0);
             }
+
+            this.state = state;
+
+            boolean isImageLoaded = state == State.IMAGE_LOADED || state == State.IMAGE_CHANGED;
+
+            btnRotateRight.setEnabled(isImageLoaded);
+            btnRotateLeft.setEnabled(isImageLoaded);
+            btnFlipHorizontal.setEnabled(isImageLoaded);
+            btnFlipVertical.setEnabled(isImageLoaded);
+
+            boolean isImageChanged = state == State.IMAGE_CHANGED;
+
+            btnApply.setEnabled(isImageChanged);
+            btnCancel.setEnabled(isImageChanged);
         }
     }
 }
