@@ -77,7 +77,7 @@ public class FileChooserDemo extends DemoBase {
 
     private static final int MIN_FILTER_ID = 0;
 
-    private static final int MAX_FILTER_ID = 3;
+    private static final int MAX_FILTER_ID = 7;
 
     /**
      * main method allows us to run as a standalone demo.
@@ -272,6 +272,20 @@ public class FileChooserDemo extends DemoBase {
             setState(State.IMAGE_CHANGED);
         }
 
+        private void doFilter(float scaleFactor, float offset) {
+            BufferedImage newImage = new BufferedImage(image.getColorModel(),
+                    image.getRaster().createCompatibleWritableRaster(image.getWidth(), image.getHeight()),
+                    image.isAlphaPremultiplied(), new Hashtable<Object, Object>());
+
+            new RescaleOp(scaleFactor, offset, null).filter(image, newImage);
+
+            image = newImage;
+
+            lbImage.setIcon(new ImageIcon(image));
+
+            setState(State.IMAGE_CHANGED);
+        }
+
         private void loadFile() {
             if (file == null) {
                 JOptionPane.showMessageDialog(ImageEditor.this,
@@ -334,6 +348,10 @@ public class FileChooserDemo extends DemoBase {
              * 1 - blur
              * 2 - edge
              * 3 - sharpen
+             * 4 - darken
+             * 5 - brighten
+             * 6 - less contrast
+             * 7 - more contrast
              */
             private final int id;
 
@@ -380,6 +398,34 @@ public class FileChooserDemo extends DemoBase {
 
                         break;
                     }
+
+                    case 4: {
+                        // Darken
+                        doFilter(1, -5.0f);
+
+                        break;
+                    }
+
+                    case 5: {
+                        // Brighten
+                        doFilter(1, 5.0f);
+
+                        break;
+                    }
+
+                    case 6: {
+                        // Less contrast
+                        doFilter(0.9f, 0);
+
+                        break;
+                    }
+
+                    case 7: {
+                        // More contrast
+                        doFilter(1.1f, 0);
+
+                        break;
+                    }
                 }
             }
 
@@ -396,6 +442,18 @@ public class FileChooserDemo extends DemoBase {
 
                     case 3:
                         return getString("FileChooserDemo.filter.sharpen");
+
+                    case 4:
+                        return getString("FileChooserDemo.filter.darken");
+
+                    case 5:
+                        return getString("FileChooserDemo.filter.brighten");
+
+                    case 6:
+                        return getString("FileChooserDemo.filter.lesscontrast");
+
+                    case 7:
+                        return getString("FileChooserDemo.filter.morecontrast");
                 }
 
                 return null;
