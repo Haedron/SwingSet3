@@ -35,7 +35,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -65,6 +65,20 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class FileChooserDemo extends DemoBase {
+    /*
+      todo: tune gaps
+     */
+    private enum State {
+        EMPTY,
+        FILE_SELECTING,
+        IMAGE_LOADED,
+        IMAGE_CHANGED
+    }
+
+    private static final int MIN_FILTER_ID = 0;
+
+    private static final int MAX_FILTER_ID = 3;
+
     /**
      * main method allows us to run as a standalone demo.
      */
@@ -83,19 +97,14 @@ public class FileChooserDemo extends DemoBase {
         add(new ImageEditor());
     }
 
-    private enum State {
-        EMPTY,
-        FILE_SELECTING,
-        IMAGE_LOADED,
-        IMAGE_CHANGED
-    }
-
     private class ImageEditor extends JGridPanel {
         private final JLabel lbImage = new JLabel(getString("FileChooserDemo.image.text"), JLabel.CENTER);
 
         private final JScrollPane pnImage = new JScrollPane(lbImage);
 
         private final JButton btnSelect = new JButton(getString("FileChooserDemo.select.text"));
+
+        private final JComboBox cbFilters = new JComboBox();
 
         private final JButton btnRotateLeft = new JButton("L"); // todo: add image
 
@@ -130,9 +139,15 @@ public class FileChooserDemo extends DemoBase {
             chooser.addChoosableFileFilter(filter);
             chooser.setFileFilter(filter);
 
-            JGridPanel pnButtons = new JGridPanel(9, 1);
+            for (int i = MIN_FILTER_ID; i <= MAX_FILTER_ID; i++) {
+                cbFilters.addItem(new FilterItem(i));
+            }
+
+            JGridPanel pnButtons = new JGridPanel(11, 1);
 
             pnButtons.cell(btnSelect).
+                    cell().
+                    cell(cbFilters).
                     cell().
                     cell(btnRotateLeft).
                     cell(btnRotateRight).
@@ -162,6 +177,14 @@ public class FileChooserDemo extends DemoBase {
                     } else {
                         setState(State.FILE_SELECTING);
                     }
+                }
+            });
+
+            cbFilters.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    ((FilterItem) cbFilters.getSelectedItem()).applyFilter();
+
+                    cbFilters.setSelectedItem(cbFilters.getItemAt(0));
                 }
             });
 
@@ -235,37 +258,49 @@ public class FileChooserDemo extends DemoBase {
             setState(State.IMAGE_CHANGED);
         }
 
+        private void doFilter(float[] elements) {
+            BufferedImage newImage = new BufferedImage(image.getColorModel(),
+                    image.getRaster().createCompatibleWritableRaster(image.getWidth(), image.getHeight()),
+                    image.isAlphaPremultiplied(), new Hashtable<Object, Object>());
+
+            new ConvolveOp(new Kernel(3, 3, elements), ConvolveOp.EDGE_NO_OP, null).filter(image, newImage);
+
+            image = newImage;
+
+            lbImage.setIcon(new ImageIcon(image));
+
+            setState(State.IMAGE_CHANGED);
+        }
+
         private void loadFile() {
             if (file == null) {
                 JOptionPane.showMessageDialog(ImageEditor.this,
                         getString("FileChooserDemo.selectfile.message"),
                         getString("FileChooserDemo.selectfile.title"),
                         JOptionPane.INFORMATION_MESSAGE);
-            }
 
-            boolean error = false;
+                return;
+            }
 
             try {
                 image = ImageIO.read(file);
 
-                if (image == null) {
-                    error = true;
-                } else {
+                if (image != null) {
                     lbImage.setText(null);
                     lbImage.setIcon(new ImageIcon(image));
 
                     setState(State.IMAGE_LOADED);
+
+                    return;
                 }
             } catch (IOException e1) {
-                error = true;
+                // Do nothing
             }
 
-            if (error) {
-                JOptionPane.showMessageDialog(ImageEditor.this,
-                        getString("FileChooserDemo.errorloadfile.message"),
-                        getString("FileChooserDemo.errorloadfile.title"),
-                        JOptionPane.ERROR_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(ImageEditor.this,
+                    getString("FileChooserDemo.errorloadfile.message"),
+                    getString("FileChooserDemo.errorloadfile.title"),
+                    JOptionPane.ERROR_MESSAGE);
         }
 
         private void setState(State state) {
@@ -281,6 +316,7 @@ public class FileChooserDemo extends DemoBase {
 
             boolean isImageLoaded = state == State.IMAGE_LOADED || state == State.IMAGE_CHANGED;
 
+            cbFilters.setEnabled(isImageLoaded);
             btnRotateRight.setEnabled(isImageLoaded);
             btnRotateLeft.setEnabled(isImageLoaded);
             btnFlipHorizontal.setEnabled(isImageLoaded);
@@ -290,6 +326,80 @@ public class FileChooserDemo extends DemoBase {
 
             btnApply.setEnabled(isImageChanged);
             btnCancel.setEnabled(isImageChanged);
+        }
+
+        private class FilterItem {
+            /**
+             * 0 - Empty filter
+             * 1 - blur
+             * 2 - edge
+             * 3 - sharpen
+             */
+            private final int id;
+
+            private FilterItem(int id) {
+                assert id >= MIN_FILTER_ID && id <= MAX_FILTER_ID;
+
+                this.id = id;
+            }
+
+            public void applyFilter() {
+                switch (id) {
+                    case 1: {
+                        // Blur
+                        float[] elements = {
+                                .1111f, .1111f, .1111f,
+                                .1111f, .1111f, .1111f,
+                                .1111f, .1111f, .1111f};
+
+                        doFilter(elements);
+
+                        break;
+                    }
+
+                    case 2: {
+                        // Edge
+                        float[] elements = {
+                                0.0f, -1.0f, 0.0f,
+                                -1.0f, 4.f, -1.0f,
+                                0.0f, -1.0f, 0.0f};
+
+                        doFilter(elements);
+
+                        break;
+                    }
+
+                    case 3: {
+                        // Sharpen
+                        float[] elements = {
+                                0.0f, -1.0f, 0.0f,
+                                -1.0f, 5.f, -1.0f,
+                                0.0f, -1.0f, 0.0f};
+
+                        doFilter(elements);
+
+                        break;
+                    }
+                }
+            }
+
+            public String toString() {
+                switch (id) {
+                    case 0:
+                        return getString("FileChooserDemo.filter.selectfilter");
+
+                    case 1:
+                        return getString("FileChooserDemo.filter.blur");
+
+                    case 2:
+                        return getString("FileChooserDemo.filter.edge");
+
+                    case 3:
+                        return getString("FileChooserDemo.filter.sharpen");
+                }
+
+                return null;
+            }
         }
     }
 }
