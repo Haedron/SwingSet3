@@ -32,6 +32,7 @@
 package swingset3.demos.choosers;
 
 import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
@@ -77,7 +78,7 @@ public class FileChooserDemo extends DemoBase {
 
     private static final int MIN_FILTER_ID = 0;
 
-    private static final int MAX_FILTER_ID = 7;
+    private static final int MAX_FILTER_ID = 8;
 
     /**
      * main method allows us to run as a standalone demo.
@@ -258,26 +259,12 @@ public class FileChooserDemo extends DemoBase {
             setState(State.IMAGE_CHANGED);
         }
 
-        private void doFilter(float[] elements) {
+        private void doFilter(BufferedImageOp imageOp) {
             BufferedImage newImage = new BufferedImage(image.getColorModel(),
                     image.getRaster().createCompatibleWritableRaster(image.getWidth(), image.getHeight()),
                     image.isAlphaPremultiplied(), new Hashtable<Object, Object>());
 
-            new ConvolveOp(new Kernel(3, 3, elements), ConvolveOp.EDGE_NO_OP, null).filter(image, newImage);
-
-            image = newImage;
-
-            lbImage.setIcon(new ImageIcon(image));
-
-            setState(State.IMAGE_CHANGED);
-        }
-
-        private void doFilter(float scaleFactor, float offset) {
-            BufferedImage newImage = new BufferedImage(image.getColorModel(),
-                    image.getRaster().createCompatibleWritableRaster(image.getWidth(), image.getHeight()),
-                    image.isAlphaPremultiplied(), new Hashtable<Object, Object>());
-
-            new RescaleOp(scaleFactor, offset, null).filter(image, newImage);
+            imageOp.filter(image, newImage);
 
             image = newImage;
 
@@ -352,6 +339,7 @@ public class FileChooserDemo extends DemoBase {
              * 5 - brighten
              * 6 - less contrast
              * 7 - more contrast
+             * 8 - gray
              */
             private final int id;
 
@@ -370,7 +358,7 @@ public class FileChooserDemo extends DemoBase {
                                 .1111f, .1111f, .1111f,
                                 .1111f, .1111f, .1111f};
 
-                        doFilter(elements);
+                        doFilter(new ConvolveOp(new Kernel(3, 3, elements), ConvolveOp.EDGE_NO_OP, null));
 
                         break;
                     }
@@ -382,7 +370,7 @@ public class FileChooserDemo extends DemoBase {
                                 -1.0f, 4.f, -1.0f,
                                 0.0f, -1.0f, 0.0f};
 
-                        doFilter(elements);
+                        doFilter(new ConvolveOp(new Kernel(3, 3, elements), ConvolveOp.EDGE_NO_OP, null));
 
                         break;
                     }
@@ -394,35 +382,42 @@ public class FileChooserDemo extends DemoBase {
                                 -1.0f, 5.f, -1.0f,
                                 0.0f, -1.0f, 0.0f};
 
-                        doFilter(elements);
+                        doFilter(new ConvolveOp(new Kernel(3, 3, elements), ConvolveOp.EDGE_NO_OP, null));
 
                         break;
                     }
 
                     case 4: {
                         // Darken
-                        doFilter(1, -5.0f);
+                        doFilter(new RescaleOp(1, -5.0f, null));
 
                         break;
                     }
 
                     case 5: {
                         // Brighten
-                        doFilter(1, 5.0f);
+                        doFilter(new RescaleOp(1, 5.0f, null));
 
                         break;
                     }
 
                     case 6: {
                         // Less contrast
-                        doFilter(0.9f, 0);
+                        doFilter(new RescaleOp(0.9f, 0, null));
 
                         break;
                     }
 
                     case 7: {
                         // More contrast
-                        doFilter(1.1f, 0);
+                        doFilter(new RescaleOp(1.1f, 0, null));
+
+                        break;
+                    }
+
+                    case 8: {
+                        // Gray
+                        doFilter(new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null));
 
                         break;
                     }
@@ -454,6 +449,9 @@ public class FileChooserDemo extends DemoBase {
 
                     case 7:
                         return getString("FileChooserDemo.filter.morecontrast");
+
+                    case 8:
+                        return getString("FileChooserDemo.filter.gray");
                 }
 
                 return null;
