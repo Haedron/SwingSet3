@@ -67,7 +67,7 @@ import swingset3.demos.DemoBase;
 )
 public class FileChooserDemo extends DemoBase {
     /*
-      todo: tune gaps
+      todo: fix buttons images
      */
     private enum State {
         EMPTY,
@@ -78,7 +78,35 @@ public class FileChooserDemo extends DemoBase {
 
     private static final int MIN_FILTER_ID = 0;
 
-    private static final int MAX_FILTER_ID = 8;
+    private static final int MAX_FILTER_ID = 7;
+
+    private static final String[] FILTER_NAMES = {
+            "FileChooserDemo.filter.blur",
+            "FileChooserDemo.filter.edge",
+            "FileChooserDemo.filter.sharpen",
+            "FileChooserDemo.filter.darken",
+            "FileChooserDemo.filter.brighten",
+            "FileChooserDemo.filter.lesscontrast",
+            "FileChooserDemo.filter.morecontrast",
+            "FileChooserDemo.filter.gray"
+    };
+
+    private static final BufferedImageOp[] FILTER_OPERATIONS = {
+            new ConvolveOp(new Kernel(3, 3,
+                    new float[]{.1111f, .1111f, .1111f, .1111f, .1111f, .1111f, .1111f, .1111f, .1111f}),
+                    ConvolveOp.EDGE_NO_OP, null),
+            new ConvolveOp(new Kernel(3, 3,
+                    new float[]{0.0f, -1.0f, 0.0f, -1.0f, 4.f, -1.0f, 0.0f, -1.0f, 0.0f}),
+                    ConvolveOp.EDGE_NO_OP, null),
+            new ConvolveOp(new Kernel(3, 3,
+                    new float[]{0.0f, -1.0f, 0.0f, -1.0f, 5.f, -1.0f, 0.0f, -1.0f, 0.0f}),
+                    ConvolveOp.EDGE_NO_OP, null),
+            new RescaleOp(1, -5.0f, null),
+            new RescaleOp(1, 5.0f, null),
+            new RescaleOp(0.9f, 0, null),
+            new RescaleOp(1.1f, 0, null),
+            new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null)
+    };
 
     /**
      * main method allows us to run as a standalone demo.
@@ -107,13 +135,15 @@ public class FileChooserDemo extends DemoBase {
 
         private final JComboBox cbFilters = new JComboBox();
 
-        private final JButton btnRotateLeft = new JButton("L"); // todo: add image
+        private final JButton btnApplyFilter = createButton("filechooser/apply.png", "FileChooserDemo.applyfilter.tooltip");
 
-        private final JButton btnRotateRight = new JButton("R"); // todo: add image
+        private final JButton btnRotateLeft = createButton("filechooser/rotateleft.png", "FileChooserDemo.rotateleft.tooltip");
 
-        private final JButton btnFlipHorizontal = new JButton("H"); // todo: add image
+        private final JButton btnRotateRight = createButton("filechooser/rotateright.png", "FileChooserDemo.rotateright.tooltip");
 
-        private final JButton btnFlipVertical = new JButton("V"); // todo: add image
+        private final JButton btnFlipHorizontal = createButton("filechooser/fliphor.png", "FileChooserDemo.fliphorizontal.tooltip");
+
+        private final JButton btnFlipVertical = createButton("filechooser/flipvert.png", "FileChooserDemo.flipvertical.tooltip");
 
         private final JButton btnApply = new JButton(getString("FileChooserDemo.apply.text"));
 
@@ -141,25 +171,28 @@ public class FileChooserDemo extends DemoBase {
             chooser.setFileFilter(filter);
 
             for (int i = MIN_FILTER_ID; i <= MAX_FILTER_ID; i++) {
-                cbFilters.addItem(new FilterItem(i));
+                cbFilters.addItem(new FilterItem(i, getString(FILTER_NAMES[i])));
             }
 
-            JGridPanel pnButtons = new JGridPanel(11, 1);
+            JGridPanel pnButtons = new JGridPanel(12, 1);
 
+            Insets smallInsets = new Insets(0, 2, 0, 0);
+            
             pnButtons.cell(btnSelect).
                     cell().
                     cell(cbFilters).
+                    cell(btnApplyFilter, smallInsets).
                     cell().
                     cell(btnRotateLeft).
-                    cell(btnRotateRight).
-                    cell(btnFlipHorizontal).
-                    cell(btnFlipVertical).
+                    cell(btnRotateRight, smallInsets).
+                    cell(btnFlipHorizontal, smallInsets).
+                    cell(btnFlipVertical, smallInsets).
                     cell().
                     cell(btnApply).
                     cell(btnCancel);
 
             cell(pnImage, Layout.FILL, Layout.FILL);
-            cell(pnButtons);
+            cell(pnButtons, new Insets(10, 10, 10, 10));
 
             chooser.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -181,11 +214,9 @@ public class FileChooserDemo extends DemoBase {
                 }
             });
 
-            cbFilters.addActionListener(new ActionListener() {
+            btnApplyFilter.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    ((FilterItem) cbFilters.getSelectedItem()).applyFilter();
-
-                    cbFilters.setSelectedItem(cbFilters.getItemAt(0));
+                    doFilter(FILTER_OPERATIONS[((FilterItem) cbFilters.getSelectedItem()).getId()]);
                 }
             });
 
@@ -243,6 +274,16 @@ public class FileChooserDemo extends DemoBase {
             });
 
             setState(State.EMPTY);
+        }
+
+        private JButton createButton(String image, String toolTip) {
+            JButton res = new JButton(createImageIcon(image, null));
+
+            res.setPreferredSize(new Dimension(34, 34));
+            res.setMinimumSize(new Dimension(34, 34));
+            res.setToolTipText(getString(toolTip));
+
+            return res;
         }
 
         private void doAffineTransform(int width, int height, AffineTransform transform) {
@@ -318,6 +359,7 @@ public class FileChooserDemo extends DemoBase {
             boolean isImageLoaded = state == State.IMAGE_LOADED || state == State.IMAGE_CHANGED;
 
             cbFilters.setEnabled(isImageLoaded);
+            btnApplyFilter.setEnabled(isImageLoaded);
             btnRotateRight.setEnabled(isImageLoaded);
             btnRotateLeft.setEnabled(isImageLoaded);
             btnFlipHorizontal.setEnabled(isImageLoaded);
@@ -328,134 +370,36 @@ public class FileChooserDemo extends DemoBase {
             btnApply.setEnabled(isImageChanged);
             btnCancel.setEnabled(isImageChanged);
         }
+    }
 
-        private class FilterItem {
-            /**
-             * 0 - Empty filter
-             * 1 - blur
-             * 2 - edge
-             * 3 - sharpen
-             * 4 - darken
-             * 5 - brighten
-             * 6 - less contrast
-             * 7 - more contrast
-             * 8 - gray
-             */
-            private final int id;
+    private static class FilterItem {
+        /**
+         * 0 - blur
+         * 1 - edge
+         * 2 - sharpen
+         * 3 - darken
+         * 4 - brighten
+         * 5 - less contrast
+         * 6 - more contrast
+         * 7 - gray
+         */
+        private final int id;
 
-            private FilterItem(int id) {
-                assert id >= MIN_FILTER_ID && id <= MAX_FILTER_ID;
+        private final String name;
 
-                this.id = id;
-            }
+        private FilterItem(int id, String name) {
+            assert id >= MIN_FILTER_ID && id <= MAX_FILTER_ID;
 
-            public void applyFilter() {
-                switch (id) {
-                    case 1: {
-                        // Blur
-                        float[] elements = {
-                                .1111f, .1111f, .1111f,
-                                .1111f, .1111f, .1111f,
-                                .1111f, .1111f, .1111f};
+            this.id = id;
+            this.name = name;
+        }
 
-                        doFilter(new ConvolveOp(new Kernel(3, 3, elements), ConvolveOp.EDGE_NO_OP, null));
+        public int getId() {
+            return id;
+        }
 
-                        break;
-                    }
-
-                    case 2: {
-                        // Edge
-                        float[] elements = {
-                                0.0f, -1.0f, 0.0f,
-                                -1.0f, 4.f, -1.0f,
-                                0.0f, -1.0f, 0.0f};
-
-                        doFilter(new ConvolveOp(new Kernel(3, 3, elements), ConvolveOp.EDGE_NO_OP, null));
-
-                        break;
-                    }
-
-                    case 3: {
-                        // Sharpen
-                        float[] elements = {
-                                0.0f, -1.0f, 0.0f,
-                                -1.0f, 5.f, -1.0f,
-                                0.0f, -1.0f, 0.0f};
-
-                        doFilter(new ConvolveOp(new Kernel(3, 3, elements), ConvolveOp.EDGE_NO_OP, null));
-
-                        break;
-                    }
-
-                    case 4: {
-                        // Darken
-                        doFilter(new RescaleOp(1, -5.0f, null));
-
-                        break;
-                    }
-
-                    case 5: {
-                        // Brighten
-                        doFilter(new RescaleOp(1, 5.0f, null));
-
-                        break;
-                    }
-
-                    case 6: {
-                        // Less contrast
-                        doFilter(new RescaleOp(0.9f, 0, null));
-
-                        break;
-                    }
-
-                    case 7: {
-                        // More contrast
-                        doFilter(new RescaleOp(1.1f, 0, null));
-
-                        break;
-                    }
-
-                    case 8: {
-                        // Gray
-                        doFilter(new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null));
-
-                        break;
-                    }
-                }
-            }
-
-            public String toString() {
-                switch (id) {
-                    case 0:
-                        return getString("FileChooserDemo.filter.selectfilter");
-
-                    case 1:
-                        return getString("FileChooserDemo.filter.blur");
-
-                    case 2:
-                        return getString("FileChooserDemo.filter.edge");
-
-                    case 3:
-                        return getString("FileChooserDemo.filter.sharpen");
-
-                    case 4:
-                        return getString("FileChooserDemo.filter.darken");
-
-                    case 5:
-                        return getString("FileChooserDemo.filter.brighten");
-
-                    case 6:
-                        return getString("FileChooserDemo.filter.lesscontrast");
-
-                    case 7:
-                        return getString("FileChooserDemo.filter.morecontrast");
-
-                    case 8:
-                        return getString("FileChooserDemo.filter.gray");
-                }
-
-                return null;
-            }
+        public String toString() {
+            return name;
         }
     }
 }
