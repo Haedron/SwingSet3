@@ -204,15 +204,12 @@ class BezierAnimationPanel extends JPanel implements Runnable {
          
 	Graphics2D g2d = null;
 	Graphics2D BufferG2D = null;
-	Graphics2D ScreenG2D = null;
 	BasicStroke solid = new BasicStroke(9.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 9.0f);
 	GeneralPath gp = new GeneralPath(GeneralPath.WIND_NON_ZERO);
 	int rule = AlphaComposite.SRC_OVER;
 	AlphaComposite opaque = AlphaComposite.SrcOver;
 	AlphaComposite blend = AlphaComposite.getInstance(rule, 0.9f);
 	AlphaComposite set = AlphaComposite.Src;
-	int frame = 0;
-	int frametmp = 0;
 	Dimension oldSize = getSize();
 	Shape clippath = null;
 	while (anim == me) {
@@ -223,10 +220,6 @@ class BezierAnimationPanel extends JPanel implements Runnable {
 		if (BufferG2D != null) {
 		    BufferG2D.dispose();
 		    BufferG2D = null;
-		}
-		if (ScreenG2D != null) {
-		    ScreenG2D.dispose();
-		    ScreenG2D = null;
 		}
 	    }
 	    oldSize = size;
@@ -316,7 +309,6 @@ class BezierAnimationPanel extends JPanel implements Runnable {
 	    if (g2d == BufferG2D) {
 		repaint();
 	    }
-	    ++frame;
 	    Thread.yield();
 	}
 	if (g2d != null) {	
@@ -328,8 +320,6 @@ class BezierAnimationPanel extends JPanel implements Runnable {
 	synchronized (lock) {
 	   Graphics2D g2d = (Graphics2D) g;
 	   if (img != null) {
-	       int imgw = img.getWidth();
-	       int imgh = img.getHeight();
 	       g2d.setComposite(AlphaComposite.Src);
 	       g2d.drawImage(img, null, 0, 0);
 	   }

@@ -142,7 +142,7 @@ public class ColorChooserDemo extends DemoBase {
                                                             okListener,
                                                             null);
 
-                dialog.show();
+                dialog.setVisible(true);
 
 		if(e.getSource() == outerColorButton) {
 		    bezAnim.setOuterColor(chosen);

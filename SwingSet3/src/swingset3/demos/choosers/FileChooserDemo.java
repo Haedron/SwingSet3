@@ -108,6 +108,38 @@ public class FileChooserDemo extends DemoBase {
             new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null)
     };
 
+    private final JLabel lbImage = new JLabel(getString("FileChooserDemo.image.text"), JLabel.CENTER);
+
+    private final JScrollPane pnImage = new JScrollPane(lbImage);
+
+    private final JButton btnSelect = new JButton(getString("FileChooserDemo.select.text"));
+
+    private final JComboBox cbFilters = new JComboBox();
+
+    private final JButton btnApplyFilter = createButton("filechooser/apply.png", "FileChooserDemo.applyfilter.tooltip");
+
+    private final JButton btnRotateLeft = createButton("filechooser/rotateleft.png", "FileChooserDemo.rotateleft.tooltip");
+
+    private final JButton btnRotateRight = createButton("filechooser/rotateright.png", "FileChooserDemo.rotateright.tooltip");
+
+    private final JButton btnFlipHorizontal = createButton("filechooser/fliphor.png", "FileChooserDemo.fliphorizontal.tooltip");
+
+    private final JButton btnFlipVertical = createButton("filechooser/flipvert.png", "FileChooserDemo.flipvertical.tooltip");
+
+    private final JButton btnApply = new JButton(getString("FileChooserDemo.apply.text"));
+
+    private final JButton btnCancel = new JButton(getString("FileChooserDemo.cancel.text"));
+
+    private final JFileChooser chooser = new JFileChooser();
+
+    private final JGridPanel pnContent = new JGridPanel(1, 0, 0);
+
+    private State state;
+
+    private File file;
+
+    private BufferedImage image;
+
     /**
      * main method allows us to run as a standalone demo.
      */
@@ -123,253 +155,221 @@ public class FileChooserDemo extends DemoBase {
     public FileChooserDemo() {
         super();
 
-        add(new ImageEditor());
-    }
+        initUI();
 
-    private class ImageEditor extends JGridPanel {
-        private final JLabel lbImage = new JLabel(getString("FileChooserDemo.image.text"), JLabel.CENTER);
+        chooser.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                file = chooser.getSelectedFile();
 
-        private final JScrollPane pnImage = new JScrollPane(lbImage);
-
-        private final JButton btnSelect = new JButton(getString("FileChooserDemo.select.text"));
-
-        private final JComboBox cbFilters = new JComboBox();
-
-        private final JButton btnApplyFilter = createButton("filechooser/apply.png", "FileChooserDemo.applyfilter.tooltip");
-
-        private final JButton btnRotateLeft = createButton("filechooser/rotateleft.png", "FileChooserDemo.rotateleft.tooltip");
-
-        private final JButton btnRotateRight = createButton("filechooser/rotateright.png", "FileChooserDemo.rotateright.tooltip");
-
-        private final JButton btnFlipHorizontal = createButton("filechooser/fliphor.png", "FileChooserDemo.fliphorizontal.tooltip");
-
-        private final JButton btnFlipVertical = createButton("filechooser/flipvert.png", "FileChooserDemo.flipvertical.tooltip");
-
-        private final JButton btnApply = new JButton(getString("FileChooserDemo.apply.text"));
-
-        private final JButton btnCancel = new JButton(getString("FileChooserDemo.cancel.text"));
-
-        private final JFileChooser chooser = new JFileChooser();
-
-        private State state;
-
-        private File file;
-
-        private BufferedImage image;
-
-        private ImageEditor() {
-            super(1, 0, 0);
-
-            chooser.setControlButtonsAreShown(false);
-
-            chooser.addChoosableFileFilter(new FileNameExtensionFilter("JPEG images", "jpg"));
-
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("All supported images",
-                    ImageIO.getWriterFormatNames());
-
-            chooser.addChoosableFileFilter(filter);
-            chooser.setFileFilter(filter);
-
-            for (int i = MIN_FILTER_ID; i <= MAX_FILTER_ID; i++) {
-                cbFilters.addItem(new FilterItem(i, getString(FILTER_NAMES[i])));
+                loadFile();
             }
+        });
 
-            JGridPanel pnButtons = new JGridPanel(12, 1);
-
-            Insets smallInsets = new Insets(0, 2, 0, 0);
-            
-            pnButtons.cell(btnSelect).
-                    cell().
-                    cell(cbFilters).
-                    cell(btnApplyFilter, smallInsets).
-                    cell().
-                    cell(btnRotateLeft).
-                    cell(btnRotateRight, smallInsets).
-                    cell(btnFlipHorizontal, smallInsets).
-                    cell(btnFlipVertical, smallInsets).
-                    cell().
-                    cell(btnApply).
-                    cell(btnCancel);
-
-            cell(pnImage, Layout.FILL, Layout.FILL);
-            cell(pnButtons, new Insets(10, 10, 10, 10));
-
-            chooser.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+        btnSelect.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (state == State.FILE_SELECTING) {
                     file = chooser.getSelectedFile();
 
                     loadFile();
+                } else {
+                    setState(State.FILE_SELECTING);
                 }
-            });
+            }
+        });
 
-            btnSelect.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (state == State.FILE_SELECTING) {
-                        file = chooser.getSelectedFile();
+        btnApplyFilter.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                doFilter(FILTER_OPERATIONS[((FilterItem) cbFilters.getSelectedItem()).getId()]);
+            }
+        });
 
-                        loadFile();
-                    } else {
-                        setState(State.FILE_SELECTING);
-                    }
+        btnRotateLeft.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                doAffineTransform(image.getHeight(), image.getWidth(),
+                        new AffineTransform(0, -1, 1, 0, 0, image.getWidth()));
+            }
+        });
+
+        btnRotateRight.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                doAffineTransform(image.getHeight(), image.getWidth(),
+                        new AffineTransform(0, 1, -1, 0, image.getHeight(), 0));
+            }
+        });
+
+        btnFlipHorizontal.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                doAffineTransform(image.getWidth(), image.getHeight(),
+                        new AffineTransform(-1, 0, 0, 1, image.getWidth(), 0));
+            }
+        });
+
+        btnFlipVertical.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                doAffineTransform(image.getWidth(), image.getHeight(),
+                        new AffineTransform(1, 0, 0, -1, 0, image.getHeight()));
+            }
+        });
+
+        btnApply.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String fileName = file.getName();
+
+                int i = fileName.lastIndexOf('.');
+
+                try {
+                    ImageIO.write(image, fileName.substring(i + 1), file);
+
+                    setState(State.IMAGE_LOADED);
+                } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(FileChooserDemo.this,
+                            MessageFormat.format(getString("FileChooserDemo.errorsavefile.message"), e1),
+                            getString("FileChooserDemo.errorsavefile.title"),
+                            JOptionPane.ERROR_MESSAGE);
                 }
-            });
+            }
+        });
 
-            btnApplyFilter.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    doFilter(FILTER_OPERATIONS[((FilterItem) cbFilters.getSelectedItem()).getId()]);
-                }
-            });
+        btnCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                loadFile();
+            }
+        });
+    }
 
-            btnRotateLeft.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    doAffineTransform(image.getHeight(), image.getWidth(),
-                            new AffineTransform(0, -1, 1, 0, 0, image.getWidth()));
-                }
-            });
+    private void initUI() {
+        chooser.setControlButtonsAreShown(false);
 
-            btnRotateRight.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    doAffineTransform(image.getHeight(), image.getWidth(),
-                            new AffineTransform(0, 1, -1, 0, image.getHeight(), 0));
-                }
-            });
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("JPEG images", "jpg"));
 
-            btnFlipHorizontal.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    doAffineTransform(image.getWidth(), image.getHeight(),
-                            new AffineTransform(-1, 0, 0, 1, image.getWidth(), 0));
-                }
-            });
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("All supported images",
+                ImageIO.getWriterFormatNames());
 
-            btnFlipVertical.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    doAffineTransform(image.getWidth(), image.getHeight(),
-                            new AffineTransform(1, 0, 0, -1, 0, image.getHeight()));
-                }
-            });
+        chooser.addChoosableFileFilter(filter);
+        chooser.setFileFilter(filter);
 
-            btnApply.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    String fileName = file.getName();
-
-                    int i = fileName.lastIndexOf('.');
-
-                    try {
-                        ImageIO.write(image, fileName.substring(i + 1), file);
-
-                        setState(State.IMAGE_LOADED);
-                    } catch (IOException e1) {
-                        JOptionPane.showMessageDialog(ImageEditor.this,
-                                MessageFormat.format(getString("FileChooserDemo.errorsavefile.message"), e1),
-                                getString("FileChooserDemo.errorsavefile.title"),
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            });
-
-            btnCancel.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    loadFile();
-                }
-            });
-
-            setState(State.EMPTY);
+        for (int i = MIN_FILTER_ID; i <= MAX_FILTER_ID; i++) {
+            cbFilters.addItem(new FilterItem(i, getString(FILTER_NAMES[i])));
         }
 
-        private JButton createButton(String image, String toolTip) {
-            JButton res = new JButton(createImageIcon(image, null));
+        JGridPanel pnButtons = new JGridPanel(12, 1);
 
-            res.setPreferredSize(new Dimension(34, 34));
-            res.setMinimumSize(new Dimension(34, 34));
-            res.setToolTipText(getString(toolTip));
+        Insets smallInsets = new Insets(0, 2, 0, 0);
 
-            return res;
+        pnButtons.cell(btnSelect).
+                cell().
+                cell(cbFilters).
+                cell(btnApplyFilter, smallInsets).
+                cell().
+                cell(btnRotateLeft).
+                cell(btnRotateRight, smallInsets).
+                cell(btnFlipHorizontal, smallInsets).
+                cell(btnFlipVertical, smallInsets).
+                cell().
+                cell(btnApply).
+                cell(btnCancel);
+
+        pnContent.cell(pnImage, JGridPanel.Layout.FILL, JGridPanel.Layout.FILL);
+        pnContent.cell(pnButtons, new Insets(10, 10, 10, 10));
+
+        add(pnContent);
+
+        setState(State.EMPTY);
+    }
+
+    private JButton createButton(String image, String toolTip) {
+        JButton res = new JButton(createImageIcon(image, null));
+
+        res.setPreferredSize(new Dimension(26, 26));
+        res.setMinimumSize(new Dimension(26, 26));
+        res.setToolTipText(getString(toolTip));
+
+        return res;
+    }
+
+    private void doAffineTransform(int width, int height, AffineTransform transform) {
+        BufferedImage newImage = new BufferedImage(image.getColorModel(),
+                image.getRaster().createCompatibleWritableRaster(width, height),
+                image.isAlphaPremultiplied(), new Hashtable<Object, Object>());
+
+        ((Graphics2D) newImage.getGraphics()).drawRenderedImage(image, transform);
+
+        image = newImage;
+
+        lbImage.setIcon(new ImageIcon(image));
+
+        setState(State.IMAGE_CHANGED);
+    }
+
+    private void doFilter(BufferedImageOp imageOp) {
+        BufferedImage newImage = new BufferedImage(image.getColorModel(),
+                image.getRaster().createCompatibleWritableRaster(image.getWidth(), image.getHeight()),
+                image.isAlphaPremultiplied(), new Hashtable<Object, Object>());
+
+        imageOp.filter(image, newImage);
+
+        image = newImage;
+
+        lbImage.setIcon(new ImageIcon(image));
+
+        setState(State.IMAGE_CHANGED);
+    }
+
+    private void loadFile() {
+        if (file == null) {
+            JOptionPane.showMessageDialog(this,
+                    getString("FileChooserDemo.selectfile.message"),
+                    getString("FileChooserDemo.selectfile.title"),
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            return;
         }
 
-        private void doAffineTransform(int width, int height, AffineTransform transform) {
-            BufferedImage newImage = new BufferedImage(image.getColorModel(),
-                    image.getRaster().createCompatibleWritableRaster(width, height),
-                    image.isAlphaPremultiplied(), new Hashtable<Object, Object>());
+        try {
+            image = ImageIO.read(file);
 
-            ((Graphics2D) newImage.getGraphics()).drawRenderedImage(image, transform);
+            if (image != null) {
+                lbImage.setText(null);
+                lbImage.setIcon(new ImageIcon(image));
 
-            image = newImage;
-
-            lbImage.setIcon(new ImageIcon(image));
-
-            setState(State.IMAGE_CHANGED);
-        }
-
-        private void doFilter(BufferedImageOp imageOp) {
-            BufferedImage newImage = new BufferedImage(image.getColorModel(),
-                    image.getRaster().createCompatibleWritableRaster(image.getWidth(), image.getHeight()),
-                    image.isAlphaPremultiplied(), new Hashtable<Object, Object>());
-
-            imageOp.filter(image, newImage);
-
-            image = newImage;
-
-            lbImage.setIcon(new ImageIcon(image));
-
-            setState(State.IMAGE_CHANGED);
-        }
-
-        private void loadFile() {
-            if (file == null) {
-                JOptionPane.showMessageDialog(ImageEditor.this,
-                        getString("FileChooserDemo.selectfile.message"),
-                        getString("FileChooserDemo.selectfile.title"),
-                        JOptionPane.INFORMATION_MESSAGE);
+                setState(State.IMAGE_LOADED);
 
                 return;
             }
-
-            try {
-                image = ImageIO.read(file);
-
-                if (image != null) {
-                    lbImage.setText(null);
-                    lbImage.setIcon(new ImageIcon(image));
-
-                    setState(State.IMAGE_LOADED);
-
-                    return;
-                }
-            } catch (IOException e1) {
-                // Do nothing
-            }
-
-            JOptionPane.showMessageDialog(ImageEditor.this,
-                    getString("FileChooserDemo.errorloadfile.message"),
-                    getString("FileChooserDemo.errorloadfile.title"),
-                    JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e1) {
+            // Do nothing
         }
 
-        private void setState(State state) {
-            if (this.state != State.FILE_SELECTING && state == State.FILE_SELECTING) {
-                setComponent(chooser, 0, 0);
-            }
+        JOptionPane.showMessageDialog(this,
+                getString("FileChooserDemo.errorloadfile.message"),
+                getString("FileChooserDemo.errorloadfile.title"),
+                JOptionPane.ERROR_MESSAGE);
+    }
 
-            if (this.state == State.FILE_SELECTING && state != State.FILE_SELECTING) {
-                setComponent(pnImage, 0, 0);
-            }
-
-            this.state = state;
-
-            boolean isImageLoaded = state == State.IMAGE_LOADED || state == State.IMAGE_CHANGED;
-
-            cbFilters.setEnabled(isImageLoaded);
-            btnApplyFilter.setEnabled(isImageLoaded);
-            btnRotateRight.setEnabled(isImageLoaded);
-            btnRotateLeft.setEnabled(isImageLoaded);
-            btnFlipHorizontal.setEnabled(isImageLoaded);
-            btnFlipVertical.setEnabled(isImageLoaded);
-
-            boolean isImageChanged = state == State.IMAGE_CHANGED;
-
-            btnApply.setEnabled(isImageChanged);
-            btnCancel.setEnabled(isImageChanged);
+    private void setState(State state) {
+        if (this.state != State.FILE_SELECTING && state == State.FILE_SELECTING) {
+            pnContent.setComponent(chooser, 0, 0);
         }
+
+        if (this.state == State.FILE_SELECTING && state != State.FILE_SELECTING) {
+            pnContent.setComponent(pnImage, 0, 0);
+        }
+
+        this.state = state;
+
+        boolean isImageLoaded = state == State.IMAGE_LOADED || state == State.IMAGE_CHANGED;
+
+        cbFilters.setEnabled(isImageLoaded);
+        btnApplyFilter.setEnabled(isImageLoaded);
+        btnRotateRight.setEnabled(isImageLoaded);
+        btnRotateLeft.setEnabled(isImageLoaded);
+        btnFlipHorizontal.setEnabled(isImageLoaded);
+        btnFlipVertical.setEnabled(isImageLoaded);
+
+        boolean isImageChanged = state == State.IMAGE_CHANGED;
+
+        btnApply.setEnabled(isImageChanged);
+        btnCancel.setEnabled(isImageChanged);
     }
 
     private static class FilterItem {
