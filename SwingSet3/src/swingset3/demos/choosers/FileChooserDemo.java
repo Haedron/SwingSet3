@@ -51,8 +51,7 @@ import swingset3.demos.DemoBase;
 /**
  * JFileChooserDemo
  *
- * @author Jeff Dinkins
- * @version 1.18 02/03/06
+ * @author Pavel Porvatov
  */
 @DemoProperties(
         value = "JFileChooser Demo",
@@ -66,9 +65,6 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class FileChooserDemo extends DemoBase {
-    /*
-      todo: fix buttons images
-     */
     private enum State {
         EMPTY,
         FILE_SELECTING,
@@ -126,7 +122,7 @@ public class FileChooserDemo extends DemoBase {
 
     private final JButton btnFlipVertical = createButton("filechooser/flipvert.png", "FileChooserDemo.flipvertical.tooltip");
 
-    private final JButton btnApply = new JButton(getString("FileChooserDemo.apply.text"));
+    private final JButton btnSave = new JButton(getString("FileChooserDemo.save.text"));
 
     private final JButton btnCancel = new JButton(getString("FileChooserDemo.cancel.text"));
 
@@ -159,9 +155,11 @@ public class FileChooserDemo extends DemoBase {
 
         chooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                file = chooser.getSelectedFile();
+                if (JFileChooser.APPROVE_SELECTION.equals(e.getActionCommand())) {
+                    file = chooser.getSelectedFile();
 
-                loadFile();
+                    loadFile();
+                }
             }
         });
 
@@ -211,8 +209,15 @@ public class FileChooserDemo extends DemoBase {
             }
         });
 
-        btnApply.addActionListener(new ActionListener() {
+        btnSave.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if (JOptionPane.showConfirmDialog(FileChooserDemo.this,
+                        getString("FileChooserDemo.savequiestion.message"),
+                        getString("FileChooserDemo.savequiestion.title"),
+                        JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+                    return;
+                }
+
                 String fileName = file.getName();
 
                 int i = fileName.lastIndexOf('.');
@@ -266,7 +271,7 @@ public class FileChooserDemo extends DemoBase {
                 cell(btnFlipHorizontal, smallInsets).
                 cell(btnFlipVertical, smallInsets).
                 cell().
-                cell(btnApply).
+                cell(btnSave).
                 cell(btnCancel);
 
         pnContent.cell(pnImage, JGridPanel.Layout.FILL, JGridPanel.Layout.FILL);
@@ -368,7 +373,7 @@ public class FileChooserDemo extends DemoBase {
 
         boolean isImageChanged = state == State.IMAGE_CHANGED;
 
-        btnApply.setEnabled(isImageChanged);
+        btnSave.setEnabled(isImageChanged);
         btnCancel.setEnabled(isImageChanged);
     }
 
