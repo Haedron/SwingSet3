@@ -448,7 +448,7 @@ public class FileChooserDemo extends DemoBase {
     }
 
     private class FilePreview extends JGridPanel {
-        private final int SIZE = 200;
+        private static final int SIZE = 200;
 
         private final JLabel lbType = new JLabel();
 

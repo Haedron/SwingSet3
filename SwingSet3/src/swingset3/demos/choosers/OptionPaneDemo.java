@@ -31,35 +31,28 @@
 
 package swingset3.demos.choosers;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.net.URL;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
+
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
 
 /**
  * JOptionPaneDemo
  *
- * @version 1.11 11/17/05
  * @author Jeff Dinkins
+ * @version 1.11 11/17/05
  */
 @DemoProperties(
-      value = "JOptionPane Demo", 
-      category = "Choosers",
-      description = "Demonstrates JOptionPane, a component which displays standard message dialogs (question, warning, error, etc).",
-      sourceFiles = {
-        "swingset3/demos/choosers/OptionPaneDemo.java",
-        "swingset3/demos/DemoBase.java"
-      }
+        value = "JOptionPane Demo",
+        category = "Choosers",
+        description = "Demonstrates JOptionPane, a component which displays standard message dialogs (question, warning, error, etc).",
+        sourceFiles = {
+                "swingset3/demos/choosers/OptionPaneDemo.java",
+                "swingset3/demos/DemoBase.java"
+                }
 )
 public class OptionPaneDemo extends DemoBase {
 
@@ -67,108 +60,114 @@ public class OptionPaneDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-	OptionPaneDemo demo = new OptionPaneDemo();
-	demo.mainImpl();
+        OptionPaneDemo demo = new OptionPaneDemo();
+        demo.mainImpl();
     }
 
     /**
      * OptionPaneDemo Constructor
      */
     public OptionPaneDemo() {
-	// Set the title for this demo, and an icon used to represent this
-	// demo inside the SwingSet2 app.
-	super();
+        // Set the title for this demo, and an icon used to represent this
+        // demo inside the SwingSet2 app.
+        super();
 
-	JPanel demo = getDemoPanel();
+        JPanel demo = getDemoPanel();
 
-	demo.setLayout(new BoxLayout(demo, BoxLayout.X_AXIS));
+        demo.setLayout(new BoxLayout(demo, BoxLayout.X_AXIS));
 
-	JPanel bp = new JPanel() {
-	    public Dimension getMaximumSize() {
-		return new Dimension(getPreferredSize().width, super.getMaximumSize().height);
-	    }
-	};
-	bp.setLayout(new BoxLayout(bp, BoxLayout.Y_AXIS));
+        JPanel bp = new JPanel() {
+            public Dimension getMaximumSize() {
+                return new Dimension(getPreferredSize().width, super.getMaximumSize().height);
+            }
+        };
+        bp.setLayout(new BoxLayout(bp, BoxLayout.Y_AXIS));
 
-	bp.add(Box.createRigidArea(VGAP30));
-	bp.add(Box.createRigidArea(VGAP30));
+        bp.add(Box.createRigidArea(VGAP30));
+        bp.add(Box.createRigidArea(VGAP30));
 
-	bp.add(createInputDialogButton());      bp.add(Box.createRigidArea(VGAP15));
-	bp.add(createWarningDialogButton());    bp.add(Box.createRigidArea(VGAP15));
-	bp.add(createMessageDialogButton());    bp.add(Box.createRigidArea(VGAP15));
-	bp.add(createComponentDialogButton());  bp.add(Box.createRigidArea(VGAP15));
-	bp.add(createConfirmDialogButton());    bp.add(Box.createVerticalGlue());
+        bp.add(createInputDialogButton());
+        bp.add(Box.createRigidArea(VGAP15));
+        bp.add(createWarningDialogButton());
+        bp.add(Box.createRigidArea(VGAP15));
+        bp.add(createMessageDialogButton());
+        bp.add(Box.createRigidArea(VGAP15));
+        bp.add(createComponentDialogButton());
+        bp.add(Box.createRigidArea(VGAP15));
+        bp.add(createConfirmDialogButton());
+        bp.add(Box.createVerticalGlue());
 
-	demo.add(Box.createHorizontalGlue());
-	demo.add(bp);
-	demo.add(Box.createHorizontalGlue());
+        demo.add(Box.createHorizontalGlue());
+        demo.add(bp);
+        demo.add(Box.createHorizontalGlue());
     }
 
     public JButton createWarningDialogButton() {
-	Action a = new AbstractAction(getString("OptionPaneDemo.warningbutton")) {
-	    public void actionPerformed(ActionEvent e) {
-		JOptionPane.showMessageDialog(
-		    getDemoPanel(),
-		    getString("OptionPaneDemo.warningtext"),
-		    getString("OptionPaneDemo.warningtitle"),
-		    JOptionPane.WARNING_MESSAGE
-		);
-	    }
-	};
-	return createButton(a);
+        Action a = new AbstractAction(getString("OptionPaneDemo.warningbutton")) {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(
+                        getDemoPanel(),
+                        getString("OptionPaneDemo.warningtext"),
+                        getString("OptionPaneDemo.warningtitle"),
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
+        };
+        return createButton(a);
     }
 
     public JButton createMessageDialogButton() {
-	Action a = new AbstractAction(getString("OptionPaneDemo.messagebutton")) {
-	    URL img = getClass().getResource("resources/images/optionpane/bottle.gif");
-	    String imagesrc = "<img src=\"" + img + "\" width=\"284\" height=\"100\">";
-	    String message = getString("OptionPaneDemo.messagetext");
-	    public void actionPerformed(ActionEvent e) {
-		JOptionPane.showMessageDialog(
-		    getDemoPanel(),
-		    "<html>" + imagesrc + "<br><center>" + message + "</center><br></html>"
-		);
-	    }
-	};
-	return createButton(a);
+        Action a = new AbstractAction(getString("OptionPaneDemo.messagebutton")) {
+            final URL img = getClass().getResource("resources/images/optionpane/bottle.gif");
+            final String imagesrc = "<img src=\"" + img + "\" width=\"284\" height=\"100\">";
+            final String message = getString("OptionPaneDemo.messagetext");
+
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(
+                        getDemoPanel(),
+                        "<html>" + imagesrc + "<br><center>" + message + "</center><br></html>"
+                );
+            }
+        };
+        return createButton(a);
     }
 
     public JButton createConfirmDialogButton() {
-	Action a = new AbstractAction(getString("OptionPaneDemo.confirmbutton")) {
-	    public void actionPerformed(ActionEvent e) {
+        Action a = new AbstractAction(getString("OptionPaneDemo.confirmbutton")) {
+            public void actionPerformed(ActionEvent e) {
                 int result = JOptionPane.showConfirmDialog(getDemoPanel(), getString("OptionPaneDemo.confirmquestion"));
-                if(result == JOptionPane.YES_OPTION) {
-		    JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.confirmyes"));
-		} else if(result == JOptionPane.NO_OPTION) {
+                if (result == JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.confirmyes"));
+                } else if (result == JOptionPane.NO_OPTION) {
                     JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.confirmno"));
-		}
-	    }
-	};
-	return createButton(a);
+                }
+            }
+        };
+        return createButton(a);
     }
 
     public JButton createInputDialogButton() {
-	Action a = new AbstractAction(getString("OptionPaneDemo.inputbutton")) {
-	    public void actionPerformed(ActionEvent e) {
+        Action a = new AbstractAction(getString("OptionPaneDemo.inputbutton")) {
+            public void actionPerformed(ActionEvent e) {
                 String result = JOptionPane.showInputDialog(getDemoPanel(), getString("OptionPaneDemo.inputquestion"));
                 if ((result != null) && (result.length() > 0)) {
                     JOptionPane.showMessageDialog(getDemoPanel(),
-                                    result + ": " +
+                            result + ": " +
                                     getString("OptionPaneDemo.inputresponse"));
                 }
-	    }
-	};
-	return createButton(a);
+            }
+        };
+        return createButton(a);
     }
 
     public JButton createComponentDialogButton() {
-	Action a = new AbstractAction(getString("OptionPaneDemo.componentbutton")) {
-	    public void actionPerformed(ActionEvent e) {
-		// In a ComponentDialog, you can show as many message components and
-		// as many options as you want:
+        Action a = new AbstractAction(getString("OptionPaneDemo.componentbutton")) {
+            public void actionPerformed(ActionEvent e) {
+                // In a ComponentDialog, you can show as many message components and
+                // as many options as you want:
 
-		// Messages
-                Object[]      message = new Object[4];
+                // Messages
+                Object[] message = new Object[4];
                 message[0] = getString("OptionPaneDemo.componentmessage");
                 message[1] = new JTextField(getString("OptionPaneDemo.componenttextfield"));
 
@@ -180,61 +179,61 @@ public class OptionPaneDemo extends DemoBase {
 
                 message[3] = getString("OptionPaneDemo.componentmessage2");
 
-		// Options
+                // Options
                 String[] options = {
-		    getString("OptionPaneDemo.component_op1"),
-		    getString("OptionPaneDemo.component_op2"),
-		    getString("OptionPaneDemo.component_op3"),
-		    getString("OptionPaneDemo.component_op4"),
-		    getString("OptionPaneDemo.component_op5")
-		};
+                        getString("OptionPaneDemo.component_op1"),
+                        getString("OptionPaneDemo.component_op2"),
+                        getString("OptionPaneDemo.component_op3"),
+                        getString("OptionPaneDemo.component_op4"),
+                        getString("OptionPaneDemo.component_op5")
+                };
                 int result = JOptionPane.showOptionDialog(
-		    getDemoPanel(),                             // the parent that the dialog blocks
-		    message,                                    // the dialog message array
-		    getString("OptionPaneDemo.componenttitle"), // the title of the dialog window
-		    JOptionPane.DEFAULT_OPTION,                 // option type
-		    JOptionPane.INFORMATION_MESSAGE,            // message type
-		    null,                                       // optional icon, use null to use the default icon
-		    options,                                    // options string array, will be made into buttons
-		    options[3]                                  // option that should be made into a default button
-		);
-		switch(result) {
-		   case 0: // yes
-		     JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.component_r1"));
-		     break;
-		   case 1: // no
-		     JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.component_r2"));
-		     break;
-		   case 2: // maybe
-		     JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.component_r3"));
-		     break;
-		   case 3: // probably
-		     JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.component_r4"));
-		     break;
-		   default:
-		     break;
-		}
+                        getDemoPanel(),                             // the parent that the dialog blocks
+                        message,                                    // the dialog message array
+                        getString("OptionPaneDemo.componenttitle"), // the title of the dialog window
+                        JOptionPane.DEFAULT_OPTION,                 // option type
+                        JOptionPane.INFORMATION_MESSAGE,            // message type
+                        null,                                       // optional icon, use null to use the default icon
+                        options,                                    // options string array, will be made into buttons
+                        options[3]                                  // option that should be made into a default button
+                );
+                switch (result) {
+                    case 0: // yes
+                        JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.component_r1"));
+                        break;
+                    case 1: // no
+                        JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.component_r2"));
+                        break;
+                    case 2: // maybe
+                        JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.component_r3"));
+                        break;
+                    case 3: // probably
+                        JOptionPane.showMessageDialog(getDemoPanel(), getString("OptionPaneDemo.component_r4"));
+                        break;
+                    default:
+                        break;
+                }
 
-	    }
-	};
-	return createButton(a);
+            }
+        };
+        return createButton(a);
     }
-		
+
     public JButton createButton(Action a) {
-	JButton b = new JButton() {
-	    public Dimension getMaximumSize() {
-		int width = Short.MAX_VALUE;
-		int height = super.getMaximumSize().height;
-		return new Dimension(width, height);
-	    }
-	};
-	// setting the following client property informs the button to show
-	// the action text as it's name. The default is to not show the
-	// action text.
-	b.putClientProperty("displayActionText", Boolean.TRUE);
-	b.setAction(a);
-	// b.setAlignmentX(JButton.CENTER_ALIGNMENT);
-	return b;
+        JButton b = new JButton() {
+            public Dimension getMaximumSize() {
+                int width = Short.MAX_VALUE;
+                int height = super.getMaximumSize().height;
+                return new Dimension(width, height);
+            }
+        };
+        // setting the following client property informs the button to show
+        // the action text as it's name. The default is to not show the
+        // action text.
+        b.putClientProperty("displayActionText", Boolean.TRUE);
+        b.setAction(a);
+        // b.setAlignmentX(JButton.CENTER_ALIGNMENT);
+        return b;
     }
 
 }
