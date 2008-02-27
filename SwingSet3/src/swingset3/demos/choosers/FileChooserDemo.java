@@ -69,7 +69,6 @@ import swingset3.demos.DemoBase;
 public class FileChooserDemo extends DemoBase {
     private enum State {
         EMPTY,
-        FILE_SELECTING,
         IMAGE_LOADED,
         IMAGE_CHANGED
     }
@@ -138,6 +137,8 @@ public class FileChooserDemo extends DemoBase {
 
     private State state;
 
+    private boolean fileChoosing;
+
     private File file;
 
     private BufferedImage image;
@@ -164,15 +165,19 @@ public class FileChooserDemo extends DemoBase {
                 if (JFileChooser.APPROVE_SELECTION.equals(e.getActionCommand())) {
                     loadFile(embeddedChooser.getSelectedFile());
                 }
+
+                if (JFileChooser.CANCEL_SELECTION.equals(e.getActionCommand())) {
+                    setState(state, false);
+                }
             }
         });
 
         btnSelect.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (state == State.FILE_SELECTING) {
+                if (fileChoosing) {
                     loadFile(embeddedChooser.getSelectedFile());
                 } else {
-                    setState(State.FILE_SELECTING);
+                    setState(state, true);
                 }
             }
         });
@@ -235,7 +240,7 @@ public class FileChooserDemo extends DemoBase {
                 try {
                     ImageIO.write(image, fileName.substring(i + 1), file);
 
-                    setState(State.IMAGE_LOADED);
+                    setState(State.IMAGE_LOADED, false);
                 } catch (IOException e1) {
                     JOptionPane.showMessageDialog(FileChooserDemo.this,
                             MessageFormat.format(getString("FileChooserDemo.errorsavefile.message"), e1),
@@ -311,7 +316,7 @@ public class FileChooserDemo extends DemoBase {
 
         add(pnContent);
 
-        setState(State.EMPTY);
+        setState(State.EMPTY, false);
     }
 
     private JButton createButton(String image, String toolTip) {
@@ -335,7 +340,7 @@ public class FileChooserDemo extends DemoBase {
 
         lbImage.setIcon(new ImageIcon(image));
 
-        setState(State.IMAGE_CHANGED);
+        setState(State.IMAGE_CHANGED, false);
     }
 
     private void doFilter(BufferedImageOp imageOp) {
@@ -349,7 +354,7 @@ public class FileChooserDemo extends DemoBase {
 
         lbImage.setIcon(new ImageIcon(image));
 
-        setState(State.IMAGE_CHANGED);
+        setState(State.IMAGE_CHANGED, false);
     }
 
     private void loadFile(File file) {
@@ -371,7 +376,7 @@ public class FileChooserDemo extends DemoBase {
 
                 this.file = file;
 
-                setState(State.IMAGE_LOADED);
+                setState(State.IMAGE_LOADED, false);
 
                 return;
             }
@@ -385,20 +390,18 @@ public class FileChooserDemo extends DemoBase {
                 JOptionPane.ERROR_MESSAGE);
     }
 
-    private void setState(State state) {
-        if (this.state != State.FILE_SELECTING && state == State.FILE_SELECTING) {
-            pnContent.setComponent(embeddedChooser, 0, 0);
-        }
-
-        if (this.state == State.FILE_SELECTING && state != State.FILE_SELECTING) {
-            pnContent.setComponent(pnImage, 0, 0);
+    private void setState(State state, boolean fileChoosing) {
+        if (this.fileChoosing != fileChoosing) {
+            pnContent.setComponent(fileChoosing ? embeddedChooser : pnImage, 0, 0);
         }
 
         this.state = state;
+        this.fileChoosing = fileChoosing;
 
-        boolean isImageLoaded = state == State.IMAGE_LOADED || state == State.IMAGE_CHANGED;
+        btnSelectWithPreview.setEnabled(!fileChoosing);
 
-        btnSelectWithPreview.setEnabled(state != State.FILE_SELECTING);
+        boolean isImageLoaded = !fileChoosing && state != State.EMPTY;
+
         cbFilters.setEnabled(isImageLoaded);
         btnApplyFilter.setEnabled(isImageLoaded);
         btnRotateRight.setEnabled(isImageLoaded);
@@ -406,7 +409,7 @@ public class FileChooserDemo extends DemoBase {
         btnFlipHorizontal.setEnabled(isImageLoaded);
         btnFlipVertical.setEnabled(isImageLoaded);
 
-        boolean isImageChanged = state == State.IMAGE_CHANGED;
+        boolean isImageChanged = !fileChoosing && state == State.IMAGE_CHANGED;
 
         btnSave.setEnabled(isImageChanged);
         btnCancel.setEnabled(isImageChanged);
