@@ -42,6 +42,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Insets;
@@ -54,7 +55,9 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -71,6 +74,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -79,14 +83,18 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import swingset3.codeview.CodeViewer;
+import swingset3.utilities.RoundedBorder;
+import swingset3.utilities.RoundedPanel;
 
 
 
@@ -116,8 +124,12 @@ public class SwingSet3 extends SingleFrameApplication  {
     public static final int DEMO_WIDTH = 650;
     public static final int DEMO_HEIGHT = 500;
     public static final int SOURCE_HEIGHT = 250;
+    
     public static final Insets UPPER_PANEL_INSETS = new Insets(12,12,8,12);
     public static final Insets SOURCE_PANE_INSETS = new Insets(4,8,8,8);
+    
+    public static final Border EMPTY_BORDER = new EmptyBorder(0,0,0,0);
+    public static final Border PANEL_BORDER = new EmptyBorder(10,10,10,10);
         
     static {
         // Property must be set *early* due to Apple Bug#3909714
@@ -170,7 +182,7 @@ public class SwingSet3 extends SingleFrameApplication  {
 
         for (String key : entries.keySet()) {
             Attributes attrs = entries.get(key);
-            Iterator attrKeys = attrs.keySet().iterator();
+            Iterator attrKeys = attrs.keySet().iterator();            
 
             boolean isDemoClass = Boolean.parseBoolean(attrs.getValue("SwingSet3-Demo"));
             if (isDemoClass) {
@@ -185,9 +197,10 @@ public class SwingSet3 extends SingleFrameApplication  {
     private ResourceMap resourceMap;
     
     // Application models
-    private Map<String,List<Demo>> demoMap;
+    private String demoListTitle;
+    private List<Demo> demoList;
     private PropertyChangeListener demoPropertyChangeListener;
-    private Map<String, DemoPanel> demoCache;
+    private Map<String, DemoPanel> runningDemoCache;
     private Demo currentDemo;
 
     // GUI components
@@ -217,15 +230,15 @@ public class SwingSet3 extends SingleFrameApplication  {
     @Override
     protected void initialize(String args[]) {        
         try {
-            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception ex) {
             // not catestrophic
         }
         resourceMap = getContext().getResourceMap();
+        
         title = resourceMap.getString("mainFrame.title");
-        demoMap = new HashMap<String,List<Demo>>();
-        demoCache = new HashMap<String, DemoPanel>();
-        addDemoSet(resourceMap.getString("demos.title"), getDemoClassNames(args));
+        runningDemoCache = new HashMap();
+        setDemoList(resourceMap.getString("demos.title"), getDemoClassNames(args));
         setDemoPlaceholder(new JPanel());
 
     }
@@ -233,6 +246,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     private List<String>getDemoClassNames(String args[]) {
         List<String> demoList = new ArrayList<String>();
         boolean augment = false;
+        Exception exception = null; 
 
         // First look for any demo list files specified on the command-line
         List<String> userDemoList = new ArrayList<String>();
@@ -244,8 +258,9 @@ public class SwingSet3 extends SingleFrameApplication  {
                 try {
                     userDemoList.addAll(readDemoClassNames(new FileReader(arg) /*filename*/));
                     
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "unable to read demo class names from file: "+arg, e);
+                } catch (IOException ex) {
+                    exception = ex;
+                    logger.log(Level.WARNING, "unable to read demo class names from file: "+arg, ex);
                 }
             }
         }
@@ -261,20 +276,20 @@ public class SwingSet3 extends SingleFrameApplication  {
         demoList.addAll(userDemoList);
         
         if (demoList.isEmpty()) {
-            JOptionPane.showMessageDialog(getMainFrame(),
-                    resourceMap.getString("error.noDemosLoaded"),
-                    resourceMap.getString("error.title"), JOptionPane.ERROR_MESSAGE);
+            displayErrorMessage(resourceMap.getString("error.noDemosLoaded"), 
+                    exception);
         }        
         return demoList;
   
     }
 
-    public void addDemoSet(String demoSetTitle, List<String> demoClassNamesList) {              
+    public void setDemoList(String demoListTitle, List<String> demoClassNamesList) {              
         List<Demo> demoList = new ArrayList<Demo>();
         for(String demoClassName: demoClassNamesList) {
             demoList.add(createDemo(demoClassName));
         }
-        demoMap.put(demoSetTitle, demoList);
+        this.demoListTitle = demoListTitle;
+        this.demoList = demoList;
     }
     
     /**
@@ -304,8 +319,15 @@ public class SwingSet3 extends SingleFrameApplication  {
     
     @Override 
     protected void startup() {
+        UIManager.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent event) {
+                if (event.getPropertyName().equals("lookAndFeel")) {
+                    configureDefaults();
+                }
+            }
+        });
         
-        initUIDefaults();
+        configureDefaults();
         
         View view = getMainView();
         view.setComponent(createMainPanel());
@@ -315,9 +337,10 @@ public class SwingSet3 extends SingleFrameApplication  {
         getMainFrame().setIconImage(resourceMap.getImageIcon("Application.icon").getImage());
         
         show(view);
+     
     } 
     
-    protected void initUIDefaults() {
+    protected void configureDefaults() {
         
         // Color palette algorithm courtesy of Jasper Potts
         Color controlColor = UIManager.getColor("control");
@@ -349,16 +372,8 @@ public class SwingSet3 extends SingleFrameApplication  {
  
         Color panelColor = UIManager.getColor("Panel.background");
         UIManager.put(subPanelBackgroundColorKey, 
-                Utilities.deriveColorHSB(panelColor, 0, .02f, -.08f));
-                
-       
-        UIManager.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
-                if (event.getPropertyName().equals("lookAndFeel")) {
-                    initUIDefaults();
-                }
-            }
-        });
+                Utilities.deriveColorHSB(panelColor, 0, 0, -.06f));
+        
     }  
     
     protected JComponent createMainPanel() {
@@ -368,19 +383,19 @@ public class SwingSet3 extends SingleFrameApplication  {
         mainPanel.setLayout(new BorderLayout());
        
         // Create demo selector panel on left
-        demoSelectorPanel = new DemoSelectorPanel(demoMap);
+        demoSelectorPanel = new DemoSelectorPanel(demoListTitle, demoList);
         demoSelectorPanel.addPropertyChangeListener(new DemoSelectionListener());
-        JScrollPane scrollPane = new JScrollPane(demoSelectorPanel);
-        scrollPane.setBorder(null);
-        mainPanel.add(scrollPane, BorderLayout.WEST);
+        mainPanel.add(demoSelectorPanel, BorderLayout.WEST);
         
         // Create splitpane on right to hold demo and source code
         demoSplitPane = new AnimatingSplitPane(JSplitPane.VERTICAL_SPLIT);
         demoSplitPane.setDividerLocation(400);
+        demoSplitPane.setBorder(EMPTY_BORDER);
         mainPanel.add(demoSplitPane, BorderLayout.CENTER);
         
         demoContainer = new JPanel();
         demoContainer.setLayout(new BorderLayout());
+        demoContainer.setBorder(PANEL_BORDER);
         demoSplitPane.setTopComponent(demoContainer);
 
         // Create pane to contain running demo
@@ -393,7 +408,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         codeViewer.setPreferredSize(new Dimension(DEMO_WIDTH, SOURCE_HEIGHT));
         codeContainer = new JPanel(new BorderLayout());
         codeContainer.add(codeViewer);
-        codeContainer.setBorder(new EmptyBorder(10,10,10,10));
+        codeContainer.setBorder(PANEL_BORDER);
         demoSplitPane.setBottomComponent(codeContainer);
         
         addPropertyChangeListener(new SwingSetPropertyListener());
@@ -423,15 +438,14 @@ public class SwingSet3 extends SingleFrameApplication  {
         // Create View menu
         JMenu viewMenu = new JMenu();
         viewMenu.setName("view");
+        // View -> Look and Feel       
+        viewMenu.add(createLookAndFeelMenu());
         // View -> Source Code Visible
         sourceCodeCheckboxItem = new JCheckBoxMenuItem();
         sourceCodeCheckboxItem.setSelected(isSourceCodeVisible());
         sourceCodeCheckboxItem.setName("sourceCodeCheckboxItem");
         sourceCodeCheckboxItem.addChangeListener(new SourceVisibilityChangeListener());
         viewMenu.add(sourceCodeCheckboxItem);
-        // View -> Look and Feel       
-        viewMenu.add(createLookAndFeelMenu());
-        
         menubar.add(viewMenu);
 
         return menubar;
@@ -471,8 +485,33 @@ public class SwingSet3 extends SingleFrameApplication  {
     }
        
     // For displaying error messages to user
-    protected void displayErrorMessage(String message) {        
-        JOptionPane.showMessageDialog(getMainFrame(), message, "SwingSet3 Error",
+    protected void displayErrorMessage(String message, Exception ex) {
+        JPanel messagePanel = new JPanel(new BorderLayout());       
+        JLabel label = new JLabel(message);
+        messagePanel.add(label);
+        if (ex != null) {
+            RoundedPanel panel = new RoundedPanel(new BorderLayout());
+            panel.setBorder(new RoundedBorder());
+            
+            // remind(aim): provide way to allow user to see exception only if desired
+            StringWriter writer = new StringWriter();
+            ex.printStackTrace(new PrintWriter(writer));
+            JTextArea exceptionText = new JTextArea();
+            exceptionText.setText("Cause of error:\n" +
+                    writer.getBuffer().toString());
+            exceptionText.setBorder(new RoundedBorder());
+            exceptionText.setOpaque(false);
+            exceptionText.setBackground(
+                    Utilities.deriveColorHSB(UIManager.getColor("Panel.background"),
+                    0, 0, -.2f));
+            JScrollPane scrollpane = new JScrollPane(exceptionText);
+            scrollpane.setBorder(EMPTY_BORDER);
+            scrollpane.setPreferredSize(new Dimension(600,240));
+            panel.add(scrollpane);
+            messagePanel.add(panel, BorderLayout.SOUTH);            
+        }
+        JOptionPane.showMessageDialog(getMainFrame(), messagePanel, 
+                resourceMap.getString("error.title"),
                 JOptionPane.ERROR_MESSAGE);
                 
     }
@@ -497,13 +536,12 @@ public class SwingSet3 extends SingleFrameApplication  {
         Demo oldCurrentDemo = currentDemo;        
         currentDemo = demo;
         if (demo != null) {
-            DemoPanel demoPanel = demoCache.get(demo.getName());
-
+            DemoPanel demoPanel = runningDemoCache.get(demo.getName());
             if (demoPanel == null || demo.getDemoComponent() == null) {
                 demo.startInitializing();
                 demoPanel = new DemoPanel(demo);  
                 demoPanel.setPreferredSize(currentDemoPanel.getPreferredSize());
-                demoCache.put(demo.getName(), demoPanel);
+                runningDemoCache.put(demo.getName(), demoPanel);
             } 
            
             demoContainer.remove(currentDemoPanel);
@@ -553,8 +591,8 @@ public class SwingSet3 extends SingleFrameApplication  {
         try {
             setLookAndFeel(lookAndFeelName);
         } catch (Exception ex) {
-            displayErrorMessage("Unable to change the Look and Feel\n"+
-                    "to "+lookAndFeelName);
+            displayErrorMessage(resourceMap.getString("error.unableToChangeLookAndFeel") +
+                    "to "+lookAndFeelName, ex);
         }
     }
     
@@ -574,9 +612,12 @@ public class SwingSet3 extends SingleFrameApplication  {
     
     private void updateLookAndFeel() {
         Window windows[] = Frame.getWindows();
-        System.out.println("updating look and feels");
+
         for(Window window : windows) {
             SwingUtilities.updateComponentTreeUI(window);
+            for(DemoPanel demoPanel : runningDemoCache.values()) {
+                SwingUtilities.updateComponentTreeUI(demoPanel);
+            }
         }
     }
 
@@ -632,11 +673,17 @@ public class SwingSet3 extends SingleFrameApplication  {
         public void hierarchyChanged(HierarchyEvent event) {
             if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) > 0) {
                 JComponent component = (JComponent)event.getComponent();
-                Demo demo = (Demo)component.getClientProperty("swingset3.demo");
+                final Demo demo = (Demo)component.getClientProperty("swingset3.demo");
                 if (!component.isShowing()) {
                     demo.stop();
                 } else {
-                    demo.start();
+                    System.out.println("calling start");
+                    demoContainer.revalidate();
+                    EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            demo.start();
+                        }
+                    });
                 }
             }            
         }        
@@ -659,7 +706,7 @@ public class SwingSet3 extends SingleFrameApplication  {
                     codeViewer.setSourceFiles(currentDemo != null?
                         currentDemo.getSourceFiles() : null);
                 }
-                demoSplitPane.setFirstExpanded(!sourceVisible);
+                demoSplitPane.setExpanded(!sourceVisible);
                 sourceCodeCheckboxItem.setSelected(sourceVisible);
             } 
         }        

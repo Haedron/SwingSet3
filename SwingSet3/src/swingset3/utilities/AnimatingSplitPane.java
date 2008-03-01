@@ -33,6 +33,9 @@ package swingset3.utilities;
 
 import java.awt.Graphics;
 import javax.swing.JSplitPane;
+import javax.swing.UIManager;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 
@@ -42,16 +45,21 @@ import org.jdesktop.animation.timing.interpolation.PropertySetter;
  */
 public class AnimatingSplitPane extends JSplitPane {
     private boolean firstExpanded = false;
-    private boolean secondExpanded = false;
     
     private int lastDividerLocation = -1;
     
     public AnimatingSplitPane(int orientation) {
         super(orientation);
-        setDividerSize(2);
     }
     
-    public void setFirstExpanded(boolean expanded) {
+    @Override
+    public void updateUI() {
+        // This will choke on Nimbus if we don't populate this value
+        UIManager.put("SplitPane.dividerSize", 12);
+        setUI(new NakedSplitPaneUI());
+    }
+    
+    public void setExpanded(boolean expanded) {
         if (expanded != firstExpanded) {
             
             if (!firstExpanded) {
@@ -70,10 +78,22 @@ public class AnimatingSplitPane extends JSplitPane {
         }
     }
     
-    public void setSecondExpanded(boolean expanded) {
-        if (expanded != secondExpanded) {
-            
+    // workaround for bug where the animator blows up without it;
+    // possibly a bug in reflection when method is in super class (?)
+    public void setDividerLocation(int dividerLocation) {
+        super.setDividerLocation(dividerLocation);
+    }
+    
+    public static class NakedSplitPaneUI extends BasicSplitPaneUI {
+
+        @Override
+        public BasicSplitPaneDivider createDefaultDivider() {
+            return new BasicSplitPaneDivider(this) {
+                @Override
+                public void paint(Graphics g) {
+                    //System.out.println("not painting split pane ui!");
+                }
+            };
         }
-        
     }
 }

@@ -31,18 +31,18 @@
 
 package swingset3.demos.toplevels;
 
-import java.awt.Component;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import javax.swing.BoxLayout;
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import swingset3.DemoProperties;
 import swingset3.utilities.Utilities;
 
@@ -59,9 +59,7 @@ public class JDialogDemo extends JPanel {
     
     private JDialog dialog;
     
-    private JButton showButton;
-    
-    private boolean locationSet = false;
+    private JComponent dialogSpaceholder;    
         
     public JDialogDemo() {        
         initComponents();
@@ -70,14 +68,36 @@ public class JDialogDemo extends JPanel {
     protected void initComponents() {
         dialog = createDialog();
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout()); 
+        
+        add(createControlPanel(), BorderLayout.WEST);
+        dialogSpaceholder = createDialogSpaceholder(dialog);
+        add(dialogSpaceholder, BorderLayout.CENTER);
+    }
+                
+    protected JComponent createDialogSpaceholder(JDialog dialog) {
+        // Create placeholder panel to provide space in which to
+        // display the toplevel dialog so that the control panel is not
+        // obscured by it.
+        JPanel placeholder = new JPanel();
+        Dimension prefSize = dialog.getPreferredSize();
+        prefSize.width += 12;
+        prefSize.height += 12;
+        placeholder.setPreferredSize(prefSize);
+        return placeholder;
+    }
+    
+    protected JComponent createControlPanel() {
+        // Create control panel on Left
+        Box panel = Box.createVerticalBox();
+        panel.setBorder(new EmptyBorder(8, 8, 8, 8));
         
         // Create button to control visibility of frame
-        showButton = new JButton("Show JDialog...");
+        JButton showButton = new JButton("Show JDialog...");
         showButton.addActionListener(new ShowActionListener());
-        add(showButton); 
+        panel.add(showButton); 
         
-        addComponentListener(new SizeInitListener());
+        return panel;
     }
     
     protected JDialog createDialog() {
@@ -89,7 +109,7 @@ public class JDialogDemo extends JPanel {
         //<snip>Add dialog's content
         JLabel label = new JLabel("I'm content.");
         label.setHorizontalAlignment(JLabel.CENTER);
-        label.setPreferredSize(new Dimension(300,200));
+        label.setPreferredSize(new Dimension(200,140));
         dialog.add(label);
         //</snip>
         
@@ -102,12 +122,9 @@ public class JDialogDemo extends JPanel {
     }
     
     public void start() {
-        // If location hasn't been initialed yet from SizeInitListener, then
-        // defer visibility of dialog        
-        if (locationSet) {
-            dialog.setVisible(true);
-        }
-    };
+        Utilities.setToplevelLocation(dialog, dialogSpaceholder, Utilities.CENTER);         
+        showDialog();
+    }
     
     public void stop() {
         //<snip>Hide dialog
@@ -115,34 +132,21 @@ public class JDialogDemo extends JPanel {
         //</snip>
     };
     
+    public void showDialog() {
+        //<snip>Show dialog
+        // if dialog already visible, then bring to the front
+        if (dialog.isShowing()) {
+            dialog.toFront();
+        } else {
+            dialog.setVisible(true);
+        }
+        //</snip>
+    }
+    
     private class ShowActionListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
-            //<snip>Make dialog visible
-            // if dialog already visible, then bring to the front
-            if (dialog.isShowing()) {
-                dialog.toFront();
-            } else {
-                dialog.setVisible(true);
-            }
-            //</snip>
+            showDialog();
         }
     }
-
-    // This is a hack to deal with the asynchronous instantiation of this
-    // demo component when embedded in HTML;   at the time start() is called,
-    // we don't necessarily have the size/location of the demo, hence cannot
-    // determine a reasonable relative location for the dialog.  So we wait
-    // until the demo's size is initialized to set the location of the dialog.
-    private class SizeInitListener extends ComponentAdapter {        
-        public void componentResized(ComponentEvent event) {
-            Component component = event.getComponent();
-            if (component.getWidth() > 0 && component.getHeight() > 0) {
-                Utilities.setToplevelLocation(dialog, component, Utilities.SOUTH);
-                locationSet = true;
-                dialog.setVisible(true);
-                component.removeComponentListener(this);                
-            }
-        }        
-    } // SizeInitListener
 
 }

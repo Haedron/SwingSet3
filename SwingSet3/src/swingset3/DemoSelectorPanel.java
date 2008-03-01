@@ -43,46 +43,48 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
+import swingset3.utilities.Utilities;
 
 /**
  *
  * @author Administrator
  */
-public class DemoSelectorPanel extends JPanel implements Scrollable {    
-
+public class DemoSelectorPanel extends JPanel {    
+    private static final Border emptyBorder = new EmptyBorder(0,0,0,0);
+    
     private static final Border chiselBorder = new ChiselBorder();
     private static final Border panelBorder = new CompoundBorder(
             chiselBorder, new EmptyBorder(6,8,6,0));
     private static final Border categoryBorder = new CompoundBorder(
             chiselBorder, new EmptyBorder(0,0,10,0));    
     private static final Border buttonBorder = new CompoundBorder(
-            new DemoButtonBorder(), new EmptyBorder(0, 18, 0, 0));    
+            new DemoButtonBorder(), new EmptyBorder(0, 18, 0, 0)); 
     
-    private List<JLabel> demoListLabels;
-    private List<JPanel> viewPanels;
+    private GradientPanel titlePanel;
+    private JLabel demoListLabel;
+    private JPanel viewPanel;
+    private JScrollPane scrollPane;
     private List<CollapsiblePanel> collapsePanels;
     private Icon expandedIcon;
     private Icon collapsedIcon;
@@ -93,90 +95,45 @@ public class DemoSelectorPanel extends JPanel implements Scrollable {
     
     private Demo selectedDemo;
     
-    public DemoSelectorPanel(Map<String,List<Demo>> demoMap) {
-        super();
-    
-        GridBagLayout gridbag = new GridBagLayout();
-        setLayout(gridbag);
-        GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
-                
+    public DemoSelectorPanel(String demoSetTitle, List<Demo> demoSet) {
+        super(new BorderLayout());
+        
+        UIManager.put("demo.visitedForeground", new Color(50, 80, 245));
+        UIManager.put("demo.failedForeground", new Color(245, 20, 80));
+        
+        // only one demo may be selected at a time
         group = new ButtonGroup();
-        demoListLabels = new ArrayList();
-        viewPanels = new ArrayList();
-        collapsePanels = new ArrayList();
         
-        Set<String> demoSetTitles = demoMap.keySet();
-        for(String title: demoSetTitles) {
-            Component selector = createDemoSelector(title, demoMap.get(title));
-            gridbag.addLayoutComponent(selector, c);
-            add(selector);
-            c.gridy++;
-        }
+        // need to track components that have defaults customizations
+        collapsePanels = new ArrayList();
+       
+        // create demo set title area at top
+        add(createTitleArea(demoSetTitle), BorderLayout.NORTH);
+        
+        // create scrollable demo panel at bottom
+        JComponent selector = createDemoSelector(demoSet);
+        scrollPane = new JScrollPane(selector);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        add(scrollPane, BorderLayout.CENTER);
+        
+        configureDefaults();
     }
     
-    public void updateUI() {
-        super.updateUI();
-        overrideDefaults();
-    }
-        
-    protected void overrideDefaults() {
-        
-        expandedIcon = new ArrowIcon(ArrowIcon.SOUTH,
-                UIManager.getColor(SwingSet3.titleForegroundKey));
-        collapsedIcon = new ArrowIcon(ArrowIcon.EAST,
-                UIManager.getColor(SwingSet3.titleForegroundKey));
-        if (demoListLabels != null) {
-            for(JLabel label: demoListLabels) {
-                label.setForeground(UIManager.getColor(SwingSet3.titleForegroundKey));
-                label.setFont(UIManager.getFont(SwingSet3.titleFontKey));
-            }
-        }
-        if (viewPanels != null) {
-            for(JPanel panel: viewPanels) {
-                panel.setBackground(
-                    UIManager.getColor(SwingSet3.subPanelBackgroundColorKey));
-            }
-        }
-        if (collapsePanels != null) {
-            for (CollapsiblePanel collapsePanel : collapsePanels) {
-                collapsePanel.setFont(
-                        UIManager.getFont("CheckBox.font").deriveFont(Font.BOLD));
-                collapsePanel.setForeground(UIManager.getColor(SwingSet3.titleForegroundKey));
-                collapsePanel.setExpandedIcon(expandedIcon);
-                collapsePanel.setCollapsedIcon(collapsedIcon);
-            }
-        }
-    }
-        
-    protected Component createDemoSelector(String demoSetTitle, List<Demo> demoSet) {
-        JPanel selectorPanel = new JPanel();
-        GridBagLayout gridbag = new GridBagLayout();
-        GridBagConstraints c = new GridBagConstraints();        
-        selectorPanel.setLayout(gridbag);
-        
-        // Add label with title of demo set
-        JPanel titlePanel = new GradientPanel(
-                SwingSet3.titleGradientColor1Key,
-                SwingSet3.titleGradientColor2Key);
+    protected JComponent createTitleArea(String demoSetTitle) {
+        JPanel titleAreaPanel = new JPanel(new BorderLayout());
+        titlePanel = new GradientPanel(
+                UIManager.getColor(SwingSet3.titleGradientColor1Key),
+                UIManager.getColor(SwingSet3.titleGradientColor2Key));
         titlePanel.setLayout(new BorderLayout());
         titlePanel.setBorder(panelBorder);
-        JLabel demoListLabel = new JLabel(demoSetTitle);
-        demoListLabels.add(demoListLabel);
+        demoListLabel = new JLabel(demoSetTitle);
         demoListLabel.setOpaque(false);
         demoListLabel.setHorizontalAlignment(JLabel.LEADING);
-        titlePanel.add(demoListLabel);
-        c.gridx = c.gridy = 0;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 1;
-        gridbag.addLayoutComponent(titlePanel, c);
-        selectorPanel.add(titlePanel);
+        titlePanel.add(demoListLabel, BorderLayout.CENTER);
+        titleAreaPanel.add(titlePanel, BorderLayout.NORTH);        
         
         // Add panel with view combobox
-        JPanel viewPanel = new JPanel();
-        viewPanels.add(viewPanel);
+        viewPanel = new JPanel();
         viewPanel.setLayout(new BoxLayout(viewPanel, BoxLayout.X_AXIS));
         viewPanel.setBorder(new CompoundBorder(chiselBorder,
                 new EmptyBorder(12,8,12,8)));
@@ -186,10 +143,20 @@ public class DemoSelectorPanel extends JPanel implements Scrollable {
         JComboBox viewComboBox = new JComboBox();
         viewComboBox.addItem("by category");
         viewPanel.add(viewComboBox);
-        c.gridy++;
-        gridbag.addLayoutComponent(viewPanel, c);
-        selectorPanel.add(viewPanel);
+        titleAreaPanel.add(viewPanel, BorderLayout.CENTER);
         
+        return titleAreaPanel;
+    }
+        
+    protected JComponent createDemoSelector(List<Demo> demoSet) {
+        JPanel selectorPanel = new JPanel();
+        GridBagLayout gridbag = new GridBagLayout();
+        selectorPanel.setLayout(gridbag);
+        GridBagConstraints c = new GridBagConstraints(); 
+        c.gridx = c.gridy = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1;
+               
         HashMap<String,JPanel> categoryMap = new HashMap();
         GridBagLayout categoryGridbag = null;
         GridBagConstraints cc = new GridBagConstraints();
@@ -210,9 +177,9 @@ public class DemoSelectorPanel extends JPanel implements Scrollable {
                 collapsePanels.add(collapsePanel);
                 collapsePanel.setBorder(categoryBorder);
                 categoryMap.put(category, categoryPanel);
-                c.gridy++;
                 gridbag.addLayoutComponent(collapsePanel, c);
                 selectorPanel.add(collapsePanel);
+                c.gridy++;
             }
             DemoButton demoButton = new DemoButton(demo);
             categoryGridbag.addLayoutComponent(demoButton, cc);
@@ -229,9 +196,56 @@ public class DemoSelectorPanel extends JPanel implements Scrollable {
         gridbag.addLayoutComponent(trailer, c);
         selectorPanel.add(trailer);
         
-        overrideDefaults();
+        configureDefaults();
         
         return selectorPanel;
+    }
+   
+    public void updateUI() {
+        super.updateUI();
+        configureDefaults();
+    }
+        
+    protected void configureDefaults() {
+        
+        expandedIcon = new ArrowIcon(ArrowIcon.SOUTH,
+                UIManager.getColor(SwingSet3.titleForegroundKey));
+        collapsedIcon = new ArrowIcon(ArrowIcon.EAST,
+                UIManager.getColor(SwingSet3.titleForegroundKey));
+        
+        setBorder(new MatteBorder(0,0,0,1, 
+                UIManager.getColor(SwingSet3.controlMidShadowKey)));
+        
+        if (titlePanel != null) {
+            titlePanel.setGradientColor1(
+                UIManager.getColor(SwingSet3.titleGradientColor1Key));
+            titlePanel.setGradientColor2(
+                UIManager.getColor(SwingSet3.titleGradientColor2Key));
+        }
+
+        if (demoListLabel != null) {
+           demoListLabel.setForeground(UIManager.getColor(SwingSet3.titleForegroundKey));
+           demoListLabel.setFont(UIManager.getFont(SwingSet3.titleFontKey));
+        }
+        if (viewPanel != null) {
+            viewPanel.setBackground(UIManager.getColor(SwingSet3.subPanelBackgroundColorKey));
+        }
+        if (scrollPane != null) {
+            scrollPane.setBorder(emptyBorder);
+            Dimension prefSize = scrollPane.getViewport().getView().getPreferredSize();
+            prefSize.width += UIManager.getInt("ScrollBar.width") + 10;
+            scrollPane.getViewport().setPreferredSize(prefSize);
+        }
+        if (collapsePanels != null) {
+            for (CollapsiblePanel collapsePanel : collapsePanels) {
+                collapsePanel.setFont(
+                        UIManager.getFont("CheckBox.font").deriveFont(Font.BOLD));
+                collapsePanel.setForeground(UIManager.getColor(SwingSet3.titleForegroundKey));
+                collapsePanel.setExpandedIcon(expandedIcon);
+                collapsePanel.setCollapsedIcon(collapsedIcon);
+            }
+        }
+        revalidate();
     }
     
     public Demo getSelectedDemo() {
@@ -244,30 +258,9 @@ public class DemoSelectorPanel extends JPanel implements Scrollable {
         firePropertyChange("selectedDemo", oldSelectedDemo, demo);
     }
     
-    public Dimension getPreferredScrollableViewportSize() {
-        Dimension prefSize = getPreferredSize();
-        return new Dimension(prefSize.width + UIManager.getInt("ScrollBar.width") + 4,
-                prefSize.height);
-    }
-
-    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-        return orientation == SwingConstants.VERTICAL?  buttonHeight : 4;        
-    }
-
-    public boolean getScrollableTracksViewportHeight() {
-        return false;
-    }
-    
-    public boolean getScrollableTracksViewportWidth() {
-        return true;
-    }
-
-    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-        return 1;
-    }
-    
     protected class DemoButton extends JToggleButton {
         private Demo demo;
+        
         public DemoButton(Demo demo) {
             super();
             this.demo = demo;
@@ -281,21 +274,41 @@ public class DemoSelectorPanel extends JPanel implements Scrollable {
             setIconTextGap(10);
             setHorizontalTextPosition(JToggleButton.TRAILING);
             setHorizontalAlignment(JToggleButton.LEADING);
-            setOpaque(true);
+            setOpaque(false);
             setBorder(buttonBorder);
             setFocusPainted(false);
             setContentAreaFilled(false);
             addActionListener(demoActionListener);
         }
+        
+        @Override
+        public void updateUI() {
+            super.updateUI();
+            // some look and feels replace our border, so take it back
+            setBorder(buttonBorder);
+        }
+        
         @Override
         protected void paintComponent(Graphics g) {
             if (isSelected()) {
+                setBackground(UIManager.getColor("Tree.selectionBackground"));
                 g.setColor(UIManager.getColor("Tree.selectionBackground"));
                 Dimension size = getSize();
                 g.fillRect(0, 0, size.width, size.height); 
                 setForeground(UIManager.getColor("Tree.selectionForeground"));
             } else {
-                setForeground(UIManager.getColor("Button.foreground"));
+                setBackground(UIManager.getColor("ToggleButton.background"));
+                Color foreground = UIManager.getColor("ToggleButton.foreground");
+                switch(demo.getState()) {
+                    case STOPPED: {
+                        foreground = UIManager.getColor("demo.visitedForeground");
+                        break;
+                    }
+                    case FAILED: {
+                        foreground = UIManager.getColor("demo.failedForeground");
+                    }
+                }
+                setForeground(foreground);
             }
             super.paintComponent(g);
         }
@@ -327,12 +340,13 @@ public class DemoSelectorPanel extends JPanel implements Scrollable {
          public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
             AbstractButton b = (AbstractButton)c;
             if (b.isSelected()) {
-                g.setColor(UIManager.getColor("controlDkShadow"));
+                Color color = c.getBackground();
+                g.setColor(Utilities.deriveColorHSB(color, 0, 0, -.20f));
                 g.drawLine(x, y, x + width, y);
-                g.setColor(UIManager.getColor("controlShadow"));
+                g.setColor(Utilities.deriveColorHSB(color, 0, 0, -.10f));
                 g.drawLine(x, y + 1, x + width, y + 1);
                 g.drawLine(x, y + 2, x, y + height - 2);
-                g.setColor(Color.white);
+                g.setColor(Utilities.deriveColorHSB(color, 0, 0, .24f));
                 g.drawLine(x, y + height - 1, x + width, y + height-1);
             }
         }
@@ -351,18 +365,12 @@ public class DemoSelectorPanel extends JPanel implements Scrollable {
             return true;
         }
          public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            Color bg = c.getBackground();
+            Color color = c.getBackground();
             // render highlight at top
-            Color highlight = new Color((int)Math.min(bg.getRed()*1.1f,255),
-                                        (int)Math.min(bg.getGreen()*1.1f, 255),
-                                        (int)Math.min(bg.getBlue()*1.1f, 255));            
-            g.setColor(highlight);
+            g.setColor(Utilities.deriveColorHSB(color, 0, 0, .2f));
             g.drawLine(x, y, x + width, y);
             // render shadow on bottom
-            Color shadow = new Color((int)(bg.getRed()*.9f),
-                                     (int)(bg.getGreen()*.9f), 
-                                     (int)(bg.getBlue()*.9f));
-            g.setColor(shadow);
+            g.setColor(Utilities.deriveColorHSB(color, 0, 0, -.2f));
             g.drawLine(x, y + height - 1, x + width, y + height - 1);
         }
     }

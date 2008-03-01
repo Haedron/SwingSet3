@@ -32,59 +32,58 @@
 package swingset3.utilities;
 
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Image;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import javax.swing.border.Border;
 
 /**
- * Simple panel subclass which renders a 2-color vertical linear gradient
- * as the background.
- * @author Aim
+ *
+ * @author Administrator
  */
-public class GradientPanel extends JPanel {
-    private Color colors[] = new Color[2];
-    private Image gradientImage; 
+public class RoundedBorder implements Border {    
+    private int cornerRadius;
     
-    public GradientPanel(Color color1, Color color2) {
-        super();
-        setOpaque(false);  // unfortunately required to disable automatic bg painting
-        setBackground(color1); // in case colors are derived from background
-        colors[0] = color1;
-        colors[1] = color2;
+    public RoundedBorder() {
+        this(10);
     }
     
-    public void setGradientColor1(Color color) {
-        changeGradientColor(0, color);
+    public RoundedBorder(int cornerRadius) {
+        this.cornerRadius = cornerRadius;
     }
-    
-    public void setGradientColor2(Color color) {
-        changeGradientColor(1, color);
-    }
-    
-    private void changeGradientColor(int colorIndex, Color newColor) {
-        Color oldColor = colors[colorIndex];
-        colors[colorIndex] = newColor;
-        if (!oldColor.equals(newColor)) {
-            gradientImage = null;
-            firePropertyChange("gradientColor"+colorIndex, oldColor, newColor);
-        }
-    }
-   
-    @Override
-    protected void paintComponent(Graphics g) {
-        Dimension size = getSize();
-        if (gradientImage == null ||
-                gradientImage.getWidth(null) != size.width ||
-                gradientImage.getHeight(null) != size.height) {
 
-            gradientImage = Utilities.createGradientImage(size.width, size.height, 
-                    colors[0], colors[1]);
+    public Insets getBorderInsets(Component c) {
+        return getBorderInsets(c, new Insets(0,0,0,0));
+    }
+
+    public Insets getBorderInsets(Component c, Insets insets) {
+        insets.top = insets.bottom = cornerRadius/2; 
+        insets.left = insets.right = 1;
+        return insets;
+    }
+
+    public boolean isBorderOpaque() {
+        return false;
+    }
+
+    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+        Graphics2D g2 = (Graphics2D)g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+                RenderingHints.VALUE_ANTIALIAS_ON);
         
-        }
-        g.drawImage(gradientImage, 0, 0, null);
-        super.paintComponent(g);
-    }
+        Color bg = c.getBackground();
+        Color color = Utilities.deriveColorHSB(bg, 0, 0, -.3f);
+        
+        g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 40));        
+        g2.drawRoundRect(x, y + 2, width - 1, height - 3, cornerRadius, cornerRadius);
+        g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 90));        
+        g2.drawRoundRect(x, y + 1, width - 1, height - 2, cornerRadius, cornerRadius); 
+        g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 255));        
+        g2.drawRoundRect(x, y, width - 1, height - 1, cornerRadius, cornerRadius);
 
+        g2.dispose();            
+    }
 }

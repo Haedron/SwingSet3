@@ -42,6 +42,8 @@ import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.jdesktop.animation.timing.Animator;
@@ -51,23 +53,22 @@ import org.jdesktop.animation.timing.interpolation.PropertySetter;
  * 
  * @author aim
  */
-//remind(aim): replace with JXCollapsiblePanel
 public class CollapsiblePanel extends JPanel {
     public enum Orientation { HORIZONTAL, VERTICAL }
       
     protected JPanel panel;
-    protected Component child;
+    protected JComponent child;
     
     protected JCheckBox expandCheckBox; // may be null, if no title was supplied
     protected Orientation orientation = Orientation.VERTICAL;
     protected Dimension childPrefSize;    
     protected boolean expanded = true;
     
-    public CollapsiblePanel(Component child) {
+    public CollapsiblePanel(JComponent child) {
         this(child, Orientation.VERTICAL);
     }
     
-    public CollapsiblePanel(Component child, Orientation orientation) {
+    public CollapsiblePanel(JComponent child, Orientation orientation) {
         this.orientation = orientation;
         this.child = child;
         setLayout(new BorderLayout()); 
@@ -77,16 +78,21 @@ public class CollapsiblePanel extends JPanel {
     }
     
     /** Creates a new instance of CollapsiblePanel */
-    public CollapsiblePanel(Component child, String title, String tooltip) {
+    public CollapsiblePanel(JComponent child, String title, String tooltip) {
         this(child, Orientation.VERTICAL, title, tooltip);
     }
     
-    public CollapsiblePanel(Component child, Orientation orientation,
+    public CollapsiblePanel(JComponent child, String title) {
+        this(child, Orientation.VERTICAL, title, null);
+    }
+    
+    public CollapsiblePanel(JComponent child, Orientation orientation,
             String title, String tooltip) {
         this(child, orientation);
         add(createCollapseControl(title, tooltip), 
                 orientation == Orientation.HORIZONTAL? 
                     BorderLayout.WEST : BorderLayout.NORTH);
+        
     }
         
     protected Component createCollapseControl(String title, String tooltip) {
@@ -94,6 +100,7 @@ public class CollapsiblePanel extends JPanel {
         Box box = Box.createHorizontalBox();
         
         expandCheckBox = new JCheckBox(title);
+        expandCheckBox.setBorder(new EmptyBorder(0,4,0,0));
         expandCheckBox.setToolTipText(tooltip);
         expandCheckBox.setHorizontalTextPosition(JCheckBox.RIGHT);
         expandCheckBox.setSelectedIcon(new ArrowIcon(ArrowIcon.SOUTH));
@@ -103,8 +110,7 @@ public class CollapsiblePanel extends JPanel {
         expandCheckBox.addChangeListener(new CollapseListener());
         box.add(expandCheckBox);
         
-        return box;
-                       
+        return box;                       
     }
     
     public void setExpanded(boolean expanded) {
@@ -113,41 +119,49 @@ public class CollapsiblePanel extends JPanel {
             if (expandCheckBox != null) {
                 expandCheckBox.setSelected(expanded);
             }
-
             childPrefSize = child.getPreferredSize();
             this.expanded = expanded;
-            Animator animator = null;
-            if (orientation == Orientation.VERTICAL) {
-                animator = new Animator(600, new PropertySetter(this, "collapseHeight",
-                    expanded? 0 : childPrefSize.height, expanded? childPrefSize.height : 0));
+            
+            if (isShowing()) {
+                // only animate if currently showing
+                Animator animator = null;
+                if (orientation == Orientation.VERTICAL) {
+                    animator = new Animator(600, new PropertySetter(this, "collapseHeight",
+                            expanded ? 0 : childPrefSize.height, expanded ? childPrefSize.height : 0));
 
-            }
-            if (orientation == Orientation.HORIZONTAL) {
-                animator = new Animator(600, new PropertySetter(this, "collapseWidth",
-                    expanded? 0 : childPrefSize.width, expanded? childPrefSize.width : 0));
-            }
-            
-            animator.setStartDelay(10);
-            animator.setAcceleration(.2f);
-            animator.setDeceleration(.3f);
-            animator.start();
-            
+                }
+                if (orientation == Orientation.HORIZONTAL) {
+                    animator = new Animator(600, new PropertySetter(this, "collapseWidth",
+                            expanded ? 0 : childPrefSize.width, expanded ? childPrefSize.width : 0));
+                }
+                animator.setStartDelay(10);
+                animator.setAcceleration(.2f);
+                animator.setDeceleration(.3f);
+                animator.start();
+            } else {
+                if (orientation == Orientation.VERTICAL) {
+                    setCollapseHeight(expanded? childPrefSize.height : 0);
+
+                } else if (orientation == Orientation.HORIZONTAL) {
+                    setCollapseWidth(expanded? childPrefSize.width : 0);
+                }               
+            }           
             firePropertyChange("expanded", oldExpanded, expanded);
+
         }
     }
     
     // intended only for animator, but must be public
     public void setCollapseHeight(int height) {
         panel.setPreferredSize(new Dimension(childPrefSize.width, height));
-        System.out.println("setCollapseHeight:"+height);
-        ((JComponent)child).revalidate();
+        child.revalidate();
         repaint();
     }
     
     // intended only for animator, but must be public
     public void setCollapseWidth(int width) {
         panel.setPreferredSize(new Dimension(width, childPrefSize.height));
-        ((JComponent)child).revalidate();
+        child.revalidate();
         repaint();
     }
 
@@ -183,12 +197,26 @@ public class CollapsiblePanel extends JPanel {
         }
     }
     
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        //configureDefaults();
+    }
+    
+    protected void configureDefaults() {
+        if (expandCheckBox != null) {
+            if (UIManager.getLookAndFeel().getName().equals("Nimbus")) {
+                expandCheckBox.setBorder(new EmptyBorder(0,4,0,0));
+            } else {
+                expandCheckBox.setBorder(new EmptyBorder(0,0,0,0));
+            }
+        }
+    }
+    
     // only used if checkbox is present
     private class CollapseListener implements ChangeListener {
         public void stateChanged(ChangeEvent event) {
             setExpanded(expandCheckBox.isSelected());
         }
-    }
-
-    
+    }    
 }

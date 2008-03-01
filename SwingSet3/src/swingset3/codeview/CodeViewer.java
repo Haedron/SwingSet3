@@ -46,7 +46,6 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -86,8 +85,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.UIResource;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
+import swingset3.utilities.RoundedBorder;
+import swingset3.utilities.RoundedPanel;
 import swingset3.utilities.Utilities;
 
 /**
@@ -160,6 +162,8 @@ public class CodeViewer extends JPanel {
     
     private JComponent codeHighlightBar;
     private JComboBox snippetSetsComboBox;
+    private JComponent codePanel;
+    private JLabel noCodeLabel;
     private JTabbedPane codeTabbedPane;
     private Color highlightColor;
     private Highlighter.HighlightPainter snippetPainter;
@@ -190,7 +194,10 @@ public class CodeViewer extends JPanel {
         codeHighlightBar = createCodeHighlightBar();
         codeHighlightBar.setVisible(false);
         add(codeHighlightBar, BorderLayout.NORTH);
-        initCodeTabbedPane();
+        codePanel = createCodePanel();
+        add(codePanel, BorderLayout.CENTER);
+        
+        configureDefaults();
     }
                 
     protected JComponent createCodeHighlightBar() {
@@ -209,8 +216,8 @@ public class CodeViewer extends JPanel {
         snippetSetsComboBox.setAlignmentY(.51f);
         snippetSetsComboBox.setMaximumRowCount(20);
         snippetSetsComboBox.setPrototypeDisplayValue(NO_SNIPPET_SELECTED + 
-                "                                                        "); // temporary item
-        snippetSetsComboBox.setRenderer(new SnippetCellRenderer2(snippetSetsComboBox.getRenderer()));
+                "                                                                    "); // temporary item
+        snippetSetsComboBox.setRenderer(new SnippetCellRenderer(snippetSetsComboBox.getRenderer()));
         snippetSetsComboBox.addActionListener(new SnippetActivator());
         snippetSetsLabel.setLabelFor(snippetSetsComboBox);
         box.add(snippetSetsLabel);
@@ -228,9 +235,38 @@ public class CodeViewer extends JPanel {
         return box;              
     }
     
-    protected void initCodeTabbedPane() {
-        codeTabbedPane = new CodeTabbedPane();
-        add(BorderLayout.CENTER, codeTabbedPane);
+    protected JComponent createCodePanel() {
+        JPanel panel = new RoundedPanel(new BorderLayout(), 10);
+        panel.setBorder(new RoundedBorder(10));
+        panel.add(Box.createVerticalStrut(12), BorderLayout.NORTH);
+        noCodeLabel = new JLabel(getString("CodeViewer.noCodeLoaded",
+                                     "no code loaded"));
+        noCodeLabel.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(noCodeLabel);
+        return panel;
+    }
+    
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        configureDefaults();        
+    }
+    
+    protected void configureDefaults() {
+        if (codePanel != null) {
+            Color base = UIManager.getColor("Panel.background");
+            codePanel.setBackground(Utilities.deriveColorHSB(base, 0, 0, -.06f));
+            noCodeLabel.setForeground(Utilities.deriveColorHSB(base, 0, 0, -.3f));
+            Utilities.printColor("noCodeLabel", noCodeLabel.getForeground());
+            noCodeLabel.setFont(
+                    UIManager.getFont("Label.font").deriveFont(Font.BOLD, 24f));
+            
+        }
+        if (snippetSetsComboBox != null) {
+            // Now that the look and feel has changed, we need to wrap the new delegate
+            snippetSetsComboBox.setRenderer(new SnippetCellRenderer(
+                    new JComboBox().getRenderer()));
+        }
     }
     
     protected String getString(String key, String fallback) {
@@ -284,6 +320,12 @@ public class CodeViewer extends JPanel {
             return;
         }        
         currentCodeFiles = sourceFiles;
+        
+        if (codeTabbedPane == null) {
+            codeTabbedPane = new JTabbedPane();
+            codePanel.remove(noCodeLabel);
+            codePanel.add(codeTabbedPane);
+        }
         
         codeTabbedPane.removeAll();
         clearAllSnippetHighlights();
@@ -642,10 +684,10 @@ public class CodeViewer extends JPanel {
         }        
     }
     
-    class SnippetCellRenderer2 implements ListCellRenderer {
+    class SnippetCellRenderer implements ListCellRenderer {
         private JLabel delegate;
         
-        public SnippetCellRenderer2(ListCellRenderer delegate) {
+        public SnippetCellRenderer(ListCellRenderer delegate) {
             this.delegate = (JLabel)delegate;
         }
         public Component getListCellRendererComponent(JList list,
@@ -659,9 +701,18 @@ public class CodeViewer extends JPanel {
             
             int count = snippetMap.getSnippetCountForSet((String)value);
             
-            String text = "<html>" + value + "<font color=\"#3b3b3b\">" +
+            Color foreground = renderer.getForeground();
+            Color countForeground = Utilities.deriveColorHSB(foreground, 
+                    0, 0, isSelected? -.6f : .45f);
+            
+            String text = "<html><font color=\"" +
+                    Utilities.getHTMLColorString(foreground) + "\">" + value + 
+                    "</font>" +
+                    "<font color=\"" +
+                    Utilities.getHTMLColorString(countForeground) + "\">" +
                     (count > 0? " (" + count + (count > 1? " snippets)" : " snippet)") : "") +
                     "</font></html>";
+
             renderer.setText(text);
             return renderer;
         }
@@ -781,34 +832,6 @@ public class CodeViewer extends JPanel {
                 layer.setBounds(0, 0, size.width, size.height);
             }                      
         } 
-    }
-    
-    private class CodeTabbedPane extends JTabbedPane {
-        private String emptyMessage;
-        
-        public CodeTabbedPane() {
-            super();
-            emptyMessage = getString("CodeViewer.noCodeLoaded",
-                                     "no code loaded");
-        }
-                
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (getTabCount() == 0) {
-                Rectangle bounds = getBounds();
-                Font font = g.getFont();
-                g.setFont(font.deriveFont(24f));
-                FontMetrics metrics = g.getFontMetrics();
-                Rectangle2D msgBounds = metrics.getStringBounds(emptyMessage, g);
-                
-                g.setColor(UIManager.getColor("textInactiveText"));
-                g.drawString(emptyMessage, (bounds.width - msgBounds.getBounds().width)/2,
-                        (bounds.height - msgBounds.getBounds().height)/2 +
-                        metrics.getAscent());                
-                
-            }
-        }            
     }
     
     private class CodeVeneer extends JPanel {        

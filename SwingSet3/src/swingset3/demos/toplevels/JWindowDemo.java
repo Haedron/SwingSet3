@@ -31,6 +31,7 @@
 
 package swingset3.demos.toplevels;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -38,11 +39,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import javax.swing.BoxLayout;
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import swingset3.DemoProperties;
 import swingset3.utilities.Utilities;
@@ -60,25 +63,41 @@ public class JWindowDemo extends JPanel {
     
     private JWindow window;
     
-    private JButton showButton;
-    
-    private boolean locationSet = false;
-        
+    private JComponent windowSpaceholder;
+            
     public JWindowDemo() {   
         initComponents();
     }
     
     protected void initComponents() {
         window = createWindow();
-
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        
+        setLayout(new BorderLayout());
+        add(createControlPanel(), BorderLayout.WEST);
+        windowSpaceholder = createWindowSpaceholder(window);
+        add(windowSpaceholder, BorderLayout.CENTER);
+    }
+                
+    protected JComponent createControlPanel() {
+        Box controlPanel = Box.createVerticalBox();
+        controlPanel.setBorder(new EmptyBorder(8,8,8,8));
         
         // Create button to control visibility of frame
-        showButton = new JButton("Show JWindow...");
+        JButton showButton = new JButton("Show JWindow...");
         showButton.addActionListener(new ShowActionListener());
-        add(showButton);  
+        controlPanel.add(showButton);  
         
-        addComponentListener(new SizeInitListener());
+        return controlPanel;
+    }
+    
+    protected JComponent createWindowSpaceholder(JWindow window) {               
+        JPanel windowPlaceholder = new JPanel();
+        Dimension prefSize = window.getPreferredSize();
+        prefSize.width += 12;
+        prefSize.height += 12;
+        windowPlaceholder.setPreferredSize(prefSize);
+
+        return windowPlaceholder;        
     }
     
     protected JWindow createWindow() {
@@ -107,12 +126,9 @@ public class JWindowDemo extends JPanel {
     }
     
     public void start() {
-        // If location hasn't been initialed yet from SizeInitListener, then
-        // defer visibility of window        
-        if (locationSet) {
-            window.setVisible(true);
-        }
-    };
+        Utilities.setToplevelLocation(window, windowSpaceholder, Utilities.CENTER);         
+        showWindow();
+    }
     
     public void stop() {
         //<snip>Hide window
@@ -120,36 +136,20 @@ public class JWindowDemo extends JPanel {
         //</snip>
     };
     
+    public void showWindow() {
+        //<snip>Show window
+        // if window already visible, then bring to the front
+        if (window.isShowing()) {
+            window.toFront();
+        } else {
+            window.setVisible(true);
+        }
+        //</snip>
+    }
+    
     private class ShowActionListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
-            //<snip>Make window visible
-            // if window already visible, then bring to the front
-            if (window.isShowing()) {
-                window.toFront();
-            } else {
-                Utilities.setToplevelLocation(window, showButton, Utilities.SOUTH_EAST);
-                window.setVisible(true);
-            }
-            //</snip>
+            showWindow();
         }
     }
-
-
-    // This is a hack to deal with the asynchronous instantiation of this
-    // demo component when embedded in HTML;   at the time start() is called,
-    // we don't necessarily have the size/location of the demo, hence cannot
-    // determine a reasonable relative location for the dialog.  So we wait
-    // until the demo's size is initialized to set the location of the dialog.
-    private class SizeInitListener extends ComponentAdapter {        
-        public void componentResized(ComponentEvent event) {
-            Component component = event.getComponent();
-            if (component.getWidth() > 0 && component.getHeight() > 0) {
-                Utilities.setToplevelLocation(window, component, Utilities.SOUTH);
-                locationSet = true;
-                window.setVisible(true);
-                component.removeComponentListener(this);                
-            }
-        }        
-    } // SizeInitListener
-    
 }

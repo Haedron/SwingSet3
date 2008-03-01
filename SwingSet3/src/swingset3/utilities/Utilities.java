@@ -41,10 +41,12 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.Window;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.text.NumberFormat;
 import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
@@ -157,6 +159,26 @@ public class Utilities implements SwingConstants {
             
             return gradientImage;
     }
+
+
+    public static BufferedImage createGradientMask(int width, int height, int orientation) {
+        // algorithm derived from Romain Guy's blog
+        BufferedImage gradient = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = gradient.createGraphics();
+        GradientPaint paint = new GradientPaint(0.0f, 0.0f,
+                new Color(1.0f, 1.0f, 1.0f, 1.0f),
+                orientation == SwingConstants.HORIZONTAL? width : 0.0f, 
+                orientation == SwingConstants.VERTICAL? height : 0.0f,
+                new Color(1.0f, 1.0f, 1.0f, 0.0f));
+        g.setPaint(paint);
+        g.fill(new Rectangle2D.Double(0, 0, width, height));
+
+        g.dispose();
+        gradient.flush();
+
+        return gradient;
+    }
     
     public static boolean browse(URI uri) throws IOException, UnavailableServiceException {
         // Try using the Desktop api first
@@ -199,6 +221,40 @@ public class Utilities implements SwingConstants {
                 hsb[1] < 0? 0 : (hsb[1] > 1? 1 : hsb[1]),
                 hsb[2] < 0? 0 : (hsb[2] > 1? 1 : hsb[2]));
                                                
+    }
+    
+    /**
+     * Derives a color by multiplying to the base color's 
+     * hue, saturation, and brightness values by the specified multipliers.   
+     * @param base the color to which the HSV offsets will be added
+     * @param xH the multiplier for hue
+     * @param xS the multiplier for saturation
+     * @param xB the multiplier for brightness
+     * @return Color with modified HSV values
+     */
+    public static Color deriveColorPercentHSB(Color base, float xH, float xS, float xB) {
+        float hsb[] = Color.RGBtoHSB(
+                base.getRed(), base.getGreen(), base.getBlue(), null);
+
+        hsb[0] *= xH;
+        hsb[1] *= xS;
+        hsb[2] *= xB;
+        return Color.getHSBColor(
+                hsb[0] < 0? 0 : (hsb[0] > 1? 1 : hsb[0]),
+                hsb[1] < 0? 0 : (hsb[1] > 1? 1 : hsb[1]),
+                hsb[2] < 0? 0 : (hsb[2] > 1? 1 : hsb[2]));
+                                               
+    }
+    
+    public static String getHTMLColorString(Color color) {
+        String red = Integer.toHexString(color.getRed());
+        String green = Integer.toHexString(color.getGreen());
+        String blue = Integer.toHexString(color.getBlue());
+
+        return "#" + 
+                (red.length() == 1? "0" + red : red) +
+                (green.length() == 1? "0" + green : green) +
+                (blue.length() == 1? "0" + blue : blue);        
     }
 
    public static void printColor(String key, Color color) {

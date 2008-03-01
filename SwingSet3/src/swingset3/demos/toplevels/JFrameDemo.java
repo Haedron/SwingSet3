@@ -33,34 +33,32 @@ package swingset3.demos.toplevels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.io.File;
 import java.net.URL;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
+import javax.imageio.ImageIO;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import swingset3.DemoProperties;
-import swingset3.utilities.Utilities;
 import swingset3.demos.toplevels.BusyGlass;
+import swingset3.utilities.Utilities;
 
 /**
- *
+ * Demo for Swing's JFrame toplevel component.
  * @author aim
  */
 @DemoProperties(
@@ -84,14 +82,10 @@ public class JFrameDemo extends JPanel {
     }
     //</snip>
     
-    // Panel components
-    private JButton showButton;
-    private JCheckBox busyCheckBox;
-    
     // Toplevel frame component    
-    private JFrame frame;
+    private JFrame frame; 
     
-    private boolean locationSet = false;
+    private JComponent frameSpaceholder;
             
     public JFrameDemo() {        
         initComponents();
@@ -100,21 +94,38 @@ public class JFrameDemo extends JPanel {
     protected void initComponents() {
         frame = createFrame();
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout());
+        add(createControlPanel(), BorderLayout.WEST);
+        frameSpaceholder = createFrameSpaceholder(frame);
+        add(frameSpaceholder, BorderLayout.CENTER);
+    }
         
+    protected JComponent createControlPanel() {               
+        Box controlPanel = Box.createVerticalBox();
+        controlPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
+       
         // Create button to control visibility of frame
-        showButton = new JButton("Show JFrame...");
+        JButton showButton = new JButton("Show JFrame...");
         showButton.addActionListener(new ShowActionListener());
-        add(showButton);
+        controlPanel.add(showButton);
         
         // Create checkbox to control busy state of frame
-        busyCheckBox = new JCheckBox("Frame busy");
+        JCheckBox busyCheckBox = new JCheckBox("Frame busy");
         busyCheckBox.setSelected(false);
         busyCheckBox.addChangeListener(new BusyChangeListener());
-        add(busyCheckBox);
-        
-        addComponentListener(new SizeInitListener());
-        
+        controlPanel.add(busyCheckBox);  
+ 
+        return controlPanel;
+    }
+    
+    protected JComponent createFrameSpaceholder(JFrame frame) {               
+        JPanel framePlaceholder = new JPanel();
+        Dimension prefSize = frame.getPreferredSize();
+        prefSize.width += 12;
+        prefSize.height += 12;
+        framePlaceholder.setPreferredSize(prefSize);
+
+        return framePlaceholder;        
     }
     
     protected JFrame createFrame() {
@@ -126,8 +137,14 @@ public class JFrameDemo extends JPanel {
         
         //<snip>Set Minimized/titlebar icon Image
         //Note: How the image is used is platform-dependent
-        ImageIcon frameIcon = new ImageIcon("resources/images/swingingduke.gif");
-        frame.setIconImage(frameIcon.getImage());
+        Image iconImage = null;
+        try {
+            URL imageURL = JFrameDemo.class.getResource("resources/images/swingingduke.gif");
+            iconImage = ImageIO.read(imageURL);
+        } catch (Exception e) {
+            // handle image IO exception
+        }
+        frame.setIconImage(iconImage);
         //</snip>
         
         //<snip>Make toplevel "busy"
@@ -146,14 +163,14 @@ public class JFrameDemo extends JPanel {
         
         //<snip>Add a horizontal toolbar
         JToolBar toolbar = new JToolBar();
-        frame.getContentPane().add(BorderLayout.NORTH, toolbar);
+        frame.add(toolbar, BorderLayout.NORTH);
         toolbar.add(new JButton("Toolbar Button"));
         //</snip>
         
         //<snip>Add the content area
         JLabel label = new JLabel("I'm content but a little blue.");
         label.setHorizontalAlignment(JLabel.CENTER);
-        label.setPreferredSize(new Dimension(400,200));
+        label.setPreferredSize(new Dimension(300,160));
         label.setBackground(new Color(197, 216, 236));
         label.setOpaque(true); // labels non-opaque by default
         frame.add(label);
@@ -161,38 +178,22 @@ public class JFrameDemo extends JPanel {
         
         //<snip>Add a statusbar
         JLabel statusLabel = new JLabel("I show status.");
+        statusLabel.setBorder(new EmptyBorder(4,4,4,4));
         statusLabel.setHorizontalAlignment(JLabel.LEADING);
-        frame.getContentPane().add(BorderLayout.SOUTH, statusLabel);
+        frame.add(statusLabel, BorderLayout.SOUTH);
         //</snip>
         
-        //<snip>Initialize frame's size
-        // which will shrink-to-fit its contents
+        //<snip>Initialize frame's size to fit it's content
         frame.pack(); 
         //</snip>
         
         return frame;
     }
-    
-    private class ShowActionListener implements ActionListener {
-        public void actionPerformed(ActionEvent actionEvent) {
-            showFrame();
-        }
-    }
-    
-    private class BusyChangeListener implements ChangeListener {
-        public void stateChanged(ChangeEvent changeEvent) {
-            setFrameBusy(busyCheckBox.isSelected());
-            showFrame(); // bring frame back to front for demo purposes
-        }
-    }    
 
     public void start() {
-        // If location hasn't been initialed yet from SizeInitListener, then
-        // defer visibility of frame        
-        if (locationSet) {
-            frame.setVisible(true);
-        }
-    };
+        Utilities.setToplevelLocation(frame, frameSpaceholder, Utilities.CENTER);         
+        showFrame();
+    }
     
     public void stop() {
         //<snip>Hide frame
@@ -222,24 +223,33 @@ public class JFrameDemo extends JPanel {
     public boolean isFrameBusy() {
         return frame.getGlassPane().isVisible();
     }
-    //</snip>
+    //</snip
+ 
+    // remind(aim): replace with Beans binding
+    private class ShowActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent actionEvent) {
+            showFrame();
+        }
+    }
     
-    // This is a hack to deal with the asynchronous instantiation of this
-    // demo component when embedded in HTML;   at the time start() is called,
-    // we don't necessarily have the size/location of the demo, hence cannot
-    // determine a reasonable relative location for the frame.  So we wait
-    // until the demo's size is initialized to set the location of the frame.
-    private class SizeInitListener extends ComponentAdapter {        
-        public void componentResized(ComponentEvent event) {
-            Component component = event.getComponent();
-            if (component.getWidth() > 0 && component.getHeight() > 0) {
-                Utilities.setToplevelLocation(frame, component, Utilities.SOUTH);
-                locationSet = true;
+    private class BusyChangeListener implements ChangeListener {
+        public void stateChanged(ChangeEvent changeEvent) {
+            JCheckBox busyCheckBox = (JCheckBox)changeEvent.getSource();
+            setFrameBusy(busyCheckBox.isSelected());
+            showFrame(); // bring frame back to front for demo purposes
+        }
+    }    
+    
+    public static void main(String args[]) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                JFrame frame = new JFrame();
+                JFrameDemo demo = new JFrameDemo();
+                frame.add(demo);
+                frame.pack();
                 frame.setVisible(true);
-                component.removeComponentListener(this);                
+                demo.start();
             }
-        }        
-    } // SizeInitListener
-    
-    
+        });
+    }    
 }
