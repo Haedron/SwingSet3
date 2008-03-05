@@ -49,6 +49,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.utilities.JGridPanel;
 
 /**
  * JFileChooserDemo
@@ -62,7 +63,7 @@ import swingset3.demos.DemoBase;
         sourceFiles = {
                 "swingset3/demos/choosers/FileChooserDemo.java",
                 "swingset3/demos/choosers/ExampleFileView.java",
-                "swingset3/demos/choosers/JGridPanel.java",
+                "swingset3/utilities/JGridPanel.java",
                 "swingset3/demos/DemoBase.java"
                 }
 )
