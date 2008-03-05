@@ -71,21 +71,7 @@ public class TextFieldDemo extends DemoBase {
     }
 
     private void initUI() {
-        tfHistory.setHistory(Arrays.asList(
-                "carmageddon",
-                "cars",
-                "cartoon",
-                "casanova",
-                "casino",
-                "castle",
-                "castlevania",
-                "cat",
-                "categoty",
-                "caterpillar",
-                "dog",
-                "magpie",
-                "hare",
-                "rabbit"));
+        tfHistory.setHistory(Arrays.asList(getString("TextField.history.words").split("\\,")));
 
         JGridPanel pnContent = new JGridPanel(1, 0, 2);
 
