@@ -35,6 +35,8 @@ import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
@@ -67,6 +69,39 @@ public class TextFieldDemo extends DemoBase {
 
     private final JLabel lbDowResult = new JLabel();
 
+    private final JLabel lbPassword = new JLabel(getString("TextField.password.text"));
+
+    private final JPasswordField tfPassword1 = new JPasswordField(20);
+
+    private final JPasswordField tfPassword2 = new JPasswordField(20);
+
+    private final DocumentListener passwordListener = new DocumentListener() {
+        public void insertUpdate(DocumentEvent e) {
+            highlightPasswords();
+        }
+
+        public void removeUpdate(DocumentEvent e) {
+            highlightPasswords();
+        }
+
+        public void changedUpdate(DocumentEvent e) {
+            highlightPasswords();
+        }
+
+        private void highlightPasswords() {
+            Color color;
+
+            if (Arrays.equals(tfPassword1.getPassword(), tfPassword2.getPassword())) {
+                color = Color.GREEN;
+            } else {
+                color = UIManager.getColor("TextField.background");
+            }
+
+            tfPassword1.setBackground(color);
+            tfPassword2.setBackground(color);
+        }
+    };
+
     /**
      * main method allows us to run as a standalone demo.
      */
@@ -90,6 +125,10 @@ public class TextFieldDemo extends DemoBase {
         });
 
         tfDow.setValue(new Date());
+
+        tfPassword1.getDocument().addDocumentListener(passwordListener);
+
+        tfPassword2.getDocument().addDocumentListener(passwordListener);
     }
 
     private void initUI() {
@@ -100,7 +139,13 @@ public class TextFieldDemo extends DemoBase {
         pnDow.cell(tfDow).
                 cell(lbDowResult);
 
-        JGridPanel pnContent = new JGridPanel(1, 0, 4);
+        JGridPanel pnPassword = new JGridPanel(3, 2);
+
+        pnPassword.cell(tfPassword1).
+                cell(tfPassword2).
+                cell();
+
+        JGridPanel pnContent = new JGridPanel(1, 0, 6);
 
         pnContent.setBorderEqual(10);
 
@@ -108,6 +153,8 @@ public class TextFieldDemo extends DemoBase {
                 cell(tfHistory).
                 cell(lbDow, new Insets(20, 0, 0, 0)).
                 cell(pnDow).
+                cell(lbPassword, new Insets(20, 0, 0, 0)).
+                cell(pnPassword).
                 cell();
 
         add(pnContent);
