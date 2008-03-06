@@ -117,7 +117,7 @@ public class JHistoryTextField extends JTextField {
                 popup.setVisible(false);
             }
         });
-        
+
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (popup.isShowing()) {

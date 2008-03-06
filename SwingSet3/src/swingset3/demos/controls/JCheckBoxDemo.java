@@ -47,37 +47,37 @@ public class JCheckBoxDemo extends JPanel {
     public static String getShortDescription() {
         return "Demonstrates JCheckBox, Swing's boolean choice component.";
     }
-    
-    public JCheckBoxDemo() {        
+
+    public JCheckBoxDemo() {
         setToolTipText(getShortDescription());
         initComponents();
     }
-    
-                
+
+
     protected void initComponents() {
-        setLayout(new GridLayout(0,1));
-        
+        setLayout(new GridLayout(0, 1));
+
         add(createSimpleCheckBoxes());
     }
-    
-    protected JPanel createSimpleCheckBoxes() {
+
+    protected static JPanel createSimpleCheckBoxes() {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder("Simple CheckBoxes"));
-        
+
         //<snip>Create simple checkbox
         JCheckBox checkbox = new JCheckBox("Over 18");
 
         //</snip>
- 
-        
+
+
         panel.add(checkbox);
-        
-        return panel;                
+
+        return panel;
     }
-    
+
     public static void main(String args[]) {
         final JCheckBoxDemo demo = new JCheckBoxDemo();
-        
+
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JFrame frame = new JFrame("JCheckBox Demo");
@@ -86,5 +86,5 @@ public class JCheckBoxDemo extends JPanel {
                 frame.setVisible(true);
             }
         });
-    }    
+    }
 }

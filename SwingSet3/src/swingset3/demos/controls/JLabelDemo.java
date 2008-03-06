@@ -31,8 +31,6 @@
 
 package swingset3.demos.controls;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,20 +46,20 @@ public class JLabelDemo extends JPanel {
     public static String getShortDescription() {
         return "Demonstrates JLabel, Swing's component which displays static text and/or image.";
     }
-    
-    public JLabelDemo() {        
+
+    public JLabelDemo() {
         setToolTipText(getShortDescription());
         initComponents();
-        setBorder(new EmptyBorder(12,10,12,10));
-    }    
-                
+        setBorder(new EmptyBorder(12, 10, 12, 10));
+    }
+
     protected void initComponents() {
         add(new JLabel("JLabel Demo Coming Soon...."));
     }
-    
+
     public static void main(String args[]) {
         final JLabelDemo demo = new JLabelDemo();
-        
+
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JFrame frame = new JFrame("JLabel Demo");
@@ -70,5 +68,5 @@ public class JLabelDemo extends JPanel {
                 frame.setVisible(true);
             }
         });
-    }    
+    }
 }

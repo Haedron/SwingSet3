@@ -43,6 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
+
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
 
@@ -54,14 +55,14 @@ import swingset3.demos.DemoBase;
  # @author Peter Korn (accessibility support)
  */
 @DemoProperties(
-      value = "ProgressBar Demo", 
-      category = "Controls",
-      description = "Demonstrates the JProgressBar, a control which displays progress to the user",
-      sourceFiles = {
-        "swingset3/demos/controls/ProgressBarDemo.java",
-        "swingset3/demos/DemoBase.java"
-        
-      }
+        value = "ProgressBar Demo",
+        category = "Controls",
+        description = "Demonstrates the JProgressBar, a control which displays progress to the user",
+        sourceFiles = {
+                "swingset3/demos/controls/ProgressBarDemo.java",
+                "swingset3/demos/DemoBase.java"
+
+                }
 )
 public class ProgressBarDemo extends DemoBase {
 
@@ -69,131 +70,127 @@ public class ProgressBarDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-	ProgressBarDemo demo = new ProgressBarDemo();
-	demo.mainImpl();
+        ProgressBarDemo demo = new ProgressBarDemo();
+        demo.mainImpl();
     }
 
     /**
      * ProgressBarDemo Constructor
      */
     public ProgressBarDemo() {
-	// Set the title for this demo, and an icon used to represent this
-	// demo inside the SwingSet2 app.
-	super();
+        // Set the title for this demo, and an icon used to represent this
+        // demo inside the SwingSet2 app.
+        super();
 
-	createProgressPanel();
+        createProgressPanel();
     }
 
-    javax.swing.Timer timer = new javax.swing.Timer(18, createTextLoadAction());
-    Action loadAction;
-    Action stopAction;
-    JProgressBar progressBar;
-    JTextArea progressTextArea;
+    private final javax.swing.Timer timer = new javax.swing.Timer(18, createTextLoadAction());
+    private Action loadAction;
+    private Action stopAction;
+    private JProgressBar progressBar;
+    private JTextArea progressTextArea;
 
-    void updateDragEnabled(boolean dragEnabled) {
-        progressTextArea.setDragEnabled(dragEnabled);
-    }
-    
     public void createProgressPanel() {
-	getDemoPanel().setLayout(new BorderLayout());
+        getDemoPanel().setLayout(new BorderLayout());
 
-	JPanel textWrapper = new JPanel(new BorderLayout());
-	textWrapper.setBorder(new SoftBevelBorder(BevelBorder.LOWERED));
-	textWrapper.setAlignmentX(LEFT_ALIGNMENT);
-	progressTextArea = new MyTextArea();
-        
-	progressTextArea.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_area_name"));
-	progressTextArea.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_area_description"));
-	textWrapper.add(new JScrollPane(progressTextArea), BorderLayout.CENTER);
+        JPanel textWrapper = new JPanel(new BorderLayout());
+        textWrapper.setBorder(new SoftBevelBorder(BevelBorder.LOWERED));
+        textWrapper.setAlignmentX(LEFT_ALIGNMENT);
+        progressTextArea = new MyTextArea();
 
-	getDemoPanel().add(textWrapper, BorderLayout.CENTER);
+        progressTextArea.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_area_name"));
+        progressTextArea.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_area_description"));
+        textWrapper.add(new JScrollPane(progressTextArea), BorderLayout.CENTER);
 
-	JPanel progressPanel = new JPanel();
-	getDemoPanel().add(progressPanel, BorderLayout.SOUTH);
+        getDemoPanel().add(textWrapper, BorderLayout.CENTER);
 
-	progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, text.length()) {
-	    public Dimension getPreferredSize() {
-		return new Dimension(300, super.getPreferredSize().height);
-	    }
-	};
-	progressBar.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_loading_progress"));
+        JPanel progressPanel = new JPanel();
+        getDemoPanel().add(progressPanel, BorderLayout.SOUTH);
 
-	progressPanel.add(progressBar);
-	progressPanel.add(createLoadButton());
-	progressPanel.add(createStopButton());
+        progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, text.length()) {
+            public Dimension getPreferredSize() {
+                return new Dimension(300, super.getPreferredSize().height);
+            }
+        };
+        progressBar.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_loading_progress"));
+
+        progressPanel.add(progressBar);
+        progressPanel.add(createLoadButton());
+        progressPanel.add(createStopButton());
     }
 
     public JButton createLoadButton() {
-	loadAction = new AbstractAction(getString("ProgressBarDemo.start_button")) {
-	    public void actionPerformed(ActionEvent e) {
-		loadAction.setEnabled(false);
-		stopAction.setEnabled(true);
+        loadAction = new AbstractAction(getString("ProgressBarDemo.start_button")) {
+            public void actionPerformed(ActionEvent e) {
+                loadAction.setEnabled(false);
+                stopAction.setEnabled(true);
                 if (progressBar.getValue() == progressBar.getMaximum()) {
                     progressBar.setValue(0);
                     textLocation = 0;
                     progressTextArea.setText("");
                 }
-		timer.start();
-	    }
-	};
-	return createButton(loadAction);
+                timer.start();
+            }
+        };
+        return createButton(loadAction);
     }
 
     public JButton createStopButton() {
-	stopAction = new AbstractAction(getString("ProgressBarDemo.stop_button")) {
-	    public void actionPerformed(ActionEvent e) {
-		timer.stop();
-		loadAction.setEnabled(true);
-		stopAction.setEnabled(false);
-	    }
-	};
-	return createButton(stopAction);
+        stopAction = new AbstractAction(getString("ProgressBarDemo.stop_button")) {
+            public void actionPerformed(ActionEvent e) {
+                timer.stop();
+                loadAction.setEnabled(true);
+                stopAction.setEnabled(false);
+            }
+        };
+        return createButton(stopAction);
     }
 
-    public JButton createButton(Action a) {
-	JButton b = new JButton();
-	// setting the following client property informs the button to show
-	// the action text as it's name. The default is to not show the
-	// action text.
-	b.putClientProperty("displayActionText", Boolean.TRUE);
-	b.setAction(a);
-	return b;
+    public static JButton createButton(Action a) {
+        JButton b = new JButton();
+        // setting the following client property informs the button to show
+        // the action text as it's name. The default is to not show the
+        // action text.
+        b.putClientProperty("displayActionText", Boolean.TRUE);
+        b.setAction(a);
+        return b;
     }
 
 
-    int textLocation = 0;
+    private int textLocation = 0;
 
-    String text = getString("ProgressBarDemo.text");
+    private final String text = getString("ProgressBarDemo.text");
 
     public Action createTextLoadAction() {
-	return new AbstractAction("text load action") {
-	    public void actionPerformed (ActionEvent e) {
-		if(progressBar.getValue() < progressBar.getMaximum()) {
-		    progressBar.setValue(progressBar.getValue() + 1);
-		    progressTextArea.append(text.substring(textLocation, textLocation+1));
-		    textLocation++;
-		} else {
-			timer.stop();
-			loadAction.setEnabled(true);
-			stopAction.setEnabled(false);
-		}
-	    }
-	};
+        return new AbstractAction("text load action") {
+            public void actionPerformed(ActionEvent e) {
+                if (progressBar.getValue() < progressBar.getMaximum()) {
+                    progressBar.setValue(progressBar.getValue() + 1);
+                    progressTextArea.append(text.substring(textLocation, textLocation + 1));
+                    textLocation++;
+                } else {
+                    timer.stop();
+                    loadAction.setEnabled(true);
+                    stopAction.setEnabled(false);
+                }
+            }
+        };
     }
 
 
-    class MyTextArea extends JTextArea {
-        public MyTextArea() {
+    private static class MyTextArea extends JTextArea {
+        private MyTextArea() {
             super(null, 0, 0);
-	    setEditable(false);
-	    setText("");
+            setEditable(false);
+            setText("");
         }
 
-        public float getAlignmentX () {
+        public float getAlignmentX() {
             return LEFT_ALIGNMENT;
         }
- 
-        public float getAlignmentY () {
+
+        public float getAlignmentY() {
             return TOP_ALIGNMENT;
         }
     }
