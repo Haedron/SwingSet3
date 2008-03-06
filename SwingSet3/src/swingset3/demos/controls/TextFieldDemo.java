@@ -30,7 +30,10 @@
  */
 package swingset3.demos.controls;
 
-import java.util.Arrays;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.*;
+import java.awt.*;
 import javax.swing.*;
 
 import swingset3.DemoProperties;
@@ -48,6 +51,7 @@ import swingset3.utilities.JGridPanel;
         description = "Demonstrates the JTextField, a control which allows to input text",
         sourceFiles = {
                 "swingset3/demos/controls/TextFieldDemo.java",
+                "swingset3/demos/controls/JHistoryTextField.java",
                 "swingset3/utilities/JGridPanel.java",
                 "swingset3/demos/DemoBase.java"
                 }
@@ -56,6 +60,12 @@ public class TextFieldDemo extends DemoBase {
     private final JLabel lbHistoryTextField = new JLabel(getString("TextField.historytextfield.text"));
 
     private final JHistoryTextField tfHistory = new JHistoryTextField();
+
+    private final JLabel lbDow = new JLabel(getString("TextField.dow.text"));
+
+    private final JFormattedTextField tfDow = new JFormattedTextField();
+
+    private final JLabel lbDowResult = new JLabel();
 
     /**
      * main method allows us to run as a standalone demo.
@@ -68,17 +78,36 @@ public class TextFieldDemo extends DemoBase {
 
     public TextFieldDemo() {
         initUI();
+
+        tfDow.addPropertyChangeListener("value", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
+
+                calendar.setTime((Date) tfDow.getValue());
+
+                lbDowResult.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH));
+            }
+        });
+
+        tfDow.setValue(new Date());
     }
 
     private void initUI() {
         tfHistory.setHistory(Arrays.asList(getString("TextField.history.words").split("\\,")));
 
-        JGridPanel pnContent = new JGridPanel(1, 0, 2);
+        JGridPanel pnDow = new JGridPanel(2, 1);
+
+        pnDow.cell(tfDow).
+                cell(lbDowResult);
+
+        JGridPanel pnContent = new JGridPanel(1, 0, 4);
 
         pnContent.setBorderEqual(10);
 
         pnContent.cell(lbHistoryTextField).
                 cell(tfHistory).
+                cell(lbDow, new Insets(20, 0, 0, 0)).
+                cell(pnDow).
                 cell();
 
         add(pnContent);
