@@ -97,8 +97,6 @@ import swingset3.codeview.CodeViewer;
 import swingset3.utilities.RoundedBorder;
 import swingset3.utilities.RoundedPanel;
 
-
-
 /**
  *
  * @author  aim
@@ -199,14 +197,8 @@ public class SwingSet3 extends SingleFrameApplication  {
     private JPopupMenu popup;
     
     // Properties
-    private List availableLookAndFeels;
     private String lookAndFeel;
     private boolean sourceVisible = true;
-    
-    // GUI state
-    private int sourcePaneLocation;
-    private int dividerSize;
-    private int codeViewerHeight;    
     
     @Override
     protected void initialize(String args[]) {        
@@ -392,10 +384,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         codeContainer.setBorder(panelBorder);
         demoSplitPane.setBottomComponent(codeContainer);
         
-        addPropertyChangeListener(new SwingSetPropertyListener());
-        
-        sourcePaneLocation = demoSplitPane.getDividerLocation();
-        dividerSize = demoSplitPane.getDividerSize();        
+        addPropertyChangeListener(new SwingSetPropertyListener());        
         
         // Create shareable popup menu for demo actions
         popup = new JPopupMenu();

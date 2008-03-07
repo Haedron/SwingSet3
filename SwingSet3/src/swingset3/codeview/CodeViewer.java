@@ -162,7 +162,7 @@ public class CodeViewer extends JPanel {
     private HashMap <URL,CodeFileInfo>codeCache = new HashMap();
     
     private JComponent codeHighlightBar;
-    private JComboBox snippetSetsComboBox;
+    private JComboBox snippetComboBox;
     private JComponent codePanel;
     private JLabel noCodeLabel;
     private JTabbedPane codeTabbedPane;
@@ -214,16 +214,14 @@ public class CodeViewer extends JPanel {
        
         JLabel snippetSetsLabel = new JLabel(getString("CodeViewer.snippets.highlightCode",
                                                        "Highlight code to: "));
-        snippetSetsComboBox = new JComboBox();
-        snippetSetsComboBox.setAlignmentY(.51f);
-        snippetSetsComboBox.setMaximumRowCount(20);
-        snippetSetsComboBox.setPrototypeDisplayValue(NO_SNIPPET_SELECTED + 
-                "                                                                    "); // temporary item
-        snippetSetsComboBox.setRenderer(new SnippetCellRenderer(snippetSetsComboBox.getRenderer()));
-        snippetSetsComboBox.addActionListener(new SnippetActivator());
-        snippetSetsLabel.setLabelFor(snippetSetsComboBox);
+        snippetComboBox = new JComboBox();
+        snippetComboBox.setAlignmentY(.51f);
+        snippetComboBox.setMaximumRowCount(20);
+        snippetComboBox.setRenderer(new SnippetCellRenderer(snippetComboBox.getRenderer()));
+        snippetComboBox.addActionListener(new SnippetActivator());
+        snippetSetsLabel.setLabelFor(snippetComboBox);
         box.add(snippetSetsLabel);
-        box.add(snippetSetsComboBox);
+        box.add(snippetComboBox);
        
         box.add(Box.createHorizontalGlue());
             
@@ -266,9 +264,9 @@ public class CodeViewer extends JPanel {
             Color base = UIManager.getColor("Panel.background");
             codePanel.setBackground(Utilities.deriveColorHSB(base, 0, 0, -.06f));
         }
-        if (snippetSetsComboBox != null) {
+        if (snippetComboBox != null) {
             // Now that the look and feel has changed, we need to wrap the new delegate
-            snippetSetsComboBox.setRenderer(new SnippetCellRenderer(
+            snippetComboBox.setRenderer(new SnippetCellRenderer(
                     new JComboBox().getRenderer()));
         }
     }
@@ -506,7 +504,7 @@ public class CodeViewer extends JPanel {
         }
         snippetModel.insertElementAt(NO_SNIPPET_SELECTED, 0);
         snippetModel.setSelectedItem(NO_SNIPPET_SELECTED);
-        snippetSetsComboBox.setModel(snippetModel);
+        snippetComboBox.setModel(snippetModel);
         codeHighlightBar.setVisible(snippetModel.getSize() > 1);
         
     }
@@ -585,7 +583,7 @@ public class CodeViewer extends JPanel {
             }
         }
         scrollToSnippet(firstCodeFileInfo, firstSnippet);
-        snippetSetsComboBox.setSelectedItem(snippetKey);
+        snippetComboBox.setSelectedItem(snippetKey);
     }
     
     protected void scrollToSnippet(CodeFileInfo codeFileInfo, Snippet snippet) {
@@ -660,7 +658,7 @@ public class CodeViewer extends JPanel {
     
     private class SnippetActivator implements ActionListener {        
         public void actionPerformed(ActionEvent e) {
-            String snippetKey = (String)snippetSetsComboBox.getSelectedItem();
+            String snippetKey = (String)snippetComboBox.getSelectedItem();
             if (!snippetKey.equals(NO_SNIPPET_SELECTED)) {
                 logger.log(Level.FINEST, "highlighting new snippet:"+snippetKey+".");
                 highlightSnippetSet(snippetKey);
