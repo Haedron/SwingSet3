@@ -91,7 +91,8 @@ public class TextFieldDemo extends DemoBase {
         private void highlightPasswords() {
             Color color;
 
-            if (Arrays.equals(tfPassword1.getPassword(), tfPassword2.getPassword())) {
+            if (tfPassword1.getPassword().length > 0 && 
+                    Arrays.equals(tfPassword1.getPassword(), tfPassword2.getPassword())) {
                 color = Color.GREEN;
             } else {
                 color = UIManager.getColor("TextField.background");
