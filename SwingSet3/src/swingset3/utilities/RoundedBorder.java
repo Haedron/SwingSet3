@@ -74,14 +74,13 @@ public class RoundedBorder implements Border {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
                 RenderingHints.VALUE_ANTIALIAS_ON);
         
-        Color bg = c.getBackground();
-        Color color = Utilities.deriveColorHSB(bg, 0, 0, -.3f);
+        Color color = Utilities.deriveColorHSB(c.getBackground(), 0, 0, -.3f);
         
-        g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 40));        
+        g2.setColor(Utilities.deriveColorAlpha(color, 40));        
         g2.drawRoundRect(x, y + 2, width - 1, height - 3, cornerRadius, cornerRadius);
-        g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 90));        
+        g2.setColor(Utilities.deriveColorAlpha(color, 90));        
         g2.drawRoundRect(x, y + 1, width - 1, height - 2, cornerRadius, cornerRadius); 
-        g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 255));        
+        g2.setColor(Utilities.deriveColorAlpha(color, 255));        
         g2.drawRoundRect(x, y, width - 1, height - 1, cornerRadius, cornerRadius);
 
         g2.dispose();            

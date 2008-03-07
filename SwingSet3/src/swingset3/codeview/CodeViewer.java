@@ -46,10 +46,12 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -85,7 +87,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.UIResource;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import swingset3.utilities.RoundedBorder;
@@ -165,6 +166,7 @@ public class CodeViewer extends JPanel {
     private JComponent codePanel;
     private JLabel noCodeLabel;
     private JTabbedPane codeTabbedPane;
+    
     private Color highlightColor;
     private Highlighter.HighlightPainter snippetPainter;
     
@@ -197,7 +199,7 @@ public class CodeViewer extends JPanel {
         codePanel = createCodePanel();
         add(codePanel, BorderLayout.CENTER);
         
-        configureDefaults();
+        applyDefaults();
     }
                 
     protected JComponent createCodeHighlightBar() {
@@ -236,31 +238,33 @@ public class CodeViewer extends JPanel {
     }
     
     protected JComponent createCodePanel() {
+        
         JPanel panel = new RoundedPanel(new BorderLayout(), 10);
         panel.setBorder(new RoundedBorder(10));
         panel.add(Box.createVerticalStrut(12), BorderLayout.NORTH);
-        noCodeLabel = new JLabel(getString("CodeViewer.noCodeLoaded",
-                                     "no code loaded"));
+        
+        noCodeLabel = new JLabel(getString("CodeViewer.noCodeLoaded", "no code loaded"));
         noCodeLabel.setHorizontalAlignment(JLabel.CENTER);
-        panel.add(noCodeLabel);
+        panel.add(noCodeLabel, BorderLayout.CENTER);
         return panel;
     }
     
     @Override
     public void updateUI() {
         super.updateUI();
-        configureDefaults();        
+        applyDefaults();        
     }
     
-    protected void configureDefaults() {
+    protected void applyDefaults() {
+        if (noCodeLabel != null) {
+            noCodeLabel.setOpaque(false);
+            noCodeLabel.setFont(UIManager.getFont("Label.font").deriveFont(24f));
+            noCodeLabel.setForeground(
+                    Utilities.deriveColorAlpha(UIManager.getColor("Label.foreground"), 110));
+        }
         if (codePanel != null) {
             Color base = UIManager.getColor("Panel.background");
             codePanel.setBackground(Utilities.deriveColorHSB(base, 0, 0, -.06f));
-            noCodeLabel.setForeground(Utilities.deriveColorHSB(base, 0, 0, -.3f));
-            Utilities.printColor("noCodeLabel", noCodeLabel.getForeground());
-            noCodeLabel.setFont(
-                    UIManager.getFont("Label.font").deriveFont(Font.BOLD, 24f));
-            
         }
         if (snippetSetsComboBox != null) {
             // Now that the look and feel has changed, we need to wrap the new delegate
@@ -321,125 +325,154 @@ public class CodeViewer extends JPanel {
         }        
         currentCodeFiles = sourceFiles;
         
-        if (codeTabbedPane == null) {
-            codeTabbedPane = new JTabbedPane();
-            codePanel.remove(noCodeLabel);
-            codePanel.add(codeTabbedPane);
-        }
-        
-        codeTabbedPane.removeAll();
+        // clear everything
         clearAllSnippetHighlights();
         snippetMap.clear();
         
         if (sourceFiles == null) {
-            // need to clear everything
+            // being reset to having no source files; need to clear everything
             currentCodeFilesInfo = null;
+            configureCodePane(false);
             configureSnippetSetsComboBox();
+ 
         } else {
             currentCodeFilesInfo = new CodeFileInfo[sourceFiles.length];
             int i = 0;
             boolean needProcessing = false;
+            boolean filesExist = false;
             for(URL sourceFile: sourceFiles) {
-                if (sourceFile == null) {
-                    throw new NullPointerException("cannot load source file because URL is null");
-                }
-                currentCodeFilesInfo[i] = codeCache.get(sourceFile);
-                if (currentCodeFilesInfo[i++] == null) {
-                    needProcessing = true;
+                if (sourceFile != null) {
+                    filesExist = true;
+                    // look in cache first to avoid unnecessary processing
+                    currentCodeFilesInfo[i] = codeCache.get(sourceFile);
+                    if (currentCodeFilesInfo[i++] == null) {
+                        needProcessing = true;
+                    }
+                } else {
+                    currentCodeFilesInfo[i++] = null;
                 }
             }
-            class SourceProcessor extends SwingWorker<CodeFileInfo[], CodeFileInfo> {
-                URL[] sourceFiles;
-                CodeFileInfo[] codeFileInfos;
+            if (!filesExist) {
+                currentCodeFilesInfo = null;
+                configureCodePane(false);
+                configureSnippetSetsComboBox();
                 
-                public SourceProcessor(URL sourceFiles[], CodeFileInfo[] codeFileInfos) {
-                    this.sourceFiles = sourceFiles;
-                    this.codeFileInfos = codeFileInfos;
-                }
-                public CodeFileInfo[] doInBackground() {
-                    for(int i = 0; i < sourceFiles.length ; i++) {
-                        // if not already fetched from cache, then process source code
-                        if (codeFileInfos[i] == null) {                     
-                            codeFileInfos[i] = initializeCodeFileInfo(sourceFiles[i]);
-                        }
-                        publish(codeFileInfos[i]);
-                    }
-                    return codeFileInfos;
-                }
-                // old signature, needed until OS X migrates to newer process() signature
-                protected void process(CodeFileInfo... codeFileInfoSet) {
-                    for(CodeFileInfo codeFileInfo: codeFileInfoSet) {
-                        processOneFile(codeFileInfo);
-                    }
-                } 
-                // updated signature
-                protected void process(List<CodeFileInfo> codeFileInfoList) {
-                    for(CodeFileInfo codeFileInfo: codeFileInfoList) {
-                        processOneFile(codeFileInfo);
-                    }
-                }                
-                private void processOneFile(CodeFileInfo codeFileInfo) {
-                    // Store code info no matter what
-                    codeCache.put(codeFileInfo.url, codeFileInfo);
-                    
-                    // It's possible that by now another set of source files has been loaded.
-                    // so check first before adding the source tab;'
-                    if (currentCodeFilesInfo == codeFileInfos) {
+            } else {
+                configureCodePane(true);
+                
+                if (needProcessing) {
+                    // Do it on a separate thread
+                    new SourceProcessor(sourceFiles, currentCodeFilesInfo).execute();
+                } else {
+                    for (CodeFileInfo codeFileInfo : currentCodeFilesInfo) {
                         registerSnippets(codeFileInfo);
                         createCodeFileTab(codeFileInfo);
-                    } else {
-                        logger.log(Level.FINEST, "source files changed before " + 
-                                Utilities.getURLFileName(codeFileInfo.url) + "was processed.");
                     }
-                    
-                } // processOneFile
-                
-                protected void done() {
-                    try { 
-                         get();
-                         configureSnippetSetsComboBox();
-                    } catch (Exception ignore) {
-                        System.err.println(ignore);
-                    }
-                }       
-                
-            } // SourceProcessor
-            
-     
-            if (needProcessing) {
-                // Do it on a separate thread
-                new SourceProcessor(sourceFiles, currentCodeFilesInfo).execute();
-            } else {
-                logger.log(Level.FINEST, "Grabbing source file info from cache.");
-                for(CodeFileInfo codeFileInfo: currentCodeFilesInfo) {
-                    registerSnippets(codeFileInfo);
-                    createCodeFileTab(codeFileInfo);
+                    configureSnippetSetsComboBox();
                 }
-                configureSnippetSetsComboBox();
             }
-        }
-        
+        }       
     }
     
-    // Called from Source Processing Thread in SwingWorker
-    private CodeFileInfo initializeCodeFileInfo(URL sourceFile) {
-        CodeFileInfo CodeFileInfo = new CodeFileInfo();
-        CodeFileInfo.url = sourceFile;
-        CodeFileInfo.styled = loadSourceCode(sourceFile);
-        CodeFileInfo.textPane = new JEditorPane();
-        CodeFileInfo.textPane.setMargin(CODE_INSETS);
-        CodeFileInfo.veneer = new CodeVeneer(CodeFileInfo);
-        Stacker layers = new Stacker(CodeFileInfo.textPane);
-        layers.add(CodeFileInfo.veneer, JLayeredPane.POPUP_LAYER);
-        CodeFileInfo.textPane.setContentType("text/html");
-        CodeFileInfo.textPane.setEditable(false); // HTML won't display correctly without this!
-        CodeFileInfo.textPane.setText(CodeFileInfo.styled);
-        CodeFileInfo.textPane.setCaretPosition(0);
+    private class SourceProcessor extends SwingWorker<CodeFileInfo[], CodeFileInfo> {
+        URL[] sourceFiles;
+        CodeFileInfo[] codeFileInfos;
+
+        public SourceProcessor(URL sourceFiles[], CodeFileInfo[] codeFileInfos) {
+            this.sourceFiles = sourceFiles;
+            this.codeFileInfos = codeFileInfos;
+        }
+
+        public CodeFileInfo[] doInBackground() {
+            for (int i = 0; i < sourceFiles.length; i++) {
+                // if not already fetched from cache, then process source code
+                if (codeFileInfos[i] == null) {
+                    codeFileInfos[i] = initializeCodeFileInfo(sourceFiles[i]);
+                }
+                publish(codeFileInfos[i]);
+            }
+            return codeFileInfos;
+        }
+        // old signature, needed until OS X migrates to newer process() signature
+        protected void process(CodeFileInfo... codeFileInfoSet) {
+            for (CodeFileInfo codeFileInfo : codeFileInfoSet) {
+                processOneFile(codeFileInfo);
+            }
+        }
+        // updated signature
+        protected void process(List<CodeFileInfo> codeFileInfoList) {
+            for (CodeFileInfo codeFileInfo : codeFileInfoList) {
+                processOneFile(codeFileInfo);
+            }
+        }
+
+        private void processOneFile(CodeFileInfo codeFileInfo) {
+            // Store code info no matter what
+            codeCache.put(codeFileInfo.url, codeFileInfo);
+
+            // It's possible that by now another set of source files has been loaded.
+            // so check first before adding the source tab;'
+            if (currentCodeFilesInfo == codeFileInfos) {
+                registerSnippets(codeFileInfo);
+                createCodeFileTab(codeFileInfo);
+            } else {
+                logger.log(Level.FINEST, "source files changed before " +
+                        Utilities.getURLFileName(codeFileInfo.url) + "was processed.");
+            }
+
+        } // processOneFile
         
-        // MUST parse AFTER textPane Document has been created to ensure
-        // snippet offsets are relative to the editor pane's Document model
-        CodeFileInfo.snippets = SnippetParser.parse(CodeFileInfo.textPane.getDocument());
-        return CodeFileInfo;
+        private CodeFileInfo initializeCodeFileInfo(URL sourceFile) {
+            CodeFileInfo CodeFileInfo = new CodeFileInfo();
+            CodeFileInfo.url = sourceFile;
+            CodeFileInfo.styled = loadSourceCode(sourceFile);
+            CodeFileInfo.textPane = new JEditorPane();
+            CodeFileInfo.textPane.setMargin(CODE_INSETS);
+            CodeFileInfo.veneer = new CodeVeneer(CodeFileInfo);
+            Stacker layers = new Stacker(CodeFileInfo.textPane);
+            layers.add(CodeFileInfo.veneer, JLayeredPane.POPUP_LAYER);
+            CodeFileInfo.textPane.setContentType("text/html");
+            CodeFileInfo.textPane.setEditable(false); // HTML won't display correctly without this!
+            CodeFileInfo.textPane.setText(CodeFileInfo.styled);
+            CodeFileInfo.textPane.setCaretPosition(0);
+
+            // MUST parse AFTER textPane Document has been created to ensure
+            // snippet offsets are relative to the editor pane's Document model
+            CodeFileInfo.snippets = SnippetParser.parse(CodeFileInfo.textPane.getDocument());
+            return CodeFileInfo;
+        }
+
+        protected void done() {
+            try {
+                get();
+                configureSnippetSetsComboBox();
+            } catch (Exception ex) {
+                System.err.println(ex);
+            }
+        }
+    } // SourceProcessor
+
+    // Called from Source Processing Thread in SwingWorker
+ 
+    private void configureCodePane(boolean hasCodeFiles) {
+        if (hasCodeFiles) {
+            if (codeTabbedPane == null) {
+                codeTabbedPane = new JTabbedPane();
+                codePanel.remove(noCodeLabel);
+                codePanel.add(codeTabbedPane);
+                revalidate();
+            } else {
+                codeTabbedPane.removeAll();
+            }
+        } else {
+            // No code files
+            if (codeTabbedPane != null) {
+                codePanel.remove(codeTabbedPane);
+                codeTabbedPane = null;
+                codePanel.add(noCodeLabel);
+                revalidate();               
+            }
+        }
     }
     
     private void createCodeFileTab(CodeFileInfo codeFileInfo) {

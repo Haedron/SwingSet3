@@ -88,6 +88,8 @@ public class DemoSelectorPanel extends JPanel {
     private List<CollapsiblePanel> collapsePanels;
     private Icon expandedIcon;
     private Icon collapsedIcon;
+    private Color visitedForeground;
+    private Color failedForeground;
        
     private ButtonGroup group;
     private ActionListener demoActionListener = new DemoActionListener();
@@ -98,8 +100,8 @@ public class DemoSelectorPanel extends JPanel {
     public DemoSelectorPanel(String demoSetTitle, List<Demo> demoSet) {
         super(new BorderLayout());
         
-        UIManager.put("demo.visitedForeground", new Color(50, 80, 245));
-        UIManager.put("demo.failedForeground", new Color(245, 20, 80));
+        visitedForeground = new Color(100, 100, 150);
+        failedForeground = new Color(245, 20, 80);
         
         // only one demo may be selected at a time
         group = new ButtonGroup();
@@ -116,7 +118,7 @@ public class DemoSelectorPanel extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane, BorderLayout.CENTER);
         
-        configureDefaults();
+        applyDefaults();
     }
     
     protected JComponent createTitleArea(String demoSetTitle) {
@@ -196,17 +198,17 @@ public class DemoSelectorPanel extends JPanel {
         gridbag.addLayoutComponent(trailer, c);
         selectorPanel.add(trailer);
         
-        configureDefaults();
+        applyDefaults();
         
         return selectorPanel;
     }
    
     public void updateUI() {
         super.updateUI();
-        configureDefaults();
+        applyDefaults();
     }
         
-    protected void configureDefaults() {
+    protected void applyDefaults() {
         
         expandedIcon = new ArrowIcon(ArrowIcon.SOUTH,
                 UIManager.getColor(SwingSet3.titleForegroundKey));
@@ -228,14 +230,8 @@ public class DemoSelectorPanel extends JPanel {
            demoListLabel.setFont(UIManager.getFont(SwingSet3.titleFontKey));
         }
         if (viewPanel != null) {
-            viewPanel.setBackground(UIManager.getColor(SwingSet3.subPanelBackgroundColorKey));
-        }
-        if (scrollPane != null) {
-            scrollPane.setBorder(emptyBorder);
-            Dimension prefSize = scrollPane.getViewport().getView().getPreferredSize();
-            prefSize.width += UIManager.getInt("ScrollBar.width") + 10;
-            scrollPane.getViewport().setPreferredSize(prefSize);
-        }
+            viewPanel.setBackground(UIManager.getColor(SwingSet3.subPanelBackgroundKey));
+        }        
         if (collapsePanels != null) {
             for (CollapsiblePanel collapsePanel : collapsePanels) {
                 collapsePanel.setFont(
@@ -278,6 +274,7 @@ public class DemoSelectorPanel extends JPanel {
             setBorder(buttonBorder);
             setFocusPainted(false);
             setContentAreaFilled(false);
+            setToolTipText(demo.getShortDescription());
             addActionListener(demoActionListener);
         }
         
@@ -301,11 +298,11 @@ public class DemoSelectorPanel extends JPanel {
                 Color foreground = UIManager.getColor("ToggleButton.foreground");
                 switch(demo.getState()) {
                     case STOPPED: {
-                        foreground = UIManager.getColor("demo.visitedForeground");
+                        foreground = visitedForeground;
                         break;
                     }
                     case FAILED: {
-                        foreground = UIManager.getColor("demo.failedForeground");
+                        foreground = failedForeground;
                     }
                 }
                 setForeground(foreground);

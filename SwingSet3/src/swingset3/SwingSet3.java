@@ -33,10 +33,10 @@ package swingset3;
 
 import swingset3.utilities.AnimatingSplitPane;
 import swingset3.utilities.Utilities;
-import application.Action;
-import application.ResourceMap;
-import application.SingleFrameApplication;
-import application.View;
+import org.jdesktop.application.Action;
+import org.jdesktop.application.ResourceMap;
+import org.jdesktop.application.SingleFrameApplication;
+import org.jdesktop.application.View;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -77,6 +77,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -115,21 +116,21 @@ public class SwingSet3 extends SingleFrameApplication  {
     public static final String controlMidShadowKey = "controlMidShadowColor";
     public static final String controlVeryDarkShadowKey = "controlVeryDarkShadowColor";
     public static final String controlDarkShadowKey = "controlDarkShadowColor";
-    public static final String titleGradientColor1Key = "SwingSet3.titleGradientColor1";
-    public static final String titleGradientColor2Key = "SwingSet3.titleGradientColor2";
-    public static final String titleForegroundKey = "SwingSet3.titleForegroundColor";
-    public static final String titleFontKey = "SwingSet3.titleFont";
-    public static final String subPanelBackgroundColorKey = "SwingSet3.subPanelBackgroundColor";
+    public static final String titleGradientColor1Key = "titleGradientColor1";
+    public static final String titleGradientColor2Key = "titleGradientColor2";
+    public static final String titleForegroundKey = "titleForegroundColor";
+    public static final String titleFontKey = "titleFont";
+    public static final String subPanelBackgroundKey = "subPanelBackgroundColor";
 
-    public static final int DEMO_WIDTH = 650;
-    public static final int DEMO_HEIGHT = 500;
-    public static final int SOURCE_HEIGHT = 250;
-    
-    public static final Insets UPPER_PANEL_INSETS = new Insets(12,12,8,12);
-    public static final Insets SOURCE_PANE_INSETS = new Insets(4,8,8,8);
-    
-    public static final Border EMPTY_BORDER = new EmptyBorder(0,0,0,0);
-    public static final Border PANEL_BORDER = new EmptyBorder(10,10,10,10);
+    public static final int mainFrameWidth = 800;
+    public static final int mainFrameHeight = 640;
+    public static final int demoSelectorWidth = 180;
+    public static final int demoPanelHeight = 400;
+    public static final int demoPanelWidth = mainFrameWidth - demoSelectorWidth;
+
+    public static final Insets sourcePaneInsets = new Insets(4,8,8,8);   
+    public static final Border emptyBorder = new EmptyBorder(0,0,0,0);
+    public static final Border panelBorder = new EmptyBorder(10,10,10,10);
         
     static {
         // Property must be set *early* due to Apple Bug#3909714
@@ -137,6 +138,7 @@ public class SwingSet3 extends SingleFrameApplication  {
             System.setProperty("apple.laf.useScreenMenuBar", "true"); 
         }
         
+        // temporary workaround for problem with Nimbus classname
         UIManager.LookAndFeelInfo lafInfo[] = UIManager.getInstalledLookAndFeels();
         for(int i = 0; i < lafInfo.length; i++) {
             if (lafInfo[i].getName().equals("Nimbus")) {
@@ -152,7 +154,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         launch(SwingSet3.class, args);
     }
     
-    public static boolean onMac() {
+    public static boolean runningOnMac() {
         return System.getProperty("os.name").equals("Mac OS X");
     } 
     
@@ -171,28 +173,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         breader.close();
         return demoClassNames;
     }
-    
-    private static List<String> readDemoClassNames(Manifest manifest) throws IOException {
-        // The problem with this approach is that with the entries map there is no way 
-        // to specify the order that the demos should appear in the tree.
-        // REMIND(aim): remove when sure this will not be supported
-        List<String> demoClassNames = new ArrayList<String>();
-        
-        Map<String,Attributes> entries = manifest.getEntries();
-
-        for (String key : entries.keySet()) {
-            Attributes attrs = entries.get(key);
-            Iterator attrKeys = attrs.keySet().iterator();            
-
-            boolean isDemoClass = Boolean.parseBoolean(attrs.getValue("SwingSet3-Demo"));
-            if (isDemoClass) {
-                String demoPath = key.replaceAll("/", ".");
-                demoClassNames.add(demoPath.replaceFirst(".class", ""));
-            }
-        }
-        return demoClassNames;
-        
-    }
+    // End of statics
     
     private ResourceMap resourceMap;
     
@@ -333,11 +314,10 @@ public class SwingSet3 extends SingleFrameApplication  {
         view.setComponent(createMainPanel());
         view.setMenuBar(createMenuBar());
         
-        // application framework should handle this!
+        // application framework should handle this
         getMainFrame().setIconImage(resourceMap.getImageIcon("Application.icon").getImage());
         
-        show(view);
-     
+        show(view);     
     } 
     
     protected void configureDefaults() {
@@ -371,7 +351,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         UIManager.put(titleFontKey, labelFont.deriveFont(Font.BOLD, labelFont.getSize()+4f));        
  
         Color panelColor = UIManager.getColor("Panel.background");
-        UIManager.put(subPanelBackgroundColorKey, 
+        UIManager.put(subPanelBackgroundKey, 
                 Utilities.deriveColorHSB(panelColor, 0, 0, -.06f));
         
     }  
@@ -384,31 +364,32 @@ public class SwingSet3 extends SingleFrameApplication  {
        
         // Create demo selector panel on left
         demoSelectorPanel = new DemoSelectorPanel(demoListTitle, demoList);
+        demoSelectorPanel.setPreferredSize(new Dimension(demoSelectorWidth, mainFrameHeight));
         demoSelectorPanel.addPropertyChangeListener(new DemoSelectionListener());
         mainPanel.add(demoSelectorPanel, BorderLayout.WEST);
         
         // Create splitpane on right to hold demo and source code
         demoSplitPane = new AnimatingSplitPane(JSplitPane.VERTICAL_SPLIT);
-        demoSplitPane.setDividerLocation(400);
-        demoSplitPane.setBorder(EMPTY_BORDER);
+        //demoSplitPane.setDividerLocation(.66f);
+        demoSplitPane.setBorder(emptyBorder);
         mainPanel.add(demoSplitPane, BorderLayout.CENTER);
         
+        // Create panel to contain currently running demo
         demoContainer = new JPanel();
         demoContainer.setLayout(new BorderLayout());
-        demoContainer.setBorder(PANEL_BORDER);
+        demoContainer.setBorder(panelBorder);
+        demoContainer.setPreferredSize(new Dimension(demoPanelWidth, demoPanelHeight));
         demoSplitPane.setTopComponent(demoContainer);
 
-        // Create pane to contain running demo
         demoContainer.add(demoPlaceholder, BorderLayout.CENTER);
         currentDemoPanel = demoPlaceholder;
                 
         // Create collapsible source code pane
 
         codeViewer = new CodeViewer();
-        codeViewer.setPreferredSize(new Dimension(DEMO_WIDTH, SOURCE_HEIGHT));
         codeContainer = new JPanel(new BorderLayout());
         codeContainer.add(codeViewer);
-        codeContainer.setBorder(PANEL_BORDER);
+        codeContainer.setBorder(panelBorder);
         demoSplitPane.setBottomComponent(codeContainer);
         
         addPropertyChangeListener(new SwingSetPropertyListener());
@@ -426,16 +407,23 @@ public class SwingSet3 extends SingleFrameApplication  {
     
     protected JMenuBar createMenuBar() {
     
-        // Create menubar
         JMenuBar menubar = new JMenuBar();
         menubar.setName("menubar");
         
-        // Create file menu
+        // File menu
         JMenu fileMenu = new JMenu();
         fileMenu.setName("file");
         menubar.add(fileMenu);
+        
+        // File -> Quit
+        if (!runningOnMac()) {
+            JMenuItem quitItem = new JMenuItem();
+            quitItem.setName("quit");
+            quitItem.setAction(getAction("quit"));
+            fileMenu.add(quitItem);
+        }
        
-        // Create View menu
+        // View menu
         JMenu viewMenu = new JMenu();
         viewMenu.setName("view");
         // View -> Look and Feel       
@@ -476,12 +464,16 @@ public class SwingSet3 extends SingleFrameApplication  {
 
         lafItem.setSelected(lafClassName.equals(lookAndFeel));
         lafItem.setHideActionText(true);
-        lafItem.setAction(getContext().getActionMap().get("setLookAndFeel"));
+        lafItem.setAction(getAction("setLookAndFeel"));
         lafItem.setText(lafName);
         lafItem.setActionCommand(lafClassName);
         lookAndFeelRadioGroup.add(lafItem);
         
         return lafItem;
+    }
+    
+    private javax.swing.Action getAction(String actionName) {
+        return getContext().getActionMap().get(actionName);
     }
        
     // For displaying error messages to user
@@ -505,7 +497,7 @@ public class SwingSet3 extends SingleFrameApplication  {
                     Utilities.deriveColorHSB(UIManager.getColor("Panel.background"),
                     0, 0, -.2f));
             JScrollPane scrollpane = new JScrollPane(exceptionText);
-            scrollpane.setBorder(EMPTY_BORDER);
+            scrollpane.setBorder(emptyBorder);
             scrollpane.setPreferredSize(new Dimension(600,240));
             panel.add(scrollpane);
             messagePanel.add(panel, BorderLayout.SOUTH);            
@@ -557,11 +549,9 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
         
         if (isSourceCodeVisible()) {
-            codeViewer.setSourceFiles(currentDemo != null?
-                currentDemo.getSourceFiles() : null);
+                codeViewer.setSourceFiles(currentDemo != null?
+                                          currentDemo.getSourceFiles() : null);
         }
-        getMainFrame().setTitle(title +
-                (currentDemo != null? (" :: " + currentDemo.getName()) : ""));
                 
         firePropertyChange("currentDemo", oldCurrentDemo, demo);
     }
@@ -677,7 +667,6 @@ public class SwingSet3 extends SingleFrameApplication  {
                 if (!component.isShowing()) {
                     demo.stop();
                 } else {
-                    System.out.println("calling start");
                     demoContainer.revalidate();
                     EventQueue.invokeLater(new Runnable() {
                         public void run() {
@@ -704,13 +693,13 @@ public class SwingSet3 extends SingleFrameApplication  {
                     // update codeViewer in case current demo changed while
                     // source was invisible
                     codeViewer.setSourceFiles(currentDemo != null?
-                        currentDemo.getSourceFiles() : null);
+                                                  currentDemo.getSourceFiles() : null);
                 }
                 demoSplitPane.setExpanded(!sourceVisible);
                 sourceCodeCheckboxItem.setSelected(sourceVisible);
             } 
         }        
-    } 
+    }
  
     public class ViewCodeSnippetAction extends AbstractAction {
         public ViewCodeSnippetAction() {

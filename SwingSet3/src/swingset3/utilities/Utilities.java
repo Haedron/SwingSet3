@@ -199,6 +199,10 @@ public class Utilities implements SwingConstants {
         return false;
     }
     
+    public static Color deriveColorAlpha(Color base, int alpha) {
+        return new Color(base.getRed(), base.getGreen(), base.getBlue(), alpha);
+    }
+    
     /**
      * Derives a color by adding the specified offsets to the base color's 
      * hue, saturation, and brightness values.   The resulting hue, saturation,

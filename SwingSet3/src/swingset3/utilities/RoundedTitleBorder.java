@@ -49,10 +49,14 @@ import javax.swing.UIManager;
  */
 public class RoundedTitleBorder extends RoundedBorder {
     private String title;
-    
-    public RoundedTitleBorder(String title) {
-        super(10);    
+    private Color titleGradientColors[];
+  
+    public RoundedTitleBorder(String title, Color titleGradientColor1, Color titleGradientColor2) {
+        super(10);
         this.title = title;
+        this.titleGradientColors = new Color[2];
+        this.titleGradientColors[0] = titleGradientColor1;
+        this.titleGradientColors[1] = titleGradientColor2;               ;
     }    
 
     public Insets getBorderInsets(Component c, Insets insets) {
@@ -73,16 +77,16 @@ public class RoundedTitleBorder extends RoundedBorder {
         // render the image with a horizontal fade
         BufferedImage titleImage = Utilities.createTranslucentImage(width, titleHeight);
         GradientPaint gradient = new GradientPaint(0, 0, 
-                UIManager.getColor("SwingSet3.titleGradientColor1"), 0, titleHeight, 
-                UIManager.getColor("SwingSet3.titleGradientColor2"), false);
+                titleGradientColors[0], 0, titleHeight, 
+                titleGradientColors[1], false);
         Graphics2D g2 = (Graphics2D)titleImage.getGraphics();
         g2.setPaint(gradient);
         g2.fillRoundRect(x, y, width, height, 10, 10);
         g2.setColor(Utilities.deriveColorHSB(
-                UIManager.getColor("SwingSet3.titleGradientColor2"), 0, 0, -.2f));
+                titleGradientColors[1], 0, 0, -.2f));
         g2.drawLine(x + 1, titleHeight - 1, width - 2, titleHeight - 1);
         g2.setColor(Utilities.deriveColorHSB(
-                UIManager.getColor("SwingSet3.titleGradientColor2"), 0, -.5f, .5f));
+                titleGradientColors[1], 0, -.5f, .5f));
         g2.drawLine(x + 1, titleHeight, width - 2, titleHeight);
         g2.setPaint(new GradientPaint(0, 0, new Color(0.0f, 0.0f, 0.0f, 1.0f),
                 width, 0, new Color(0.0f, 0.0f, 0.0f, 0.0f)));        

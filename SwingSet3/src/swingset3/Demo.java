@@ -34,15 +34,12 @@ package swingset3;
 import java.awt.Component;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 /**
  * Wrapper class which encapsulates a GUI component to be displayed
@@ -210,13 +207,16 @@ public class Demo {
     }
     
     protected void initSourceFiles(String sourceFilePaths[]) {
-        sourceFiles = new URL[sourceFilePaths.length];
-        for(int i = 0; i < sourceFilePaths.length; i++) {
-            sourceFiles[i] = getClass().getClassLoader().getResource(sourceFilePaths[i]);
-            if (sourceFiles[i] == null) {
-                System.err.println("warning: unable to load source file: " +sourceFilePaths[i]);
+        ArrayList<URL> sourceURLs = new ArrayList();
+        for(String sourceFilePath : sourceFilePaths) {
+            URL url = getClass().getClassLoader().getResource(sourceFilePath);
+            if (url == null) {
+                System.err.println("warning: unable to load source file: " + sourceFilePath);
+            } else {
+                sourceURLs.add(url);
             }
         }
+        sourceFiles = sourceURLs.toArray(new URL[0]);
     }
     
     void startInitializing() {

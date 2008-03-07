@@ -31,13 +31,11 @@
 
 package swingset3;
 
-import application.ResourceMap;
 import swingset3.utilities.HTMLPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -48,17 +46,14 @@ import java.io.IOException;
 import java.net.URL;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
-import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.jdesktop.animation.timing.triggers.TimingTrigger;
 import org.jdesktop.animation.timing.triggers.TimingTriggerEvent;
+import org.jdesktop.application.ResourceMap;
 import org.jdesktop.swingx.JXPanel;
 import swingset3.utilities.RoundedBorder;
 import swingset3.utilities.RoundedPanel;
@@ -70,7 +65,7 @@ import swingset3.utilities.Utilities;
  * @author aim
  */
 public class DemoPanel extends JXPanel {
-    private static final Border roundedDemoBorder = new RoundedBorder(10);
+    private static final Border roundedBorder = new RoundedBorder(10);
     private static final Insets margin = new Insets(8,10,8,8);
     
     protected Demo demo;
@@ -150,7 +145,7 @@ public class DemoPanel extends JXPanel {
         
         public LoadAnimationPanel(Demo demo) {
             super(10);
-            setBorder(roundedDemoBorder);
+            setBorder(roundedBorder);
             setBackground(Utilities.deriveColorHSB(
                     UIManager.getColor("Panel.background"), 0, 0, -.06f));
             
@@ -214,13 +209,14 @@ public class DemoPanel extends JXPanel {
     } // LoadAnimationPanel
        
     protected static class LoadedDemoPanel extends RoundedPanel {
+        private String demoName;
         private JComponent descriptionArea;
         private JComponent demoPanel;
         
         public LoadedDemoPanel(Demo demo) {
             super(10);
             setLayout(null);
-            setBorder(new RoundedTitleBorder(demo.getName()));
+            demoName = demo.getName();
             
             URL description = demo.getHTMLDescription();
             if (description != null) {
@@ -228,7 +224,7 @@ public class DemoPanel extends JXPanel {
                 add(descriptionArea);
                 
                 demoPanel = new RoundedPanel(new BorderLayout());
-                demoPanel.setBorder(roundedDemoBorder);
+                demoPanel.setBorder(roundedBorder);
 
             } else {
                 // no description             
@@ -237,7 +233,7 @@ public class DemoPanel extends JXPanel {
             demoPanel.add(demo.createDemoComponent());
             add(demoPanel);
             
-            configureDefaults();
+            applyDefaults();
         }
 
         public JComponent createDescriptionArea(URL descriptionURL) {
@@ -285,10 +281,14 @@ public class DemoPanel extends JXPanel {
         @Override
         public void updateUI() {
             super.updateUI();
-            configureDefaults();
+            applyDefaults();
         }
 
-        protected void configureDefaults() {
+        protected void applyDefaults() {
+            setBorder(new RoundedTitleBorder(demoName,
+                    UIManager.getColor(SwingSet3.titleGradientColor1Key),
+                    UIManager.getColor(SwingSet3.titleGradientColor2Key)));
+            
             setFont(UIManager.getFont(SwingSet3.titleFontKey));
             Color bg = Utilities.deriveColorHSB(
                     UIManager.getColor("Panel.background"), 0, 0, -.06f);
