@@ -157,8 +157,6 @@ public class FileChooserDemo extends DemoBase {
      * FileChooserDemo Constructor
      */
     public FileChooserDemo() {
-        super();
-
         initUI();
 
         embeddedChooser.addActionListener(new ActionListener() {

@@ -59,17 +59,17 @@ import swingset3.utilities.JGridPanel;
                 }
 )
 public class TextFieldDemo extends DemoBase {
-    private final JLabel lbHistoryTextField = new JLabel(getString("TextField.historytextfield.text"));
+    private final JLabel lbHistoryTextField = new JLabel(getString("TextFieldDemo.historytextfield.text"));
 
     private final JHistoryTextField tfHistory = new JHistoryTextField();
 
-    private final JLabel lbDow = new JLabel(getString("TextField.dow.text"));
+    private final JLabel lbDow = new JLabel(getString("TextFieldDemo.dow.text"));
 
     private final JFormattedTextField tfDow = new JFormattedTextField();
 
     private final JLabel lbDowResult = new JLabel();
 
-    private final JLabel lbPassword = new JLabel(getString("TextField.password.text"));
+    private final JLabel lbPassword = new JLabel(getString("TextFieldDemo.password.text"));
 
     private final JPasswordField tfPassword1 = new JPasswordField(20);
 
@@ -133,7 +133,7 @@ public class TextFieldDemo extends DemoBase {
     }
 
     private void initUI() {
-        tfHistory.setHistory(Arrays.asList(getString("TextField.history.words").split("\\,")));
+        tfHistory.setHistory(Arrays.asList(getString("TextFieldDemo.history.words").split("\\,")));
 
         JGridPanel pnDow = new JGridPanel(2, 1);
 
