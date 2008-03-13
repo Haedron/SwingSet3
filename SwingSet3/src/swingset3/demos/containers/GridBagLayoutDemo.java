@@ -46,7 +46,8 @@ import swingset3.utilities.JGridPanel;
         category = "Containers",
         description = "Demonstrates GridBagLayout, a layout which allows to arrange components in containers.",
         sourceFiles = {
-                "swingset3/demos/containers/InternalFrameDemo.java",
+                "swingset3/demos/containers/GridBagLayoutDemo.java",
+                "swingset3/demos/containers/Calculator.java",
                 "swingset3/demos/DemoBase.java"
                 }
 )

@@ -79,6 +79,7 @@ public class Calculator extends JComponent {
         keyMapping.put('*', Operator.MULTIPLICATION);
         keyMapping.put('+', Operator.ADDITION);
         keyMapping.put('-', Operator.SUBTRACTION);
+        keyMapping.put('\n', Operator.EQUALS);
 
         initUI();
 
@@ -134,14 +135,14 @@ public class Calculator extends JComponent {
             }
         });
 
-        JPanel pnGridPanel = new JPanel(new GridLayout(1, 2));
+        JPanel pnGridPanel = new JPanel(new GridLayout(1, 2, 8, 8));
 
         pnGridPanel.add(btnBackspace);
         pnGridPanel.add(btnReset);
 
         setLayout(new GridBagLayout());
 
-        JButton btnSwapSign = new JButton("+/-");
+        JButton btnSwapSign = new SquareButton("+/-");
 
         btnSwapSign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -156,18 +157,18 @@ public class Calculator extends JComponent {
         addComp(new CharButton('8'), 1, 2, 1, 1);
         addComp(new CharButton('9'), 2, 2, 1, 1);
         addComp(new OperatorButton(Operator.DIVISION, "/"), 3, 2, 1, 1);
-        addComp(new OperatorButton(Operator.SQRT, "sqrt"), 4, 2, 1, 1);
+        addComp(new OperatorButton(Operator.INVERSE, "1/x"), 4, 2, 1, 1);
 
         addComp(new CharButton('4'), 0, 3, 1, 1);
         addComp(new CharButton('5'), 1, 3, 1, 1);
         addComp(new CharButton('6'), 2, 3, 1, 1);
         addComp(new OperatorButton(Operator.MULTIPLICATION, "*"), 3, 3, 1, 1);
+        addComp(new OperatorButton(Operator.SQRT, "sqrt"), 4, 3, 1, 1);
 
         addComp(new CharButton('1'), 0, 4, 1, 1);
         addComp(new CharButton('2'), 1, 4, 1, 1);
         addComp(new CharButton('3'), 2, 4, 1, 1);
         addComp(new OperatorButton(Operator.SUBTRACTION, "-"), 3, 4, 1, 1);
-        addComp(new OperatorButton(Operator.INVERSE, "1/x"), 4, 4, 1, 1);
 
         addComp(new CharButton('0'), 0, 5, 1, 1);
         addComp(btnSwapSign, 1, 5, 1, 1);
@@ -176,11 +177,19 @@ public class Calculator extends JComponent {
         addComp(new OperatorButton(Operator.EQUALS, "="), 4, 5, 1, 1);
 
         // Set focusable false
-        for (Component component : getComponents()) {
-            component.setFocusable(false);
-        }
+        resetFocusable(this);
 
         setFocusable(true);
+    }
+
+    private static void resetFocusable(Component component) {
+        component.setFocusable(false);
+
+        if (component instanceof Container) {
+            for (Component c : ((Container) component).getComponents()) {
+                resetFocusable(c);
+            }
+        }
     }
 
     private void doReset() {
@@ -197,14 +206,13 @@ public class Calculator extends JComponent {
         String newValue;
 
         if (state == State.INPUT_X || state == State.INPUT_Y) {
-            newValue = ZERO.equals(text) && Character.isDigit(c) ?
-                    String.valueOf(c) : text + c;
+            newValue = attachChar(text, c);
 
             if (stringToValue(newValue) == null) {
                 return;
             }
         } else {
-            newValue = c == DECIMAL_SEPARATOR ? "0" + DECIMAL_SEPARATOR : String.valueOf(c);
+            newValue = attachChar("0", c);
 
             if (stringToValue(newValue) == null) {
                 return;
@@ -222,6 +230,22 @@ public class Calculator extends JComponent {
         }
 
         tfScreen.setText(newValue);
+    }
+
+    private static String attachChar(String s, char c) {
+        if (Character.isDigit(c)) {
+            if (s.equals(ZERO)) {
+                return Character.toString(c);
+            }
+
+            if (s.equals("-" + ZERO)) {
+                return "-" + Character.toString(c);
+            }
+
+            return s + Character.toString(c);
+        } else {
+            return s + Character.toString(c);
+        }
     }
 
     private void doSwapSign() {
@@ -347,7 +371,15 @@ public class Calculator extends JComponent {
         } else {
             String result = value.toString();
 
-            return result.endsWith(".0") ? result.substring(0, result.length() - 2) : result;
+            if (result.endsWith(".0")) {
+                result = result.substring(0, result.length() - 2);
+            }
+
+            if (result.equals("-0")) {
+                result = ZERO;
+            }
+
+            return result;
         }
     }
 
@@ -355,12 +387,22 @@ public class Calculator extends JComponent {
             int gridwidth, int gridheight) {
         add(comp, new GridBagConstraints(gridx, gridy, gridwidth, gridheight,
                 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                new Insets(0, 0, 0, 0), 10, 10));
+                new Insets(4, 4, 4, 4), 0, 0));
     }
 
-    private class CharButton extends JButton {
+    private static class SquareButton extends JButton {
+        private SquareButton(String text) {
+            super(text);
+
+            setMinimumSize(new Dimension(32, 28));
+            setPreferredSize(new Dimension(32, 28));
+            setMargin(new Insets(2, 2, 2, 2));
+        }
+    }
+
+    private class CharButton extends SquareButton {
         private CharButton(final char c) {
-            setText(String.valueOf(c));
+            super(String.valueOf(c));
 
             addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -370,9 +412,9 @@ public class Calculator extends JComponent {
         }
     }
 
-    private class OperatorButton extends JButton {
+    private class OperatorButton extends SquareButton {
         private OperatorButton(final Operator operator, String text) {
-            setText(text);
+            super(text);
 
             addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
