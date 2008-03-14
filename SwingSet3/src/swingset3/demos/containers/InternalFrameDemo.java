@@ -51,6 +51,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import javax.swing.border.EmptyBorder;
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
 
@@ -71,21 +72,22 @@ import swingset3.demos.DemoBase;
                 "swingset3/demos/DemoBase.java"
                 }
 )
-public class InternalFrameDemo extends DemoBase {
-    private static final int FRAME0_X = 10;
-    private static final int FRAME0_Y = 230;
+public class InternalFrameDemo extends DemoBase { 
 
-    private static final int FRAME0_WIDTH = 300;
-    private static final int FRAME0_HEIGHT = 230;
-
-    private static final int FRAME_WIDTH = 225;
-    private static final int FRAME_HEIGHT = 150;
-
-    private static final int PALETTE_X = 320;
+    private static final int PALETTE_X = 20;
     private static final int PALETTE_Y = 20;
 
     private static final int PALETTE_WIDTH = 250;
-    private static final int PALETTE_HEIGHT = 250;
+    private static final int PALETTE_HEIGHT = 250;    
+    
+    private static final int FRAME0_X = PALETTE_X + PALETTE_WIDTH + 20;
+    private static final int FRAME0_Y = 20;
+
+    private static final int FRAME0_WIDTH = 300;
+    private static final int FRAME0_HEIGHT = 300;
+
+    private static final int FRAME_WIDTH = 300;
+    private static final int FRAME_HEIGHT = 300;
 
     private int windowCount = 0;
     private JDesktopPane desktop = null;
@@ -99,7 +101,6 @@ public class InternalFrameDemo extends DemoBase {
     private final ImageIcon smIcon3;
     private final ImageIcon smIcon4;
 
-    private final Integer FIRST_FRAME_LAYER = new Integer(1);
     private final Integer DEMO_FRAME_LAYER = new Integer(2);
     private final Integer PALETTE_LAYER = new Integer(3);
 
@@ -127,31 +128,29 @@ public class InternalFrameDemo extends DemoBase {
         super();
 
         // preload all the icons we need for this demo
-        icon1 = createImageIcon("ImageClub/misc/fish.gif", getString("InternalFrameDemo.fish"));
-        icon2 = createImageIcon("ImageClub/misc/moon.gif", getString("InternalFrameDemo.moon"));
-        icon3 = createImageIcon("ImageClub/misc/sun.gif", getString("InternalFrameDemo.sun"));
-        icon4 = createImageIcon("ImageClub/misc/cab.gif", getString("InternalFrameDemo.cab"));
+        icon1 = createImageIcon("internalframe/bananas.png", getString("InternalFrameDemo.bananas"));
+        icon2 = createImageIcon("internalframe/globe.png", getString("InternalFrameDemo.globe"));
+        icon3 = createImageIcon("internalframe/package.png", getString("InternalFrameDemo.package"));
+        icon4 = createImageIcon("internalframe/soccer_ball.png", getString("InternalFrameDemo.soccerball"));
 
-        smIcon1 = createImageIcon("ImageClub/misc/fish_small.gif", getString("InternalFrameDemo.fish"));
-        smIcon2 = createImageIcon("ImageClub/misc/moon_small.gif", getString("InternalFrameDemo.moon"));
-        smIcon3 = createImageIcon("ImageClub/misc/sun_small.gif", getString("InternalFrameDemo.sun"));
-        smIcon4 = createImageIcon("ImageClub/misc/cab_small.gif", getString("InternalFrameDemo.cab"));
+        smIcon1 = createImageIcon("internalframe/bananas_small.png", getString("InternalFrameDemo.bananas"));
+        smIcon2 = createImageIcon("internalframe/globe_small.png", getString("InternalFrameDemo.globe"));
+        smIcon3 = createImageIcon("internalframe/package_small.png", getString("InternalFrameDemo.package"));
+        smIcon4 = createImageIcon("internalframe/soccer_ball_small.png", getString("InternalFrameDemo.soccerball"));
 
-        // Create the desktop pane
+        //<snip>Create desktop pane
+        // The desktop pane will contain all the internal frames
         desktop = new JDesktopPane();
         getDemoPanel().add(desktop, BorderLayout.CENTER);
+        //</snip>
 
         // Create the "frame maker" palette
         createInternalFramePalette();
 
         // Create an initial internal frame to show
-        JInternalFrame frame1 = createInternalFrame(icon1, FIRST_FRAME_LAYER, 1, 1);
+        JInternalFrame frame1 = createInternalFrame(icon2, DEMO_FRAME_LAYER, 1, 1);
         frame1.setBounds(FRAME0_X, FRAME0_Y, FRAME0_WIDTH, FRAME0_HEIGHT);
 
-        // Create more starter windows
-        createInternalFrame(icon3, DEMO_FRAME_LAYER, FRAME_WIDTH, FRAME_HEIGHT);
-        createInternalFrame(icon4, DEMO_FRAME_LAYER, FRAME_WIDTH, FRAME_HEIGHT);
-        createInternalFrame(icon2, DEMO_FRAME_LAYER, FRAME_WIDTH, FRAME_HEIGHT);
     }
 
 
@@ -159,37 +158,43 @@ public class InternalFrameDemo extends DemoBase {
      * Create an internal frame and add a scrollable imageicon to it
      */
     public JInternalFrame createInternalFrame(Icon icon, Integer layer, int width, int height) {
-        JInternalFrame jif = new JInternalFrame();
+        //<snip>Create internal frame
+        JInternalFrame internalFrame = new JInternalFrame();
+        //</snip>
 
         if (!windowTitleField.getText().equals(getString("InternalFrameDemo.frame_label"))) {
-            jif.setTitle(windowTitleField.getText() + "  ");
+            internalFrame.setTitle(windowTitleField.getText() + "  ");
         } else {
-            jif = new JInternalFrame(getString("InternalFrameDemo.frame_label") + " " + windowCount + "  ");
+            internalFrame = new JInternalFrame(getString("InternalFrameDemo.frame_label") + " " + windowCount + "  ");
         }
 
-        // set properties
-        jif.setClosable(windowClosable.isSelected());
-        jif.setMaximizable(windowMaximizable.isSelected());
-        jif.setIconifiable(windowIconifiable.isSelected());
-        jif.setResizable(windowResizable.isSelected());
+        //<snip>Set internal frame properties
+        internalFrame.setClosable(windowClosable.isSelected());
+        internalFrame.setMaximizable(windowMaximizable.isSelected());
+        internalFrame.setIconifiable(windowIconifiable.isSelected());
+        internalFrame.setResizable(windowResizable.isSelected());
+        //</snip>
 
-        jif.setBounds(20 * (windowCount % 10), 20 * (windowCount % 10), width, height);
-        jif.setContentPane(new ImageScroller(icon));
+        internalFrame.setBounds(FRAME0_X + 20 * (windowCount % 10), 
+                                FRAME0_Y + 20 * (windowCount % 10), width, height);
+        internalFrame.setContentPane(new ImageScroller(icon));
 
         windowCount++;
 
-        desktop.add(jif, layer);
+        //<snip>Add internal frame to desktop pane
+        desktop.add(internalFrame, layer);
+        //</snip>
 
-        // Set this internal frame to be selected
-
+        //<snip>Set internal frame to be active
         try {
-            jif.setSelected(true);
+            internalFrame.setSelected(true);
         } catch (java.beans.PropertyVetoException e2) {
         }
+        //</snip>
 
-        jif.show();
+        internalFrame.show();
 
-        return jif;
+        return internalFrame;
     }
 
     public JInternalFrame createInternalFramePalette() {
@@ -212,10 +217,10 @@ public class InternalFrameDemo extends DemoBase {
         JButton b4 = new JButton(smIcon4);
 
         // add frame maker actions
-        b1.addActionListener(new ShowFrameAction(this, icon1));
-        b2.addActionListener(new ShowFrameAction(this, icon2));
-        b3.addActionListener(new ShowFrameAction(this, icon3));
-        b4.addActionListener(new ShowFrameAction(this, icon4));
+        b1.addActionListener(new CreateFrameAction(this, icon1));
+        b2.addActionListener(new CreateFrameAction(this, icon2));
+        b3.addActionListener(new CreateFrameAction(this, icon3));
+        b4.addActionListener(new CreateFrameAction(this, icon4));
 
         // add frame maker buttons to panel
         JPanel p = new JPanel();
@@ -246,13 +251,8 @@ public class InternalFrameDemo extends DemoBase {
         // ************************************
         // * Create frame property checkboxes *
         // ************************************
-        p = new JPanel() {
-            final Insets insets = new Insets(10, 15, 10, 5);
-
-            public Insets getInsets() {
-                return insets;
-            }
-        };
+        p = new JPanel();
+        p.setBorder(new EmptyBorder(10, 15, 10, 5));
         p.setLayout(new GridLayout(1, 2));
 
 
@@ -281,13 +281,8 @@ public class InternalFrameDemo extends DemoBase {
         // ************************************
         // *   Create Frame title textfield   *
         // ************************************
-        p = new JPanel() {
-            final Insets insets = new Insets(0, 0, 10, 0);
-
-            public Insets getInsets() {
-                return insets;
-            }
-        };
+        p = new JPanel();
+        p.setBorder(new EmptyBorder(0, 0, 10, 0));
 
         windowTitleField = new JTextField(getString("InternalFrameDemo.frame_label"));
         windowTitleLabel = new JLabel(getString("InternalFrameDemo.title_text_field_label"));
@@ -307,11 +302,11 @@ public class InternalFrameDemo extends DemoBase {
     }
 
 
-    class ShowFrameAction extends AbstractAction {
+    class CreateFrameAction extends AbstractAction {
         final InternalFrameDemo demo;
         final Icon icon;
 
-        public ShowFrameAction(InternalFrameDemo demo, Icon icon) {
+        public CreateFrameAction(InternalFrameDemo demo, Icon icon) {
             this.demo = demo;
             this.icon = icon;
         }
