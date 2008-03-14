@@ -141,9 +141,9 @@ public class OscarCellRenderers {
         
         public NomineeRenderer() {
             winnerIcon = new ImageIcon(
-                    getClass().getResource("resources/images/goldstar.png"));
+                    getClass().getResource("resources/images/table/goldstar.png"));
             nomineeIcon = new ImageIcon(
-                    getClass().getResource("resources/images/nominee.png"));
+                    getClass().getResource("resources/images/table/nominee.png"));
             setHorizontalTextPosition(JLabel.TRAILING);
         }
         
@@ -200,24 +200,4 @@ public class OscarCellRenderers {
         }
     }
     
-    public static class FilmEdgeRenderer extends RowRenderer {
-        private ImageIcon filmEdgeIcon;
-        
-        public FilmEdgeRenderer() {
-            filmEdgeIcon = new ImageIcon(
-                    getClass().getResource("resources/images/filmchad.jpg"));
-        }        
-        public Component getTableCellRendererComponent(JTable table, Object value, 
-                boolean isSelected, boolean hasFocus, int row, int column) {
-            super.getTableCellRendererComponent(table, value, false, false, row, column);
-            if (column == 0) {
-                setHorizontalAlignment(JLabel.LEFT);
-            } else {
-                setHorizontalAlignment(JLabel.RIGHT);
-            }
-            setText("");
-            setIcon(filmEdgeIcon);            
-            return this;                     
-        }               
-    }
 }

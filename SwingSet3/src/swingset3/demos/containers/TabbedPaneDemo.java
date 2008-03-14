@@ -118,8 +118,8 @@ public class TabbedPaneDemo extends DemoBase implements ActionListener {
         tabbedpane = new JTabbedPane();
         getDemoPanel().add(tabbedpane, BorderLayout.CENTER);
 
-        String name = getString("TabbedPaneDemo.laine");
-        JLabel pix = new JLabel(createImageIcon("tabbedpane/laine.jpg", name));
+        String name = getString("TabbedPaneDemo.camille");
+        JLabel pix = new JLabel(createImageIcon("tabbedpane/camille.jpg", name));
         tabbedpane.add(name, pix);
 
         name = getString("TabbedPaneDemo.ewan");

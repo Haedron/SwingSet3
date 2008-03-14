@@ -152,22 +152,22 @@ public abstract class OscarDataParser extends DefaultHandler {
     
     @Override
     public void error(SAXParseException ex) throws SAXException {
-        AdvancedTableDemo.logger.log(Level.SEVERE, "error parsing oscar data ", ex);
+        TableDemo.logger.log(Level.SEVERE, "error parsing oscar data ", ex);
     }
     
     @Override
     public void fatalError(SAXParseException ex) throws SAXException {
-        AdvancedTableDemo.logger.log(Level.SEVERE, "fatal error parsing oscar data ", ex);        
+        TableDemo.logger.log(Level.SEVERE, "fatal error parsing oscar data ", ex);        
     }
     
     @Override
     public void warning(SAXParseException ex) {
-        AdvancedTableDemo.logger.log(Level.WARNING, "warning occurred while parsing oscar data ", ex);
+        TableDemo.logger.log(Level.WARNING, "warning occurred while parsing oscar data ", ex);
     }
     
     @Override
     public void endDocument() throws SAXException {
-        AdvancedTableDemo.logger.log(Level.FINER, "parsed to end of oscar data.");
+        TableDemo.logger.log(Level.FINER, "parsed to end of oscar data.");
     }
     
     protected abstract void addCandidate(OscarCandidate candidate);
