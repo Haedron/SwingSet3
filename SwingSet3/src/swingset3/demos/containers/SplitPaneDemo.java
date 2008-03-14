@@ -54,8 +54,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
+import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -129,8 +131,10 @@ public class SplitPaneDemo extends DemoBase {
         splitPane.setDividerLocation(200);
         //</snip>
         
+        //<snip>Set minimum size for each child
         day.setMinimumSize(new Dimension(20, 20));
         night.setMinimumSize(new Dimension(20, 20));
+        //</snip>
 
         getDemoPanel().add(splitPane, BorderLayout.CENTER);
         getDemoPanel().setBackground(Color.black);
@@ -147,34 +151,32 @@ public class SplitPaneDemo extends DemoBase {
         c = new GridBagConstraints();
         controlPanel = new JPanel(gridbag);
         
-        // Create Orientation control
+        //<snip>Create radio box to edit splitpane orientation
         Box box = Box.createHorizontalBox();
         ButtonGroup group = new ButtonGroup();
         
+        OrientationListener orientationListener = new OrientationListener();
+        
         JRadioButton button = new JRadioButton(getString("SplitPaneDemo.vert_split"));
+        button.setActionCommand("vertical");
         button.setMnemonic(getMnemonic("SplitPaneDemo.vert_split_mnemonic"));
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-            }
-        });
+        button.addActionListener(orientationListener);
         group.add(button);
         box.add(button);
 
         button = new JRadioButton(getString("SplitPaneDemo.horz_split"));
+        button.setActionCommand("horizontal");
         button.setMnemonic(getMnemonic("SplitPaneDemo.horz_split_mnemonic"));
         button.setSelected(true);
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-            }
-        });
+        button.addActionListener(orientationListener);
         group.add(button);
         box.add(button);
+        //</snip>
+        
         addToGridbag(box, 0, 0, 1, 1, 
                 GridBagConstraints.NONE, GridBagConstraints.WEST);
 
-        // Create continuous layout checkbox
+        //<snip>Create checkbox to edit continuous layout
         JCheckBox checkBox = new JCheckBox(getString("SplitPaneDemo.cont_layout"));
         checkBox.setMnemonic(getMnemonic("SplitPaneDemo.cont_layout_mnemonic"));
         checkBox.setSelected(true);
@@ -185,11 +187,13 @@ public class SplitPaneDemo extends DemoBase {
                         ((JCheckBox) e.getSource()).isSelected());
             }
         });
+        //</snip>
+        
         c.gridy++;
         addToGridbag(checkBox, 0, 1, 1, 1, 
                 GridBagConstraints.NONE, GridBagConstraints.WEST);     
 
-        // Create one-touch expandable checkbox
+        //<snip>Create checkbox to edit one-touch-expandable
         checkBox = new JCheckBox(getString("SplitPaneDemo.one_touch_expandable"));
         checkBox.setMnemonic(getMnemonic("SplitPaneDemo.one_touch_expandable_mnemonic"));
         checkBox.setSelected(true);
@@ -200,104 +204,64 @@ public class SplitPaneDemo extends DemoBase {
                         ((JCheckBox) e.getSource()).isSelected());
             }
         });
+        //</snip>
+                
         addToGridbag(checkBox, 0, 2, 1, 1, 
                             GridBagConstraints.NONE, GridBagConstraints.WEST); 
         
         JSeparator separator = new JSeparator(JSeparator.VERTICAL);
         addToGridbag(separator, 1, 0, 1, 3, 
                           GridBagConstraints.VERTICAL, GridBagConstraints.CENTER);
-        
-        fieldVerifier = new FieldVerifier();
+      
 
-        // Create divider size textfield
-        JFormattedTextField divSize = new JFormattedTextField();
-        divSize.setValue(new Integer(splitPane.getDividerSize()));
-        //divSize.setInputVerifier(fieldVerifier);
-        divSize.setColumns(3);
-        divSize.getAccessibleContext().setAccessibleName(getString("SplitPaneDemo.divider_size"));
-        divSize.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
-                if (event.getPropertyName().equals("value")) {
-                    int minSize = (Integer)event.getNewValue();
-                    if (minSize > 0) {
-                        splitPane.setDividerSize(minSize);
-                    } 
-                }
+        //<snip>Create spinner to edit divider size
+        final JSpinner spinner = new JSpinner(
+                new SpinnerNumberModel(splitPane.getDividerSize(), 5, 50, 2));
+        
+        spinner.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                SpinnerNumberModel model = (SpinnerNumberModel)spinner.getModel();
+                splitPane.setDividerSize(model.getNumber().intValue());       
             }
         });
+        //</snip>
+        
         JLabel label = new JLabel(getString("SplitPaneDemo.divider_size"));
-        label.setLabelFor(divSize);
+        label.setLabelFor(spinner);
         label.setDisplayedMnemonic(getMnemonic("SplitPaneDemo.divider_size_mnemonic"));
         addToGridbag(label, 2, 0, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.EAST);
-        addToGridbag(divSize, 3, 0, 1, 1,
+        addToGridbag(spinner, 3, 0, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.WEST);
 
-        // Create textfields to configure day & night's minimum sizes
-        daySize = new JTextField(String.valueOf(day.getMinimumSize().width));
-        daySize.setColumns(5);
-        daySize.getAccessibleContext().setAccessibleName(getString("SplitPaneDemo.first_component_min_size"));
-        daySize.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String value = ((JTextField) e.getSource()).getText();
-                int newSize;
-
-                try {
-                    newSize = Integer.parseInt(value);
-                } catch (Exception ex) {
-                    newSize = -1;
-                }
-                if (newSize > 10) {
-                    day.setMinimumSize(new Dimension(newSize, newSize));
-                } else {
-                    JOptionPane.showMessageDialog(splitPane,
-                            getString("SplitPaneDemo.invalid_min_size") +
-                                    getString("SplitPaneDemo.must_be_greater_than") + 10,
-                            getString("SplitPaneDemo.error"),
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
+        //<snip>Create spinners to edit day & night's minimum sizes
+        JSpinner minSizeSpinner = new JSpinner(
+                new SpinnerNumberModel(day.getMinimumSize().width, 0, 300, 10));
+        
+        minSizeSpinner.addChangeListener(new MinimumSizeListener(day));
+        //</snip>
+                
         label = new JLabel(getString("SplitPaneDemo.first_component_min_size"));
-        label.setLabelFor(daySize);
+        label.setLabelFor(minSizeSpinner);
         label.setDisplayedMnemonic(getMnemonic("SplitPaneDemo.first_component_min_size_mnemonic"));
         addToGridbag(label, 2, 1, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.EAST);
-        addToGridbag(daySize, 3, 1, 1, 1,
+        addToGridbag(minSizeSpinner, 3, 1, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.WEST);
+        
+        //<snip>Create spinners to edit day & night's minimum sizes
+        minSizeSpinner = new JSpinner(
+                new SpinnerNumberModel(night.getMinimumSize().width, 0, 300, 10));
+        
+        minSizeSpinner.addChangeListener(new MinimumSizeListener(night));
+        //</snip>
 
-        /* Create a text field that will change the preferred/minimum size
-            of the moon component. */
-        nightSize = new JTextField(String.valueOf(night.getMinimumSize().width));
-        nightSize.setColumns(5);
-        nightSize.getAccessibleContext().setAccessibleName(getString("SplitPaneDemo.second_component_min_size"));
-        nightSize.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String value = ((JTextField) e.getSource()).getText();
-                int newSize;
-
-                try {
-                    newSize = Integer.parseInt(value);
-                } catch (Exception ex) {
-                    newSize = -1;
-                }
-                if (newSize > 10) {
-                    night.setMinimumSize(new Dimension(newSize, newSize));
-                } else {
-                    JOptionPane.showMessageDialog(splitPane,
-                            getString("SplitPaneDemo.invalid_min_size") +
-                                    getString("SplitPaneDemo.must_be_greater_than") + 10,
-                            getString("SplitPaneDemo.error"),
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
         label = new JLabel(getString("SplitPaneDemo.second_component_min_size"));
-        label.setLabelFor(nightSize);
+        label.setLabelFor(minSizeSpinner);
         label.setDisplayedMnemonic(getMnemonic("SplitPaneDemo.second_component_min_size_mnemonic"));
         addToGridbag(label, 2, 2, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.EAST);
-        addToGridbag(nightSize, 3, 2, 1, 1,
+        addToGridbag(minSizeSpinner, 3, 2, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.WEST);
 
         return controlPanel;
@@ -316,21 +280,31 @@ public class SplitPaneDemo extends DemoBase {
         controlPanel.add(child);
         
     }
+    //<snip>Create radio box to edit splitpane orientation   
+    public class OrientationListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            splitPane.setOrientation(event.getActionCommand().equals("vertical")?
+                JSplitPane.VERTICAL_SPLIT : JSplitPane.HORIZONTAL_SPLIT);
+        }
+        
+    }
+    //</snip>
     
-    public class FieldVerifier extends InputVerifier {
-        public boolean verify(JComponent input) {
-            JFormattedTextField ftf = (JFormattedTextField) input;
-            AbstractFormatter formatter = ftf.getFormatter();
-            if (formatter != null) {
-                String text = ftf.getText();
-                try {
-                    Integer value = (Integer)formatter.stringToValue(text);
-                    return value > 0;
-                } catch (ParseException pe) {
-                    return false;
-                }
-            }
-            return true;
+    //<snip>Create spinners to edit day & night's minimum sizes
+    public class MinimumSizeListener implements ChangeListener {
+        private JComponent component;
+        
+        public MinimumSizeListener(JComponent c) {
+            this.component = c;
+        }
+        
+        public void stateChanged(ChangeEvent event) {
+            JSpinner spinner = (JSpinner)event.getSource();
+            SpinnerNumberModel model = (SpinnerNumberModel)spinner.getModel();
+            int min = model.getNumber().intValue();
+            component.setMinimumSize(new Dimension(min, min));       
+            
         }
     }
+    //</snip>
 }
