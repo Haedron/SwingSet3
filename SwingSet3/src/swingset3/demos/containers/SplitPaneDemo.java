@@ -34,18 +34,26 @@ package swingset3.demos.containers;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.ParseException;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
@@ -71,14 +79,22 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class SplitPaneDemo extends DemoBase {
+    private static final Insets insets = new Insets(4,8,4,8);
 
-    private JSplitPane splitPane = null;
-    private JLabel earth = null;
-    private JLabel moon = null;
+    private JSplitPane splitPane;
+    private JLabel day;
+    private JLabel night;
+    
+    private JPanel controlPanel;
+    private GridBagLayout gridbag;
+    private GridBagConstraints c;
+
 
     private JTextField divSize;
-    private JTextField earthSize;
-    private JTextField moonSize;
+    private JTextField daySize;
+    private JTextField nightSize;
+    
+    private InputVerifier fieldVerifier;
 
     /**
      * main method allows us to run as a standalone demo.
@@ -94,17 +110,27 @@ public class SplitPaneDemo extends DemoBase {
     public SplitPaneDemo() {
         super();
 
-        earth = new JLabel(createImageIcon("splitpane/earth.jpg", getString("SplitPaneDemo.earth")));
-        earth.setMinimumSize(new Dimension(20, 20));
-
-        moon = new JLabel(createImageIcon("splitpane/moon.jpg", getString("SplitPaneDemo.moon")));
-        moon.setMinimumSize(new Dimension(20, 20));
-
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, earth, moon);
+        //<snip>Create horizontal SplitPane with day and night       
+        day = new JLabel(createImageIcon("splitpane/day.jpg", getString("SplitPaneDemo.day")));
+        night = new JLabel(createImageIcon("splitpane/night.jpg", getString("SplitPaneDemo.night")));
+        
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, day, night);        
+        //</snip>
+        
+        //<snip>Turn on continuous layout
         splitPane.setContinuousLayout(true);
+        //</snip>
+        
+        //<snip>Turn on one-touch expansion
         splitPane.setOneTouchExpandable(true);
+        //</snip>
 
+        //<snip>Set divider location
         splitPane.setDividerLocation(200);
+        //</snip>
+        
+        day.setMinimumSize(new Dimension(20, 20));
+        night.setMinimumSize(new Dimension(20, 20));
 
         getDemoPanel().add(splitPane, BorderLayout.CENTER);
         getDemoPanel().setBackground(Color.black);
@@ -116,16 +142,16 @@ public class SplitPaneDemo extends DemoBase {
      * Creates controls to alter the JSplitPane.
      */
     protected JPanel createSplitPaneControls() {
-        JPanel wrapper = new JPanel();
+        
+        gridbag = new GridBagLayout();
+        c = new GridBagConstraints();
+        controlPanel = new JPanel(gridbag);
+        
+        // Create Orientation control
+        Box box = Box.createHorizontalBox();
         ButtonGroup group = new ButtonGroup();
-        JRadioButton button;
-
-        Box buttonWrapper = new Box(BoxLayout.X_AXIS);
-
-        wrapper.setLayout(new GridLayout(0, 1));
-
-        /* Create a radio button to vertically split the split pane. */
-        button = new JRadioButton(getString("SplitPaneDemo.vert_split"));
+        
+        JRadioButton button = new JRadioButton(getString("SplitPaneDemo.vert_split"));
         button.setMnemonic(getMnemonic("SplitPaneDemo.vert_split_mnemonic"));
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -133,9 +159,8 @@ public class SplitPaneDemo extends DemoBase {
             }
         });
         group.add(button);
-        buttonWrapper.add(button);
+        box.add(button);
 
-        /* Create a radio button the horizontally split the split pane. */
         button = new JRadioButton(getString("SplitPaneDemo.horz_split"));
         button.setMnemonic(getMnemonic("SplitPaneDemo.horz_split_mnemonic"));
         button.setSelected(true);
@@ -145,10 +170,11 @@ public class SplitPaneDemo extends DemoBase {
             }
         });
         group.add(button);
-        buttonWrapper.add(button);
+        box.add(button);
+        addToGridbag(box, 0, 0, 1, 1, 
+                GridBagConstraints.NONE, GridBagConstraints.WEST);
 
-        /* Create a check box as to whether or not the split pane continually
-  lays out the component when dragging. */
+        // Create continuous layout checkbox
         JCheckBox checkBox = new JCheckBox(getString("SplitPaneDemo.cont_layout"));
         checkBox.setMnemonic(getMnemonic("SplitPaneDemo.cont_layout_mnemonic"));
         checkBox.setSelected(true);
@@ -159,10 +185,11 @@ public class SplitPaneDemo extends DemoBase {
                         ((JCheckBox) e.getSource()).isSelected());
             }
         });
-        buttonWrapper.add(checkBox);
+        c.gridy++;
+        addToGridbag(checkBox, 0, 1, 1, 1, 
+                GridBagConstraints.NONE, GridBagConstraints.WEST);     
 
-        /* Create a check box as to whether or not the split pane divider
-    contains the oneTouchExpandable buttons. */
+        // Create one-touch expandable checkbox
         checkBox = new JCheckBox(getString("SplitPaneDemo.one_touch_expandable"));
         checkBox.setMnemonic(getMnemonic("SplitPaneDemo.one_touch_expandable_mnemonic"));
         checkBox.setSelected(true);
@@ -173,51 +200,44 @@ public class SplitPaneDemo extends DemoBase {
                         ((JCheckBox) e.getSource()).isSelected());
             }
         });
-        buttonWrapper.add(checkBox);
-        wrapper.add(buttonWrapper);
+        addToGridbag(checkBox, 0, 2, 1, 1, 
+                            GridBagConstraints.NONE, GridBagConstraints.WEST); 
+        
+        JSeparator separator = new JSeparator(JSeparator.VERTICAL);
+        addToGridbag(separator, 1, 0, 1, 3, 
+                          GridBagConstraints.VERTICAL, GridBagConstraints.CENTER);
+        
+        fieldVerifier = new FieldVerifier();
 
-        /* Create a text field to change the divider size. */
-        JPanel tfWrapper;
-        JLabel label;
-
-        divSize = new JTextField();
-        divSize.setText(Integer.toString(splitPane.getDividerSize()));
-        divSize.setColumns(5);
+        // Create divider size textfield
+        JFormattedTextField divSize = new JFormattedTextField();
+        divSize.setValue(new Integer(splitPane.getDividerSize()));
+        //divSize.setInputVerifier(fieldVerifier);
+        divSize.setColumns(3);
         divSize.getAccessibleContext().setAccessibleName(getString("SplitPaneDemo.divider_size"));
-        divSize.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String value = ((JTextField) e.getSource()).getText();
-                int newSize;
-
-                try {
-                    newSize = Integer.parseInt(value);
-                } catch (Exception ex) {
-                    newSize = -1;
-                }
-                if (newSize > 0) {
-                    splitPane.setDividerSize(newSize);
-                } else {
-                    JOptionPane.showMessageDialog(splitPane,
-                            getString("SplitPaneDemo.invalid_divider_size"),
-                            getString("SplitPaneDemo.error"),
-                            JOptionPane.ERROR_MESSAGE);
+        divSize.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent event) {
+                if (event.getPropertyName().equals("value")) {
+                    int minSize = (Integer)event.getNewValue();
+                    if (minSize > 0) {
+                        splitPane.setDividerSize(minSize);
+                    } 
                 }
             }
         });
-        label = new JLabel(getString("SplitPaneDemo.divider_size"));
-        tfWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        tfWrapper.add(label);
-        tfWrapper.add(divSize);
+        JLabel label = new JLabel(getString("SplitPaneDemo.divider_size"));
         label.setLabelFor(divSize);
         label.setDisplayedMnemonic(getMnemonic("SplitPaneDemo.divider_size_mnemonic"));
-        wrapper.add(tfWrapper);
+        addToGridbag(label, 2, 0, 1, 1,
+                                GridBagConstraints.NONE, GridBagConstraints.EAST);
+        addToGridbag(divSize, 3, 0, 1, 1,
+                                GridBagConstraints.NONE, GridBagConstraints.WEST);
 
-        /* Create a text field that will change the preferred/minimum size
-            of the earth component. */
-        earthSize = new JTextField(String.valueOf(earth.getMinimumSize().width));
-        earthSize.setColumns(5);
-        earthSize.getAccessibleContext().setAccessibleName(getString("SplitPaneDemo.first_component_min_size"));
-        earthSize.addActionListener(new ActionListener() {
+        // Create textfields to configure day & night's minimum sizes
+        daySize = new JTextField(String.valueOf(day.getMinimumSize().width));
+        daySize.setColumns(5);
+        daySize.getAccessibleContext().setAccessibleName(getString("SplitPaneDemo.first_component_min_size"));
+        daySize.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String value = ((JTextField) e.getSource()).getText();
                 int newSize;
@@ -228,7 +248,7 @@ public class SplitPaneDemo extends DemoBase {
                     newSize = -1;
                 }
                 if (newSize > 10) {
-                    earth.setMinimumSize(new Dimension(newSize, newSize));
+                    day.setMinimumSize(new Dimension(newSize, newSize));
                 } else {
                     JOptionPane.showMessageDialog(splitPane,
                             getString("SplitPaneDemo.invalid_min_size") +
@@ -239,19 +259,19 @@ public class SplitPaneDemo extends DemoBase {
             }
         });
         label = new JLabel(getString("SplitPaneDemo.first_component_min_size"));
-        tfWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        tfWrapper.add(label);
-        tfWrapper.add(earthSize);
-        label.setLabelFor(earthSize);
+        label.setLabelFor(daySize);
         label.setDisplayedMnemonic(getMnemonic("SplitPaneDemo.first_component_min_size_mnemonic"));
-        wrapper.add(tfWrapper);
+        addToGridbag(label, 2, 1, 1, 1,
+                                GridBagConstraints.NONE, GridBagConstraints.EAST);
+        addToGridbag(daySize, 3, 1, 1, 1,
+                                GridBagConstraints.NONE, GridBagConstraints.WEST);
 
         /* Create a text field that will change the preferred/minimum size
             of the moon component. */
-        moonSize = new JTextField(String.valueOf(moon.getMinimumSize().width));
-        moonSize.setColumns(5);
-        moonSize.getAccessibleContext().setAccessibleName(getString("SplitPaneDemo.second_component_min_size"));
-        moonSize.addActionListener(new ActionListener() {
+        nightSize = new JTextField(String.valueOf(night.getMinimumSize().width));
+        nightSize.setColumns(5);
+        nightSize.getAccessibleContext().setAccessibleName(getString("SplitPaneDemo.second_component_min_size"));
+        nightSize.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String value = ((JTextField) e.getSource()).getText();
                 int newSize;
@@ -262,7 +282,7 @@ public class SplitPaneDemo extends DemoBase {
                     newSize = -1;
                 }
                 if (newSize > 10) {
-                    moon.setMinimumSize(new Dimension(newSize, newSize));
+                    night.setMinimumSize(new Dimension(newSize, newSize));
                 } else {
                     JOptionPane.showMessageDialog(splitPane,
                             getString("SplitPaneDemo.invalid_min_size") +
@@ -273,13 +293,44 @@ public class SplitPaneDemo extends DemoBase {
             }
         });
         label = new JLabel(getString("SplitPaneDemo.second_component_min_size"));
-        tfWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        tfWrapper.add(label);
-        tfWrapper.add(moonSize);
-        label.setLabelFor(moonSize);
+        label.setLabelFor(nightSize);
         label.setDisplayedMnemonic(getMnemonic("SplitPaneDemo.second_component_min_size_mnemonic"));
-        wrapper.add(tfWrapper);
+        addToGridbag(label, 2, 2, 1, 1,
+                                GridBagConstraints.NONE, GridBagConstraints.EAST);
+        addToGridbag(nightSize, 3, 2, 1, 1,
+                                GridBagConstraints.NONE, GridBagConstraints.WEST);
 
-        return wrapper;
+        return controlPanel;
+    }
+    
+    protected void addToGridbag(JComponent child, int gx, int gy, 
+            int gwidth, int gheight, int fill, int anchor) {
+        c.insets = insets;
+        c.gridx = gx;
+        c.gridy = gy;
+        c.gridwidth = gwidth;
+        c.gridheight = gheight;
+        c.fill = fill;
+        c.anchor = anchor;
+        gridbag.addLayoutComponent(child, c);
+        controlPanel.add(child);
+        
+    }
+    
+    public class FieldVerifier extends InputVerifier {
+        public boolean verify(JComponent input) {
+            JFormattedTextField ftf = (JFormattedTextField) input;
+            AbstractFormatter formatter = ftf.getFormatter();
+            if (formatter != null) {
+                String text = ftf.getText();
+                try {
+                    Integer value = (Integer)formatter.stringToValue(text);
+                    return value > 0;
+                } catch (ParseException pe) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

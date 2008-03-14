@@ -60,18 +60,16 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -120,9 +118,9 @@ public class SwingSet3 extends SingleFrameApplication  {
     public static final String titleFontKey = "titleFont";
     public static final String subPanelBackgroundKey = "subPanelBackgroundColor";
 
-    public static final int mainFrameWidth = 800;
+    public static final int mainFrameWidth = 880;
     public static final int mainFrameHeight = 640;
-    public static final int demoSelectorWidth = 180;
+    public static final int demoSelectorWidth = 200;
     public static final int demoPanelHeight = 400;
     public static final int demoPanelWidth = mainFrameWidth - demoSelectorWidth;
 
@@ -212,7 +210,13 @@ public class SwingSet3 extends SingleFrameApplication  {
         title = resourceMap.getString("mainFrame.title");
         runningDemoCache = new HashMap();
         setDemoList(resourceMap.getString("demos.title"), getDemoClassNames(args));
-        setDemoPlaceholder(new JPanel());
+
+        JPanel introPanel = new RoundedPanel(new BorderLayout());
+        introPanel.setBorder(new RoundedBorder());
+        JLabel intro = new JLabel(new ImageIcon(SwingSet3.class.getResource("resources/images/home.png")));
+        intro.setVerticalAlignment(JLabel.TOP);
+        introPanel.add(intro);
+        setDemoPlaceholder(introPanel);
 
     }
     
@@ -373,8 +377,10 @@ public class SwingSet3 extends SingleFrameApplication  {
         demoContainer.setPreferredSize(new Dimension(demoPanelWidth, demoPanelHeight));
         demoSplitPane.setTopComponent(demoContainer);
 
-        demoContainer.add(demoPlaceholder, BorderLayout.CENTER);
         currentDemoPanel = demoPlaceholder;
+        demoPlaceholder.setBackground(Color.orange);
+        demoPlaceholder.setOpaque(true);
+        demoContainer.add(demoPlaceholder, BorderLayout.CENTER);
                 
         // Create collapsible source code pane
 
@@ -498,9 +504,6 @@ public class SwingSet3 extends SingleFrameApplication  {
     }
     
     public void setDemoPlaceholder(JComponent demoPlaceholder) {
-        if (this.demoPlaceholder == demoPlaceholder) {
-            return;
-        }
         JComponent oldDemoPlaceholder = this.demoPlaceholder;
         this.demoPlaceholder = demoPlaceholder;
         firePropertyChange("demoPlaceholder", oldDemoPlaceholder, demoPlaceholder);
@@ -534,7 +537,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
 
         if (currentDemo == null) {
-            demoContainer.add(BorderLayout.CENTER, demoPlaceholder);
+            demoContainer.add(demoPlaceholder, BorderLayout.CENTER);
         }
         
         if (isSourceCodeVisible()) {

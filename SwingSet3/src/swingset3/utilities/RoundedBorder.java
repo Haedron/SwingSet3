@@ -60,7 +60,8 @@ public class RoundedBorder implements Border {
     }
 
     public Insets getBorderInsets(Component c, Insets insets) {
-        insets.top = insets.bottom = cornerRadius/2; 
+        //insets.top = insets.bottom = cornerRadius/2; 
+        insets.top = insets.bottom = 1;
         insets.left = insets.right = 1;
         return insets;
     }
