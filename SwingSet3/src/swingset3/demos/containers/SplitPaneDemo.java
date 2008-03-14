@@ -159,14 +159,12 @@ public class SplitPaneDemo extends DemoBase {
         
         JRadioButton button = new JRadioButton(getString("SplitPaneDemo.vert_split"));
         button.setActionCommand("vertical");
-        button.setMnemonic(getMnemonic("SplitPaneDemo.vert_split_mnemonic"));
         button.addActionListener(orientationListener);
         group.add(button);
         box.add(button);
 
         button = new JRadioButton(getString("SplitPaneDemo.horz_split"));
         button.setActionCommand("horizontal");
-        button.setMnemonic(getMnemonic("SplitPaneDemo.horz_split_mnemonic"));
         button.setSelected(true);
         button.addActionListener(orientationListener);
         group.add(button);
@@ -178,7 +176,6 @@ public class SplitPaneDemo extends DemoBase {
 
         //<snip>Create checkbox to edit continuous layout
         JCheckBox checkBox = new JCheckBox(getString("SplitPaneDemo.cont_layout"));
-        checkBox.setMnemonic(getMnemonic("SplitPaneDemo.cont_layout_mnemonic"));
         checkBox.setSelected(true);
 
         checkBox.addChangeListener(new ChangeListener() {
@@ -195,7 +192,6 @@ public class SplitPaneDemo extends DemoBase {
 
         //<snip>Create checkbox to edit one-touch-expandable
         checkBox = new JCheckBox(getString("SplitPaneDemo.one_touch_expandable"));
-        checkBox.setMnemonic(getMnemonic("SplitPaneDemo.one_touch_expandable_mnemonic"));
         checkBox.setSelected(true);
 
         checkBox.addChangeListener(new ChangeListener() {
@@ -228,7 +224,6 @@ public class SplitPaneDemo extends DemoBase {
         
         JLabel label = new JLabel(getString("SplitPaneDemo.divider_size"));
         label.setLabelFor(spinner);
-        label.setDisplayedMnemonic(getMnemonic("SplitPaneDemo.divider_size_mnemonic"));
         addToGridbag(label, 2, 0, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.EAST);
         addToGridbag(spinner, 3, 0, 1, 1,
@@ -243,7 +238,6 @@ public class SplitPaneDemo extends DemoBase {
                 
         label = new JLabel(getString("SplitPaneDemo.first_component_min_size"));
         label.setLabelFor(minSizeSpinner);
-        label.setDisplayedMnemonic(getMnemonic("SplitPaneDemo.first_component_min_size_mnemonic"));
         addToGridbag(label, 2, 1, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.EAST);
         addToGridbag(minSizeSpinner, 3, 1, 1, 1,
@@ -258,7 +252,6 @@ public class SplitPaneDemo extends DemoBase {
 
         label = new JLabel(getString("SplitPaneDemo.second_component_min_size"));
         label.setLabelFor(minSizeSpinner);
-        label.setDisplayedMnemonic(getMnemonic("SplitPaneDemo.second_component_min_size_mnemonic"));
         addToGridbag(label, 2, 2, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.EAST);
         addToGridbag(minSizeSpinner, 3, 2, 1, 1,
