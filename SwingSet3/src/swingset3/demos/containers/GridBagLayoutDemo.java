@@ -48,7 +48,8 @@ import swingset3.utilities.JGridPanel;
         sourceFiles = {
                 "swingset3/demos/containers/GridBagLayoutDemo.java",
                 "swingset3/demos/containers/Calculator.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/demos/DemoBase.java",
+                "swingset3/utilities/JGridPanel.java"
                 }
 )
 public class GridBagLayoutDemo extends DemoBase {
