@@ -263,7 +263,11 @@ public class SwingSet3 extends SingleFrameApplication  {
     public void setDemoList(String demoListTitle, List<String> demoClassNamesList) {              
         List<Demo> demoList = new ArrayList<Demo>();
         for(String demoClassName: demoClassNamesList) {
-            demoList.add(createDemo(demoClassName));
+            Demo demo = createDemo(demoClassName);
+
+            if (demo != null) {
+                demoList.add(demo);
+            }
         }
         this.demoListTitle = demoListTitle;
         this.demoList = demoList;
