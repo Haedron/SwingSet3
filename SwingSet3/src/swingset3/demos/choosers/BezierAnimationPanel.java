@@ -36,7 +36,11 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
+import java.util.Hashtable;
+import java.util.Map;
 import javax.swing.*;
+
+import static swingset3.demos.choosers.BezierAnimationPanel.BezierColor.*;
 
 
 /**
@@ -47,13 +51,14 @@ import javax.swing.*;
  * @version 1.16 11/17/05
  */
 class BezierAnimationPanel extends JPanel implements Runnable {
+    public enum BezierColor {
+        BACKGROUND,
+        OUTER,
+        GRADIENT_A,
+        GRADIENT_B
+    }
 
-    private Color backgroundColor = new Color(0, 0, 153);
-    private Color outerColor = new Color(255, 255, 255);
-    private Color gradientColorA = new Color(255, 0, 101);
-    private Color gradientColorB = new Color(255, 255, 0);
-
-    private boolean bgChanged = false;
+    private final Map<BezierColor, Color> colors = new Hashtable<BezierColor, Color>();
 
     private GradientPaint gradient = null;
 
@@ -65,8 +70,6 @@ class BezierAnimationPanel extends JPanel implements Runnable {
 
     private BufferedImage img;
 
-    private Rectangle bounds = null;
-
     private Thread anim;
 
     private final Object lock = new Object();
@@ -75,75 +78,44 @@ class BezierAnimationPanel extends JPanel implements Runnable {
      * BezierAnimationPanel Constructor
      */
     public BezierAnimationPanel() {
-        addHierarchyListener(
-                new HierarchyListener() {
-                    public void hierarchyChanged(HierarchyEvent e) {
-                        if (isShowing()) {
-                            start();
-                        } else {
-                            stop();
-                        }
-                    }
+        setOpaque(true);
+
+        colors.put(BACKGROUND, new Color(0, 0, 153));
+        colors.put(OUTER, new Color(255, 255, 255));
+        colors.put(GRADIENT_A, new Color(255, 0, 101));
+        colors.put(GRADIENT_B, new Color(255, 255, 0));
+
+        addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if (isShowing()) {
+                    start();
+                } else {
+                    stop();
                 }
+            }
+        }
         );
-        setBackground(getBackgroundColor());
     }
 
-    public boolean isOpaque() {
-        return true;
+    public Color getBezierColor(BezierColor bezierColor) {
+        return colors.get(bezierColor);
     }
 
-    public Color getGradientColorA() {
-        return gradientColorA;
-    }
-
-    public void setGradientColorA(Color c) {
-        if (c != null) {
-            gradientColorA = c;
-        }
-    }
-
-    public Color getGradientColorB() {
-        return gradientColorB;
-    }
-
-    public void setGradientColorB(Color c) {
-        if (c != null) {
-            gradientColorB = c;
-        }
-    }
-
-    public Color getOuterColor() {
-        return outerColor;
-    }
-
-    public void setOuterColor(Color c) {
-        if (c != null) {
-            outerColor = c;
-        }
-    }
-
-    public Color getBackgroundColor() {
-        return backgroundColor;
-    }
-
-    public void setBackgroundColor(Color c) {
-        if (c != null) {
-            backgroundColor = c;
-            setBackground(c);
-            bgChanged = true;
+    public void setBezierColor(BezierColor bezierColor, Color value) {
+        if (value != null) {
+            colors.put(bezierColor, value);
         }
     }
 
     public void start() {
         Dimension size = getSize();
         for (int i = 0; i < animpts.length; i += 2) {
-            animpts[i + 0] = (float) (Math.random() * size.width);
+            animpts[i] = (float) (Math.random() * size.width);
             animpts[i + 1] = (float) (Math.random() * size.height);
-            deltas[i + 0] = (float) (Math.random() * 4.0 + 2.0);
+            deltas[i] = (float) (Math.random() * 4.0 + 2.0);
             deltas[i + 1] = (float) (Math.random() * 4.0 + 2.0);
-            if (animpts[i + 0] > size.width / 6.0f) {
-                deltas[i + 0] = -deltas[i + 0];
+            if (animpts[i] > size.width / 6.0f) {
+                deltas[i] = -deltas[i];
             }
             if (animpts[i + 1] > size.height / 6.0f) {
                 deltas[i + 1] = -deltas[i + 1];
@@ -175,14 +147,14 @@ class BezierAnimationPanel extends JPanel implements Runnable {
         Thread me = Thread.currentThread();
         while (getSize().width <= 0) {
             try {
-                anim.sleep(500);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 return;
             }
         }
 
         Graphics2D g2d = null;
-        Graphics2D BufferG2D = null;
+        Graphics2D bufferG2D = null;
         BasicStroke solid = new BasicStroke(9.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 9.0f);
         GeneralPath gp = new GeneralPath(GeneralPath.WIND_NON_ZERO);
         int rule = AlphaComposite.SRC_OVER;
@@ -196,9 +168,9 @@ class BezierAnimationPanel extends JPanel implements Runnable {
             if (size.width != oldSize.width || size.height != oldSize.height) {
                 img = null;
                 clippath = null;
-                if (BufferG2D != null) {
-                    BufferG2D.dispose();
-                    BufferG2D = null;
+                if (bufferG2D != null) {
+                    bufferG2D.dispose();
+                    bufferG2D = null;
                 }
             }
             oldSize = size;
@@ -207,17 +179,17 @@ class BezierAnimationPanel extends JPanel implements Runnable {
                 img = (BufferedImage) createImage(size.width, size.height);
             }
 
-            if (BufferG2D == null) {
-                BufferG2D = img.createGraphics();
-                BufferG2D.setRenderingHint(RenderingHints.KEY_RENDERING,
+            if (bufferG2D == null) {
+                bufferG2D = img.createGraphics();
+                bufferG2D.setRenderingHint(RenderingHints.KEY_RENDERING,
                         RenderingHints.VALUE_RENDER_DEFAULT);
-                BufferG2D.setClip(clippath);
+                bufferG2D.setClip(clippath);
             }
-            g2d = BufferG2D;
+            g2d = bufferG2D;
 
             float[] ctrlpts;
             for (int i = 0; i < animpts.length; i += 2) {
-                animate(animpts, deltas, i + 0, size.width);
+                animate(animpts, deltas, i, size.width);
                 animate(animpts, deltas, i + 1, size.height);
             }
             ctrlpts = animpts;
@@ -236,7 +208,7 @@ class BezierAnimationPanel extends JPanel implements Runnable {
                 prevx = curx;
                 prevy = cury;
                 if (i < ctrlpts.length) {
-                    curx = ctrlpts[i + 0];
+                    curx = ctrlpts[i];
                     cury = ctrlpts[i + 1];
                 } else {
                     curx = ctrlpts[0];
@@ -252,41 +224,33 @@ class BezierAnimationPanel extends JPanel implements Runnable {
 
             synchronized (lock) {
                 g2d.setComposite(set);
-                g2d.setBackground(backgroundColor);
+                g2d.setBackground(getBezierColor(BACKGROUND));
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                         RenderingHints.VALUE_ANTIALIAS_OFF);
-
-                if (bgChanged || bounds == null) {
-                    bounds = new Rectangle(0, 0, getWidth(), getHeight());
-                    bgChanged = false;
-                }
 
                 // g2d.clearRect(bounds.x-5, bounds.y-5, bounds.x + bounds.width + 5, bounds.y + bounds.height + 5);
                 g2d.clearRect(0, 0, getWidth(), getHeight());
 
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                         RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(outerColor);
+                g2d.setColor(getBezierColor(OUTER));
                 g2d.setComposite(opaque);
                 g2d.setStroke(solid);
                 g2d.draw(gp);
                 g2d.setPaint(gradient);
 
-                if (!bgChanged) {
-                    bounds = gp.getBounds();
-                } else {
-                    bounds = new Rectangle(0, 0, getWidth(), getHeight());
-                    bgChanged = false;
-                }
-                gradient = new GradientPaint(bounds.x, bounds.y, gradientColorA,
+                Rectangle bounds = gp.getBounds();
+
+                gradient = new GradientPaint(bounds.x, bounds.y, getBezierColor(GRADIENT_A),
                         bounds.x + bounds.width, bounds.y + bounds.height,
-                        gradientColorB, true);
+                        getBezierColor(GRADIENT_B), true);
+
                 g2d.setComposite(blend);
                 g2d.fill(gp);
             }
-            if (g2d == BufferG2D) {
-                repaint();
-            }
+
+            repaint();
+
             Thread.yield();
         }
         if (g2d != null) {
