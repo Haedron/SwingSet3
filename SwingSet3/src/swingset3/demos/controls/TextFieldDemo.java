@@ -30,13 +30,13 @@
  */
 package swingset3.demos.controls;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 import javax.swing.*;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
@@ -67,6 +67,8 @@ public class TextFieldDemo extends DemoBase {
 
     private final JFormattedTextField tfDow = new JFormattedTextField();
 
+    private final JButton btnGo = new JButton(getString("TextFieldDemo.go.text"));
+
     private final JLabel lbDowResult = new JLabel();
 
     private final JLabel lbPassword = new JLabel(getString("TextFieldDemo.password.text"));
@@ -91,7 +93,7 @@ public class TextFieldDemo extends DemoBase {
         private void highlightPasswords() {
             Color color;
 
-            if (tfPassword1.getPassword().length > 0 && 
+            if (tfPassword1.getPassword().length > 0 &&
                     Arrays.equals(tfPassword1.getPassword(), tfPassword2.getPassword())) {
                 color = Color.GREEN;
             } else {
@@ -115,8 +117,10 @@ public class TextFieldDemo extends DemoBase {
     public TextFieldDemo() {
         initUI();
 
-        tfDow.addPropertyChangeListener("value", new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
+        tfDow.setValue(new Date());
+
+        btnGo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
 
                 calendar.setTime((Date) tfDow.getValue());
@@ -124,8 +128,6 @@ public class TextFieldDemo extends DemoBase {
                 lbDowResult.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH));
             }
         });
-
-        tfDow.setValue(new Date());
 
         tfPassword1.getDocument().addDocumentListener(passwordListener);
 
@@ -135,9 +137,10 @@ public class TextFieldDemo extends DemoBase {
     private void initUI() {
         tfHistory.setHistory(Arrays.asList(getString("TextFieldDemo.history.words").split("\\,")));
 
-        JGridPanel pnDow = new JGridPanel(2, 1);
+        JGridPanel pnDow = new JGridPanel(3, 2);
 
         pnDow.cell(tfDow).
+                cell(btnGo).
                 cell(lbDowResult);
 
         JGridPanel pnPassword = new JGridPanel(3, 2);
