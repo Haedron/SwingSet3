@@ -82,10 +82,10 @@ public class CodeStyler {
     //private static Hashtable reservedWords = new Hashtable(); // < Java2 (thread-safe)
     private boolean inMultiLineComment = false;
     private String backgroundColor = "#ffffff";
-    private String commentStart = "</font><font size=2 color=\"#0000aa\"><i>";
-    private String commentEnd = "</font></i><font size=2 color=black>";    
-    private String stringStart = "</font><font size=2 color=\"#00bb00\">";
-    private String stringEnd = "</font><font size=2 color=black>";
+    private String commentStart = "</font><font size=4 color=\"#0000aa\"><i>";
+    private String commentEnd = "</font></i><font size=4 color=black>";    
+    private String stringStart = "</font><font size=4 color=\"#00bb00\">";
+    private String stringEnd = "</font><font size=4 color=black>";
     private String reservedWordStart = "<b>";
     private String reservedWordEnd = "</b>";
 
