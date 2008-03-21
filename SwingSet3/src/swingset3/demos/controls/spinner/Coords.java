@@ -28,50 +28,30 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package swingset3.demos;
-
-import java.util.Arrays;
-import java.util.List;
-import swingset3.DemoList;
+package swingset3.demos.controls.spinner;
 
 /**
- *
- * @author aim
+ * @author Mikhail Lapshin
  */
-public class SwingDemoList implements DemoList {
+public class Coords {
+    private double x;
+    private double y;
 
-    public List<String> getDemoClassNames() {
-        return Arrays.asList(
-        "swingset3.demos.toplevels.JFrameDemo",
-       "swingset3.demos.toplevels.JDialogDemo",
-       "swingset3.demos.toplevels.JWindowDemo",
-                
-       "swingset3.demos.containers.InternalFrameDemo",
-       "swingset3.demos.containers.TabbedPaneDemo",
-       "swingset3.demos.containers.ScrollPaneDemo",
-       "swingset3.demos.containers.SplitPaneDemo",
-       "swingset3.demos.containers.GridBagLayoutDemo",
-                
-       "swingset3.demos.data.TableDemo",
-       "swingset3.demos.data.TreeDemo",
-       "swingset3.demos.data.ListDemo",
-                
-       "swingset3.demos.controls.ButtonDemo",
-       "swingset3.demos.controls.JButtonDemo",
-       "swingset3.demos.controls.ComboBoxDemo",
-       "swingset3.demos.controls.ProgressBarDemo",
-       "swingset3.demos.controls.SliderDemo",
-       "swingset3.demos.controls.SpinnerDemo",
-
-       "swingset3.demos.controls.TextFieldDemo",
-       "swingset3.demos.text.EditorPaneDemo",               
-                
-       "swingset3.demos.choosers.ColorChooserDemo",
-       "swingset3.demos.choosers.FileChooserDemo",
-       "swingset3.demos.choosers.OptionPaneDemo",
-                
-       "swingset3.demos.general.ToolTipDemo");
+    public Coords(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
-    
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    @Override
+    public String toString() {
+        return "[x=" + x + ",y=" + y + "]";
+    }
 }

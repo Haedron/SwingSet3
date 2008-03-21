@@ -1,0 +1,359 @@
+/*
+ * Copyright %YEARS% Sun Microsystems, Inc.  All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *   - Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   - Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *
+ *   - Neither the name of Sun Microsystems nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package swingset3.demos.controls.spinner;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author Mikhail Lapshin
+ */
+public class JMandelbrot extends JComponent {
+    private double xLowLimit = -2;
+    private double xHighLimit = 2;
+    private double yLowLimit = -2;
+    private double yHighLimit = 2;
+
+    private Coords center;
+    public static final String CENTER_PROPERTY_NAME = "center";
+
+    private double xScale;
+    private double yScale;
+    private double zoomRate = 2;
+    public static final String ZOOM_RATE_PROPERTY_NAME = "zoomRate";
+
+    private int maxIteration = 300; //10 - 100000
+    public static final String MAX_ITERATION_PROPERTY_NAME = "maxIteration";
+
+    private Palette palette;
+    public static final String PALETTE_PROPERTY_NAME = "palette";
+
+    private int numOfThreads = 2;
+    public static final String NUM_OF_THREADS_PROPERTY_NAME = "numOfThreads";
+
+    private final double EPSILON = 1E-16;
+    private int MIN_WIDTH = 50;
+    private int MIN_HEIGHT = 50;
+
+    private Image buffer;
+    private MandelbrotCalculator[] calculators = new MandelbrotCalculator[numOfThreads];
+
+    private int oldComponentWidth;
+    private int oldComponentHeight;
+    
+    private Map<String, String> strings;
+   
+
+    public JMandelbrot(int width, int height, Palette palette, 
+            Map<String, String> strings) {
+        this.strings = strings;
+        oldComponentWidth = width;
+        oldComponentHeight = height;
+        setPreferredSize(new Dimension(width, height));
+        setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
+        xScale = width / (xHighLimit - xLowLimit);
+        yScale = height / (yHighLimit - yLowLimit);
+        calcConstants(width, height);
+        setPalette(palette);
+        installListeners();
+        setToolTipText(getString("SpinnerDemo.toolTip")); 
+    }
+
+    private String getString(String key) {
+        String result = strings.get(key);
+        return (result != null) ? result : "a string";
+    }
+
+    private void calcConstants() {
+        calcConstants(getWidth(), getHeight());
+    }
+
+    private void calcConstants(int width, int height) {
+        if ((width >= MIN_WIDTH) && (height >= MIN_HEIGHT)) {
+            double oldIntervalWidth = xHighLimit - xLowLimit;
+            double oldIntervalHeight = yHighLimit - yLowLimit;
+            double newIntervalWidth = width * oldIntervalWidth / oldComponentWidth;
+            double newIntervalHeight = height * oldIntervalHeight / oldComponentHeight;
+            double xDiff = newIntervalWidth - oldIntervalWidth;
+            double yDiff = newIntervalHeight - oldIntervalHeight;
+            xLowLimit -= xDiff / 2;
+            xHighLimit += xDiff / 2;
+            yLowLimit -= yDiff / 2;
+            yHighLimit += yDiff / 2;
+            buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            oldComponentWidth = width;
+            oldComponentHeight = height;
+            setCenter(calcCenter());
+        }
+    }
+
+    private void installListeners() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int xCoord = e.getX();
+                int yCoord = e.getY();
+                double intervalWidth = xHighLimit - xLowLimit;
+                double intervalHeight = yHighLimit - yLowLimit;
+                double x = intervalWidth * xCoord / getWidth() + xLowLimit;
+                double y = intervalHeight * yCoord / getHeight() + yLowLimit;
+
+                double newIntervalWidth;
+                double newIntervalHeight;
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    boolean limitReached = false;
+                    newIntervalWidth = intervalWidth / zoomRate;
+                    if ((newIntervalWidth / getWidth()) < EPSILON) {
+                        newIntervalWidth = intervalWidth;
+                        limitReached = true;
+                    }
+                    newIntervalHeight = intervalHeight / zoomRate;
+                    if ((newIntervalHeight / getHeight()) < EPSILON) {
+                        newIntervalHeight = intervalHeight;
+                        limitReached = true;
+                    }
+                    if (!limitReached) {
+                        xLowLimit = x - (x - xLowLimit) / zoomRate;
+                        yLowLimit = y - (y - yLowLimit) / zoomRate;
+                    }
+                } else {
+                    newIntervalWidth = intervalWidth * zoomRate;
+                    newIntervalHeight = intervalHeight * zoomRate;
+                    xLowLimit = x - (x - xLowLimit) * zoomRate;
+                    yLowLimit = y - (y - yLowLimit) * zoomRate;
+
+                }
+
+                xHighLimit = xLowLimit + newIntervalWidth;
+                yHighLimit = yLowLimit + newIntervalHeight;
+
+                setCenter(calcCenter());
+
+                xScale = getWidth() / newIntervalWidth;
+                yScale = getHeight() / newIntervalHeight;
+
+                calculatePicture();
+            }
+        });
+
+        addComponentListener(new ComponentListener() {
+            public void componentResized(ComponentEvent e) {
+                calcConstants();
+                calculatePicture();
+                repaint();
+            }
+
+            public void componentMoved(ComponentEvent e) {
+            }
+
+            public void componentShown(ComponentEvent e) {
+            }
+
+            public void componentHidden(ComponentEvent e) {
+            }
+        });
+    }
+
+    public void calculatePicture() {
+        int yStep = getHeight() / numOfThreads;
+        int yStart = 0;
+        for (int i = 0; i < calculators.length; i++) {
+            if ((calculators[i] != null) && !calculators[i].isDone()) {
+                calculators[i].cancel(true);
+            }
+            int yEnd;
+            if (i == calculators.length - 1) {
+                yEnd = getHeight();
+            } else {
+                yEnd = yStart + yStep;
+
+            }
+            calculators[i] = new MandelbrotCalculator(0, getWidth(), yStart, yEnd);
+            calculators[i].execute();
+            yStart = yEnd;
+        }
+    }
+
+    private Coords calcCenter() {
+        return new Coords(xLowLimit + (xHighLimit - xLowLimit) / 2,
+                yLowLimit + (yHighLimit - yLowLimit) / 2);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(buffer, 0, 0, null);
+    }
+
+    private class MandelbrotCalculator extends SwingWorker<Object, Object> {
+        private int xStart;
+        private int xEnd;
+        private int yStart;
+        private int yEnd;
+
+        public MandelbrotCalculator(int xStart, int xEnd, int yStart, int yEnd) {
+            this.xStart = xStart;
+            this.xEnd = xEnd;
+            this.yStart = yStart;
+            this.yEnd = yEnd;
+        }
+
+        protected Object doInBackground() throws Exception {
+            Graphics bg = buffer.getGraphics();
+            for (int yCo = yStart; yCo < yEnd; yCo++) {
+                for (int xCo = xStart; xCo < xEnd; xCo++) {
+                    double x = xCo / xScale + xLowLimit;
+                    double y = yCo / yScale + yLowLimit;
+                    int value = calcValue(x, y);
+                    bg.setColor(getColorByValue(value));
+                    bg.fillRect(xCo, yCo, 1, 1);
+                }
+                if (Thread.currentThread().isInterrupted()) {
+                    return null;
+                }
+                publish();
+            }
+            return null;
+        }
+
+        private int calcValue(double x, double y) {
+            int iteration = 0;
+            double x0 = x;
+            double y0 = y;
+            while (iteration < maxIteration) {
+                double x2 = x * x;
+                double y2 = y * y;
+                if (x2 + y2 > 4) {
+                    break;
+                }
+                y = 2 * x * y + y0;
+                x = x2 - y2 + x0;
+                iteration++;
+            }
+            return iteration;
+        }
+
+        private Color getColorByValue(int value) {
+            if (value == maxIteration) {
+                return Color.BLACK;
+            }
+            return palette.getColor(value);
+        }
+
+        @Override
+        protected void process(List<Object> chunks) {
+            repaint();
+        }
+    }
+
+    // Getters and Setters
+
+    public int getMaxIteration() {
+        return maxIteration;
+    }
+
+    public void setMaxIteration(int maxIteration) {
+        int oldValue = this.maxIteration;
+        this.maxIteration = maxIteration;
+        firePropertyChange(MAX_ITERATION_PROPERTY_NAME, oldValue, maxIteration);
+        palette.setSize(maxIteration);
+    }
+
+    public double getXHighLimit() {
+        return xHighLimit;
+    }
+
+    public double getXLowLimit() {
+        return xLowLimit;
+    }
+
+    public double getYLowLimit() {
+        return yLowLimit;
+    }
+
+    public double getYHighLimit() {
+        return yHighLimit;
+    }
+
+    public double getZoomRate() {
+        return zoomRate;
+    }
+
+    public void setZoomRate(double zoomRate) {
+        double oldValue = this.zoomRate;
+        this.zoomRate = zoomRate;
+        firePropertyChange(ZOOM_RATE_PROPERTY_NAME, oldValue, zoomRate);
+    }
+
+    public Coords getCenter() {
+        return center;
+    }
+
+    public void setCenter(Coords coords) {
+        Coords oldValue = this.center;
+        this.center = coords;
+
+        double width = xHighLimit - xLowLimit;
+        double height = yHighLimit - yLowLimit;
+
+        xLowLimit = coords.getX() - width / 2;
+        xHighLimit = xLowLimit + width;
+        yLowLimit = coords.getY() - height / 2;
+        yHighLimit = yLowLimit + height;
+
+        firePropertyChange(CENTER_PROPERTY_NAME, oldValue, coords);
+    }
+
+    public Palette getPalette() {
+        return palette;
+    }
+
+    public void setPalette(Palette palette) {
+        Palette oldValue = this.palette;
+        palette.setSize(maxIteration);
+        this.palette = palette;
+        firePropertyChange(PALETTE_PROPERTY_NAME, oldValue, palette);
+    }
+
+    public int getNumOfThreads() {
+        return numOfThreads;
+    }
+
+    public void setNumOfThreads(int numOfThreads) {
+        int oldValue = this.numOfThreads;
+        this.numOfThreads = numOfThreads;
+        firePropertyChange(NUM_OF_THREADS_PROPERTY_NAME, oldValue, numOfThreads);
+    }
+}

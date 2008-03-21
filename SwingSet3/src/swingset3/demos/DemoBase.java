@@ -34,8 +34,11 @@ package swingset3.demos;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
@@ -94,6 +97,7 @@ public class DemoBase extends JPanel {
 
     // Resource bundle for internationalized and accessible text
     private ResourceBundle bundle = null;
+    private String bundleName = null;
 
 
     protected DemoBase() {
@@ -107,16 +111,37 @@ public class DemoBase extends JPanel {
 
     public String getString(String key) {
         String value = "nada";
-        if(bundle == null) {
-            String bundleName = getClass().getPackage().getName()+".resources."+getClass().getSimpleName();
-            bundle = ResourceBundle.getBundle(bundleName);
-        }
-        try {
-            value = bundle != null? bundle.getString(key) : key;
-        } catch (MissingResourceException e) {
-            System.out.println("java.util.MissingResourceException: Couldn't find value for: " + key);
-        }
+        initBundle();
+        value = bundle != null? bundle.getString(key) : key;
         return value;
+    }
+    
+    private void initBundle() {
+        if(bundle == null) {
+            bundleName = "a bundle";
+            try {
+                bundleName = getClass().getPackage().getName()+".resources."+getClass().getSimpleName();
+                bundle = ResourceBundle.getBundle(bundleName);
+            } catch (MissingResourceException e) {
+                logger.log(Level.SEVERE, "java.util.MissingResourceException: Couldn't load bundle: " + bundleName);
+            }
+        }
+    }
+    
+    public Map getStrings() {
+        Map<String, String> result = new HashMap<String, String>();
+        initBundle();
+        if (bundle != null) {
+            try {
+                Set<String> keys = bundle.keySet();
+                for (String key : keys) {
+                    result.put(key, bundle.getString(key));
+                }
+            } catch (MissingResourceException e) {
+                logger.log(Level.SEVERE, "java.util.MissingResourceException: Couldn't load bundle: " + bundleName);
+            }
+        }
+        return result;
     }
 
     public char getMnemonic(String key) {
@@ -158,11 +183,15 @@ public class DemoBase extends JPanel {
     
     protected void mainImpl() {
 	JFrame frame = new JFrame(getName());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         frame.getContentPane().setLayout(new BorderLayout());
 	frame.getContentPane().add(getDemoPanel(), BorderLayout.CENTER);
 	getDemoPanel().setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
-	frame.pack();
-	frame.show();
+
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+	frame.setVisible(true);
     }
     
     void updateDragEnabled(boolean dragEnabled) {}
