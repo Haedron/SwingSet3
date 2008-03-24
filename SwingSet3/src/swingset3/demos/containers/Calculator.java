@@ -394,9 +394,21 @@ public class Calculator extends JComponent {
         private SquareButton(String text) {
             super(text);
 
-            setMinimumSize(new Dimension(32, 28));
-            setPreferredSize(new Dimension(32, 28));
-            setMargin(new Insets(2, 2, 2, 2));
+            setMargin(new Insets(2, 0, 2, 0));
+        }
+
+        public Dimension getMinimumSize() {
+            Dimension result = super.getMinimumSize();
+
+            if (result.width < result.height) {
+                result.width = result.height;
+            }
+
+            return result;
+        }
+
+        public Dimension getPreferredSize() {
+            return getMinimumSize();
         }
     }
 
