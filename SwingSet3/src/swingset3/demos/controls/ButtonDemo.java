@@ -102,10 +102,11 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
      * ButtonDemo Constructor
      */
     public ButtonDemo() {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
         tab = new JTabbedPane();
         tab.getModel().addChangeListener(this);
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(tab);
 
         //addButtons();

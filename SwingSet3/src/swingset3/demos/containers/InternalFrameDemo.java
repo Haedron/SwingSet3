@@ -127,6 +127,8 @@ public class InternalFrameDemo extends DemoBase {
      * InternalFrameDemo Constructor
      */
     public InternalFrameDemo() {
+        setLayout(new BorderLayout());
+
         // preload all the icons we need for this demo
         icon1 = resourceManager.createImageIcon("internalframe/bananas.png", 
                 resourceManager.getString("InternalFrameDemo.bananas"));

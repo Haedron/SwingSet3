@@ -86,6 +86,8 @@ public class ColorChooserDemo extends DemoBase {
      * ColorChooserDemo Constructor
      */
     public ColorChooserDemo() {
+        setLayout(new BorderLayout());
+
         outerColorButton.setIcon(new ColorSwatch(BezierAnimationPanel.BezierColor.OUTER));
 
         backgroundColorButton.setIcon(new ColorSwatch(BezierAnimationPanel.BezierColor.BACKGROUND));

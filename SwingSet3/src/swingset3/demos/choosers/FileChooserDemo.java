@@ -160,6 +160,8 @@ public class FileChooserDemo extends DemoBase {
      * FileChooserDemo Constructor
      */
     public FileChooserDemo() {
+        setLayout(new BorderLayout());
+
         initUI();
 
         embeddedChooser.addActionListener(new ActionListener() {

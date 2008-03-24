@@ -35,13 +35,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import swingset3.DemoProperties;
 import swingset3.utilities.Utilities;
@@ -122,7 +116,7 @@ public class JDialogDemo extends JPanel {
     }
     
     public void start() {
-        Utilities.setToplevelLocation(dialog, dialogSpaceholder, Utilities.CENTER);         
+        Utilities.setToplevelLocation(dialog, dialogSpaceholder, SwingConstants.CENTER);
         showDialog();
     }
     

@@ -43,31 +43,30 @@ import javax.swing.*;
  */
 public class DemoBase extends JPanel {
     // The preferred size of the demo
-    private int PREFERRED_WIDTH = 600;
-    private int PREFERRED_HEIGHT = 600;
+    private static int PREFERRED_WIDTH = 600;
+    private static int PREFERRED_HEIGHT = 600;
 
-    public static Dimension HGAP5 = new Dimension(5, 1);
-    public static Dimension VGAP5 = new Dimension(1, 5);
+    public static final Dimension HGAP5 = new Dimension(5, 1);
+    public static final Dimension VGAP5 = new Dimension(1, 5);
 
-    public static Dimension HGAP10 = new Dimension(10, 1);
-    public static Dimension VGAP10 = new Dimension(1, 10);
+    public static final Dimension HGAP10 = new Dimension(10, 1);
+    public static final Dimension VGAP10 = new Dimension(1, 10);
 
-    public static Dimension HGAP15 = new Dimension(15, 1);
-    public static Dimension VGAP15 = new Dimension(1, 15);
+    public static final Dimension HGAP15 = new Dimension(15, 1);
+    public static final Dimension VGAP15 = new Dimension(1, 15);
 
-    public static Dimension HGAP20 = new Dimension(20, 1);
-    public static Dimension VGAP20 = new Dimension(1, 20);
+    public static final Dimension HGAP20 = new Dimension(20, 1);
+    public static final Dimension VGAP20 = new Dimension(1, 20);
 
-    public static Dimension HGAP25 = new Dimension(25, 1);
-    public static Dimension VGAP25 = new Dimension(1, 25);
+    public static final Dimension HGAP25 = new Dimension(25, 1);
+    public static final Dimension VGAP25 = new Dimension(1, 25);
 
-    public static Dimension HGAP30 = new Dimension(30, 1);
-    public static Dimension VGAP30 = new Dimension(1, 30);
+    public static final Dimension HGAP30 = new Dimension(30, 1);
+    public static final Dimension VGAP30 = new Dimension(1, 30);
 
 
     protected DemoBase() {
         UIManager.put("swing.boldMetal", Boolean.FALSE);
-        setLayout(new BorderLayout());
     }
 
     protected void mainImpl() {

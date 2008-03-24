@@ -77,6 +77,8 @@ public class EditorPaneDemo extends DemoBase {
      * EditorPaneDemo Constructor
      */
     public EditorPaneDemo() {
+        setLayout(new BorderLayout());
+
         try {
 	    URL url;
 	    // System.getProperty("user.dir") +

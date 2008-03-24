@@ -39,12 +39,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JWindow;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import swingset3.DemoProperties;
@@ -126,7 +121,7 @@ public class JWindowDemo extends JPanel {
     }
     
     public void start() {
-        Utilities.setToplevelLocation(window, windowSpaceholder, Utilities.CENTER);         
+        Utilities.setToplevelLocation(window, windowSpaceholder, SwingConstants.CENTER);
         showWindow();
     }
     

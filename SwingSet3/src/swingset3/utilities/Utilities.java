@@ -46,7 +46,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.text.NumberFormat;
 import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
@@ -58,9 +57,11 @@ import javax.swing.SwingUtilities;
  *
  * @author aim
  */
-public class Utilities implements SwingConstants {
+public class Utilities {
     
-    private Utilities() {} // never instantiate
+    private Utilities() {
+        // never instantiate
+    }
     
     public static boolean runningFromWebStart() {
         return ServiceManager.getServiceNames() != null;        
@@ -75,53 +76,53 @@ public class Utilities implements SwingConstants {
         Point p = new Point();
         SwingUtilities.convertPointToScreen(p, component);
 
-        int x = 0;
-        int y = 0;
+        int x;
+        int y;
         
         // Set frame location to be centered on panel
         switch(relativePosition) {
-            case NORTH: {
+            case SwingConstants.NORTH: {
                 x = (p.x + (compBounds.width/2)) - (toplevel.getWidth() / 2);
                 y = p.y - toplevel.getHeight();
                 break;                
             }
-            case EAST: {
+            case SwingConstants.EAST: {
                 x = p.x + compBounds.width;
                 y = (p.y + (compBounds.height/2)) - (toplevel.getHeight() / 2);
                 break;
             }
-            case SOUTH: {
+            case SwingConstants.SOUTH: {
                 x = (p.x + (compBounds.width/2)) - (toplevel.getWidth() / 2);            
                 y = p.y + compBounds.height;
                 break;
             }
-            case WEST: {
+            case SwingConstants.WEST: {
                 x = p.x - toplevel.getWidth();
                 y = (p.y + (compBounds.height/2)) - (toplevel.getHeight() / 2);
                 break;                                
             }
-            case NORTH_EAST: {
+            case SwingConstants.NORTH_EAST: {
                 x = p.x + compBounds.width;
                 y = p.y - toplevel.getHeight();
                 break;                
             }
-            case NORTH_WEST: {
+            case SwingConstants.NORTH_WEST: {
                 x = p.x - toplevel.getWidth();
                 y = p.y - toplevel.getHeight();
                 break;                                     
             }
-            case SOUTH_EAST: {
+            case SwingConstants.SOUTH_EAST: {
                 x = p.x + compBounds.width;            
                 y = p.y + compBounds.height; 
                 break;
             }
-            case SOUTH_WEST: {
+            case SwingConstants.SOUTH_WEST: {
                 x = p.x - toplevel.getWidth();
                 y = p.y + compBounds.height; 
                 break;                
             }
             default:
-            case CENTER: {               
+            case SwingConstants.CENTER: {               
                 x = (p.x + (compBounds.width/2)) - (toplevel.getWidth() / 2);
                 y = (p.y + (compBounds.height/2)) - (toplevel.getHeight() / 2);
             }
@@ -150,7 +151,7 @@ public class Utilities implements SwingConstants {
     
     public static BufferedImage createGradientImage(int width, int height, Color gradient1, Color gradient2) {
                    
-            BufferedImage gradientImage = Utilities.createCompatibleImage(width, height);
+            BufferedImage gradientImage = createCompatibleImage(width, height);
             GradientPaint gradient = new GradientPaint(0, 0, gradient1, 0, height, gradient2, false);
             Graphics2D g2 = (Graphics2D)gradientImage.getGraphics();
             g2.setPaint(gradient);
@@ -275,7 +276,7 @@ public class Utilities implements SwingConstants {
     private static void testSetToplevelLocation(Window base, int relativePosition) {        
         JFrame frame = new JFrame("frame "+ relativePosition);
         frame.setSize(130,130);
-        Utilities.setToplevelLocation(frame, base, relativePosition);
+        setToplevelLocation(frame, base, relativePosition);
         frame.setVisible(true);        
     }
     
@@ -285,15 +286,15 @@ public class Utilities implements SwingConstants {
         baseframe.setLocation(new Point(400,400));
         baseframe.setVisible(true);
         
-        Utilities.testSetToplevelLocation(baseframe, Utilities.CENTER);
-        Utilities.testSetToplevelLocation(baseframe, Utilities.NORTH);
-        Utilities.testSetToplevelLocation(baseframe, Utilities.EAST);
-        Utilities.testSetToplevelLocation(baseframe, Utilities.SOUTH); 
-        Utilities.testSetToplevelLocation(baseframe, Utilities.WEST);
-        Utilities.testSetToplevelLocation(baseframe, Utilities.NORTH_EAST);
-        Utilities.testSetToplevelLocation(baseframe, Utilities.NORTH_WEST);
-        Utilities.testSetToplevelLocation(baseframe, Utilities.SOUTH_EAST);
-        Utilities.testSetToplevelLocation(baseframe, Utilities.SOUTH_WEST);
+        testSetToplevelLocation(baseframe, SwingConstants.CENTER);
+        testSetToplevelLocation(baseframe, SwingConstants.NORTH);
+        testSetToplevelLocation(baseframe, SwingConstants.EAST);
+        testSetToplevelLocation(baseframe, SwingConstants.SOUTH); 
+        testSetToplevelLocation(baseframe, SwingConstants.WEST);
+        testSetToplevelLocation(baseframe, SwingConstants.NORTH_EAST);
+        testSetToplevelLocation(baseframe, SwingConstants.NORTH_WEST);
+        testSetToplevelLocation(baseframe, SwingConstants.SOUTH_EAST);
+        testSetToplevelLocation(baseframe, SwingConstants.SOUTH_WEST);
     }
     
 }

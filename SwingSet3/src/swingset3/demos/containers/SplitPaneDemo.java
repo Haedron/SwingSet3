@@ -107,6 +107,8 @@ public class SplitPaneDemo extends DemoBase {
      * SplitPaneDemo Constructor
      */
     public SplitPaneDemo() {
+        setLayout(new BorderLayout());
+
         //<snip>Create horizontal SplitPane with day and night       
         day = new JLabel(resourceManager.createImageIcon("splitpane/day.jpg", 
                 resourceManager.getString("SplitPaneDemo.day")));

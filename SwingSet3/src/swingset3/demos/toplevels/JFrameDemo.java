@@ -40,21 +40,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import swingset3.DemoProperties;
-import swingset3.demos.toplevels.BusyGlass;
 import swingset3.utilities.Utilities;
 
 /**
@@ -191,7 +181,7 @@ public class JFrameDemo extends JPanel {
     }
 
     public void start() {
-        Utilities.setToplevelLocation(frame, frameSpaceholder, Utilities.CENTER);         
+        Utilities.setToplevelLocation(frame, frameSpaceholder, SwingConstants.CENTER);
         showFrame();
     }
     
@@ -199,7 +189,7 @@ public class JFrameDemo extends JPanel {
         //<snip>Hide frame
         frame.setVisible(false);
         //</snip>
-    };
+    }
     
     public void showFrame() {
         //<snip>Show frame

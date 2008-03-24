@@ -118,6 +118,8 @@ public class TextFieldDemo extends DemoBase {
     }
 
     public TextFieldDemo() {
+        setLayout(new BorderLayout());
+
         initUI();
 
         tfDow.setValue(new Date());

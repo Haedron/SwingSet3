@@ -77,7 +77,9 @@ public class TreeDemo extends DemoBase {
      * TreeDemo Constructor
      */
     public TreeDemo() {
-	add(createTree(), BorderLayout.CENTER);
+        setLayout(new BorderLayout());
+
+        add(createTree(), BorderLayout.CENTER);
     }
  
     public JScrollPane createTree() {

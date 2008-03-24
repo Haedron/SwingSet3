@@ -106,6 +106,8 @@ public class ListDemo extends DemoBase {
      * ListDemo Constructor
      */
     public ListDemo() {
+        setLayout(new BorderLayout());
+
 	loadImages();
 
 	JLabel description = new JLabel(resourceManager.getString("ListDemo.description"));

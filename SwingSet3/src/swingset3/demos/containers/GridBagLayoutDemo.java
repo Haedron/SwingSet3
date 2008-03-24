@@ -30,6 +30,7 @@
  */
 package swingset3.demos.containers;
 
+import java.awt.*;
 import javax.swing.*;
 
 import swingset3.DemoProperties;
@@ -70,6 +71,8 @@ public class GridBagLayoutDemo extends DemoBase {
     }
 
     public GridBagLayoutDemo() {
+        setLayout(new BorderLayout());
+
         initUI();
     }
 

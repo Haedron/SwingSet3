@@ -93,6 +93,8 @@ public class TabbedPaneDemo extends DemoBase implements ActionListener {
      * TabbedPaneDemo Constructor
      */
     public TabbedPaneDemo() {
+        setLayout(new BorderLayout());
+
         // create tab position controls
         JPanel tabControls = new JPanel();
         tabControls.add(new JLabel(resourceManager.getString("TabbedPaneDemo.label")));

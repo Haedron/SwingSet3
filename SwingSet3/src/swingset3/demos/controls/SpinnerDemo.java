@@ -75,6 +75,8 @@ public class SpinnerDemo extends DemoBase {
     }
 
     public SpinnerDemo() {
+        setLayout(new BorderLayout());
+
         CosinePaletteChooser chooser = 
                 new CosinePaletteChooser(250, 180, resourceManager);
         final JMandelbrot mandelbrot = 
