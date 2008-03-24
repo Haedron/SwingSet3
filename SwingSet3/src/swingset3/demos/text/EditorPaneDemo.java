@@ -125,9 +125,4 @@ public class EditorPaneDemo extends DemoBase {
 	    }
 	};
     }
-    
-    void updateDragEnabled(boolean dragEnabled) {
-        html.setDragEnabled(dragEnabled);
-    }
-    
 }

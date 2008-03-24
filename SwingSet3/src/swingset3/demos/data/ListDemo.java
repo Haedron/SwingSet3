@@ -55,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * List Demo. This demo shows that it is not
@@ -79,6 +80,8 @@ import swingset3.demos.DemoBase;
       }
 )
 public class ListDemo extends DemoBase {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
+    
     JList list;
 
     JPanel prefixList;
@@ -105,7 +108,7 @@ public class ListDemo extends DemoBase {
     public ListDemo() {
 	loadImages();
 
-	JLabel description = new JLabel(getString("ListDemo.description"));
+	JLabel description = new JLabel(resourceManager.getString("ListDemo.description"));
 	add(description, BorderLayout.NORTH);
 
 	JPanel centerPanel = new JPanel();
@@ -192,10 +195,6 @@ public class ListDemo extends DemoBase {
 	addSuffix("Concepts", false);
     }
 
-    void updateDragEnabled(boolean dragEnabled) {
-        list.setDragEnabled(dragEnabled);
-    }
-
     public JPanel createControlPanel() {
 	JPanel controlPanel = new JPanel() {
 	    Insets insets = new Insets(0, 4, 10, 10);
@@ -207,11 +206,11 @@ public class ListDemo extends DemoBase {
 
 	JPanel prefixPanel = new JPanel();
 	prefixPanel.setLayout(new BoxLayout(prefixPanel, BoxLayout.Y_AXIS));
-	prefixPanel.add(new JLabel(getString("ListDemo.prefixes")));
+	prefixPanel.add(new JLabel(resourceManager.getString("ListDemo.prefixes")));
 
 	JPanel suffixPanel = new JPanel();
 	suffixPanel.setLayout(new BoxLayout(suffixPanel, BoxLayout.Y_AXIS));
-	suffixPanel.add(new JLabel(getString("ListDemo.suffixes")));
+	suffixPanel.add(new JLabel(resourceManager.getString("ListDemo.suffixes")));
 
 	prefixList = new JPanel() {
 	    Insets insets = new Insets(0, 4, 0, 0);
@@ -369,14 +368,15 @@ public class ListDemo extends DemoBase {
     }
 
     ImageIcon images[] = new ImageIcon[7];
+
     void loadImages() {
-	    images[0] = createImageIcon("list/red.gif",  getString("ListDemo.red"));
-	    images[1] = createImageIcon("list/blue.gif",  getString("ListDemo.blue"));
-	    images[2] = createImageIcon("list/yellow.gif",  getString("ListDemo.yellow"));
-	    images[3] = createImageIcon("list/green.gif",  getString("ListDemo.green"));
-	    images[4] = createImageIcon("list/gray.gif",  getString("ListDemo.gray"));
-	    images[5] = createImageIcon("list/cyan.gif",  getString("ListDemo.cyan"));
-	    images[6] = createImageIcon("list/magenta.gif",  getString("ListDemo.magenta"));
+        images[0] = resourceManager.createImageIcon("list/red.gif", resourceManager.getString("ListDemo.red"));
+        images[1] = resourceManager.createImageIcon("list/blue.gif", resourceManager.getString("ListDemo.blue"));
+        images[2] = resourceManager.createImageIcon("list/yellow.gif", resourceManager.getString("ListDemo.yellow"));
+        images[3] = resourceManager.createImageIcon("list/green.gif", resourceManager.getString("ListDemo.green"));
+        images[4] = resourceManager.createImageIcon("list/gray.gif", resourceManager.getString("ListDemo.gray"));
+        images[5] = resourceManager.createImageIcon("list/cyan.gif", resourceManager.getString("ListDemo.cyan"));
+        images[6] = resourceManager.createImageIcon("list/magenta.gif", resourceManager.getString("ListDemo.magenta"));
     }
 
     class CompanyLogoListCellRenderer extends DefaultListCellRenderer {

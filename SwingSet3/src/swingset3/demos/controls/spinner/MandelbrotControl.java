@@ -40,7 +40,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
-import java.util.Map;
+
+import swingset3.demos.ResourceManager;
 
 /**
  * @author Mikhail Lapshin
@@ -55,11 +56,11 @@ public class MandelbrotControl extends JPanel {
     private JSpinner ySpinner;
     private JTextField ySpinnerEditor;
     private double COORD_SPINNER_STEP = 1d / 10;
-    private Map<String, String> strings;
+    private final ResourceManager resourceManager;
 
-    public MandelbrotControl(JMandelbrot mandelbrot, Map<String, String> strings) {
+    public MandelbrotControl(JMandelbrot mandelbrot, ResourceManager resourceManager) {
         this.mandelbrot = mandelbrot;
-        this.strings = strings;
+        this.resourceManager = resourceManager;
         createUI();
         installListeners();
     }
@@ -67,7 +68,7 @@ public class MandelbrotControl extends JPanel {
     private void createUI() {
         JSpinnerPanel spinnerPanel = new JSpinnerPanel();
         setBorder(BorderFactory.createTitledBorder(
-                getString("SpinnerDemo.fractalControls")));
+                resourceManager.getString("SpinnerDemo.fractalControls")));
 
         iterSpinner = new JSpinner(
                 new SpinnerNumberModel(mandelbrot.getMaxIteration(), 10, 100000, 50));
@@ -78,7 +79,7 @@ public class MandelbrotControl extends JPanel {
             }
         });
         spinnerPanel.addSpinner(
-                getString("SpinnerDemo.iterations"), iterSpinner);
+                resourceManager.getString("SpinnerDemo.iterations"), iterSpinner);
 
         zoomSpinner = new JSpinner(
                 new SpinnerNumberModel(mandelbrot.getZoomRate(), 1, 20, 1));
@@ -88,7 +89,7 @@ public class MandelbrotControl extends JPanel {
             }
         });
         spinnerPanel.addSpinner(
-                getString("SpinnerDemo.zoomRate"), zoomSpinner);
+                resourceManager.getString("SpinnerDemo.zoomRate"), zoomSpinner);
 
         threadSpinner = new JSpinner(
                 new SpinnerNumberModel(mandelbrot.getNumOfThreads(), 1, 16, 1));
@@ -98,7 +99,7 @@ public class MandelbrotControl extends JPanel {
             }
         });
         spinnerPanel.addSpinner(
-                getString("SpinnerDemo.threads"), threadSpinner);
+                resourceManager.getString("SpinnerDemo.threads"), threadSpinner);
 
         final double width = mandelbrot.getXHighLimit() - mandelbrot.getXLowLimit();
         final double xValue = mandelbrot.getCenter().getX();
@@ -118,7 +119,7 @@ public class MandelbrotControl extends JPanel {
         xSpinner.setEditor(xSpinnerEditor);
         installSpinnerEditorListeners(xSpinner, xSpinnerEditor);
         spinnerPanel.addSpinner(
-                getString("SpinnerDemo.x"), xSpinner);
+                resourceManager.getString("SpinnerDemo.x"), xSpinner);
 
         final double height = mandelbrot.getYHighLimit() - mandelbrot.getYLowLimit();
         final double yValue = mandelbrot.getCenter().getY();
@@ -138,7 +139,7 @@ public class MandelbrotControl extends JPanel {
         ySpinner.setEditor(ySpinnerEditor);
         installSpinnerEditorListeners(ySpinner, ySpinnerEditor);
         spinnerPanel.addSpinner(
-                getString("SpinnerDemo.y"), ySpinner);
+                resourceManager.getString("SpinnerDemo.y"), ySpinner);
 
         add(spinnerPanel);
     }
@@ -162,7 +163,7 @@ public class MandelbrotControl extends JPanel {
         });
     }
 
-    private JTextField installSpinnerEditorListeners(final JSpinner parentSpinner, JTextField editor) {
+    private static JTextField installSpinnerEditorListeners(final JSpinner parentSpinner, JTextField editor) {
         editor.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 updateCoordSpinnerValue(parentSpinner);
@@ -179,7 +180,7 @@ public class MandelbrotControl extends JPanel {
         return editor;
     }
 
-    private void updateCoordSpinnerValue(JSpinner spinner) {
+    private static void updateCoordSpinnerValue(JSpinner spinner) {
         double newValue = (Double) spinner.getModel().getValue();
         JTextField editor = (JTextField) spinner.getEditor();
         try {
@@ -189,12 +190,6 @@ public class MandelbrotControl extends JPanel {
         }
         spinner.setValue(newValue);
     }
-
-    private String getString(String key) {
-        String result = strings.get(key);
-        return (result != null) ? result : "a string";
-    }
-
 
     private static class JSpinnerPanel extends JPanel {
         private JPanel labelPanel;

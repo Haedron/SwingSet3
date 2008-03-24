@@ -39,6 +39,7 @@ import javax.swing.border.EmptyBorder;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 import swingset3.utilities.JGridPanel;
 
 
@@ -60,15 +61,17 @@ import swingset3.utilities.JGridPanel;
                 }
 )
 public class ColorChooserDemo extends DemoBase {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
+
     private final BezierAnimationPanel bezAnim = new BezierAnimationPanel();
 
-    private final JButton outerColorButton = new JButton(getString("ColorChooserDemo.outer_line"));
+    private final JButton outerColorButton = new JButton(resourceManager.getString("ColorChooserDemo.outer_line"));
 
-    private final JButton backgroundColorButton = new JButton(getString("ColorChooserDemo.background"));
+    private final JButton backgroundColorButton = new JButton(resourceManager.getString("ColorChooserDemo.background"));
 
-    private final JButton gradientAButton = new JButton(getString("ColorChooserDemo.grad_a"));
+    private final JButton gradientAButton = new JButton(resourceManager.getString("ColorChooserDemo.grad_a"));
 
-    private final JButton gradientBButton = new JButton(getString("ColorChooserDemo.grad_b"));
+    private final JButton gradientBButton = new JButton(resourceManager.getString("ColorChooserDemo.grad_b"));
 
     /**
      * main method allows us to run as a standalone demo.
@@ -111,7 +114,7 @@ public class ColorChooserDemo extends DemoBase {
                 };
 
                 JDialog dialog = JColorChooser.createDialog(ColorChooserDemo.this,
-                        getString("ColorChooserDemo.chooser_title"),
+                        resourceManager.getString("ColorChooserDemo.chooser_title"),
                         true,
                         chooser,
                         colorChooserListener,

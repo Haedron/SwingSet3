@@ -34,25 +34,28 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
-import java.util.Map;
+
+import swingset3.demos.ResourceManager;
 
 /**
  * @author Mikhail Lapshin
  */
 public class CosinePaletteChooser extends JPanel {
-    private final int MIN_COLOR = 50;
-    private final int MAX_COLOR = 255;
-    private final int R_STEPS = 5;
-    private final int G_STEPS = 5;
-    private final int B_STEPS = 5;
-    private final int R_ANGLE = 270;
-    private final int G_ANGLE = 90;
-    private final int B_ANGLE = 0;
+    private static final int MIN_COLOR = 50;
+    private static final int MAX_COLOR = 255;
+    private static final int R_STEPS = 5;
+    private static final int G_STEPS = 5;
+    private static final int B_STEPS = 5;
+    private static final int R_ANGLE = 270;
+    private static final int G_ANGLE = 90;
+    private static final int B_ANGLE = 0;
+    
+    private final ResourceManager resourceManager;
+
     private CosinePalette palette;
     public static final String PALETTE_PROPERTY_NAME = "palette";
     private JPaletteShower shower;
     private ChangeListener changeListener;
-    private Map<String, String> strings;
 
     private JSpinner rsSpinner;
     private JSpinner gsSpinner;
@@ -62,8 +65,8 @@ public class CosinePaletteChooser extends JPanel {
     private JSpinner baSpinner;
     //todo add minColorSpinner and maxColorSpinner
 
-    public CosinePaletteChooser(int width, int height, Map<String, String> strings) {
-        this.strings = strings;
+    public CosinePaletteChooser(int width, int height, ResourceManager resourceManager) {
+        this.resourceManager = resourceManager;
         palette = new CosinePalette(width, MIN_COLOR, MAX_COLOR,
                 R_ANGLE * Math.PI / 180, G_ANGLE * Math.PI / 180, B_ANGLE * Math.PI / 180,
                 R_STEPS, G_STEPS, B_STEPS);
@@ -77,28 +80,23 @@ public class CosinePaletteChooser extends JPanel {
         };
 
         setPreferredSize(new Dimension(width, height));
-        setBorder(BorderFactory.createTitledBorder(getString("SpinnerDemo.colorPalette")));
+        setBorder(BorderFactory.createTitledBorder(resourceManager.getString("SpinnerDemo.colorPalette")));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(shower);
         add(getControlPanel());
     }
     
-    private String getString(String key) {
-        String result = strings.get(key);
-        return (result != null) ? result : "a string";
-    }
-
     private CosinePalette createPalette() {
         return new CosinePalette(getWidth(), MIN_COLOR, MAX_COLOR,
                 getRadianValue(raSpinner), getRadianValue(gaSpinner), getRadianValue(baSpinner),
                 getIntValue(rsSpinner), getIntValue(gsSpinner), getIntValue(bsSpinner));
     }
 
-    private int getIntValue(JSpinner spinner) {
+    private static int getIntValue(JSpinner spinner) {
         return (Integer) spinner.getValue();
     }
 
-    private double getRadianValue(JSpinner spinner) {
+    private static double getRadianValue(JSpinner spinner) {
         return getIntValue(spinner) * Math.PI / 180;
     }
 
@@ -120,14 +118,14 @@ public class CosinePaletteChooser extends JPanel {
     private JPanel getStartAnglePanel() {
         JPanel startAnglePanel = new JPanel();
         startAnglePanel.setBorder(BorderFactory.createTitledBorder(
-                getString("SpinnerDemo.startAngles")));
+                resourceManager.getString("SpinnerDemo.startAngles")));
         startAnglePanel.setLayout(new BoxLayout(startAnglePanel, BoxLayout.Y_AXIS));
 
-        raSpinner = createSpinner(getString("SpinnerDemo.r"), 
+        raSpinner = createSpinner(resourceManager.getString("SpinnerDemo.r"), 
                 startAnglePanel, new SpinnerNumberModel(R_ANGLE, 0, 360, 10));
-        gaSpinner = createSpinner(getString("SpinnerDemo.g"), 
+        gaSpinner = createSpinner(resourceManager.getString("SpinnerDemo.g"), 
                 startAnglePanel, new SpinnerNumberModel(G_ANGLE, 0, 360, 10));
-        baSpinner = createSpinner(getString("SpinnerDemo.b"), 
+        baSpinner = createSpinner(resourceManager.getString("SpinnerDemo.b"), 
                 startAnglePanel, new SpinnerNumberModel(B_ANGLE, 0, 360, 10));
 
         return startAnglePanel;
@@ -136,14 +134,14 @@ public class CosinePaletteChooser extends JPanel {
     private JPanel getStepPanel() {
         JPanel stepPanel = new JPanel();
         stepPanel.setBorder(BorderFactory.createTitledBorder(
-                getString("SpinnerDemo.steps")));
+                resourceManager.getString("SpinnerDemo.steps")));
         stepPanel.setLayout(new BoxLayout(stepPanel, BoxLayout.Y_AXIS));
 
-        rsSpinner = createSpinner(getString("SpinnerDemo.r"), 
+        rsSpinner = createSpinner(resourceManager.getString("SpinnerDemo.r"), 
                 stepPanel, new SpinnerNumberModel(R_STEPS, 1, 1000, 1));
-        gsSpinner = createSpinner(getString("SpinnerDemo.g"), 
+        gsSpinner = createSpinner(resourceManager.getString("SpinnerDemo.g"), 
                 stepPanel, new SpinnerNumberModel(G_STEPS, 1, 1000, 1));
-        bsSpinner = createSpinner(getString("SpinnerDemo.b"), 
+        bsSpinner = createSpinner(resourceManager.getString("SpinnerDemo.b"), 
                 stepPanel, new SpinnerNumberModel(B_STEPS, 1, 1000, 1));
 
         return stepPanel;

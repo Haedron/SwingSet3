@@ -39,6 +39,7 @@ import java.awt.event.ItemListener;
 import javax.swing.*;
 
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /*
  * The LayoutControlPanel contains controls for setting an 
@@ -55,7 +56,7 @@ public class LayoutControlPanel extends JPanel implements SwingConstants {
 
     // private ComponentOrientChanger componentOrientChanger = null;
 
-    LayoutControlPanel(ButtonDemo demo) {
+    LayoutControlPanel(ButtonDemo demo, ResourceManager resourceManager) {
         this.demo = demo;
 
         // this.componentOrientationChanger = componentOrientationChanger;
@@ -110,13 +111,13 @@ public class LayoutControlPanel extends JPanel implements SwingConstants {
             setAlignment(control, CENTER, CENTER);
         }
 
-        l = new JLabel(demo.getString("LayoutControlPanel.textposition_label"));
+        l = new JLabel(resourceManager.getString("LayoutControlPanel.textposition_label"));
         add(l);
         add(textPosition);
 
         add(Box.createRigidArea(DemoBase.VGAP20));
 
-        l = new JLabel(demo.getString("LayoutControlPanel.contentalignment_label"));
+        l = new JLabel(resourceManager.getString("LayoutControlPanel.contentalignment_label"));
         add(l);
         add(labelAlignment);
 

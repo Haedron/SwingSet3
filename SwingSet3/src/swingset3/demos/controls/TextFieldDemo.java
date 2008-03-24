@@ -40,6 +40,7 @@ import javax.swing.event.DocumentListener;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 import swingset3.utilities.JGridPanel;
 
 /**
@@ -59,19 +60,21 @@ import swingset3.utilities.JGridPanel;
                 }
 )
 public class TextFieldDemo extends DemoBase {
-    private final JLabel lbHistoryTextField = new JLabel(getString("TextFieldDemo.historytextfield.text"));
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
+
+    private final JLabel lbHistoryTextField = new JLabel(resourceManager.getString("TextFieldDemo.historytextfield.text"));
 
     private final JHistoryTextField tfHistory = new JHistoryTextField();
 
-    private final JLabel lbDow = new JLabel(getString("TextFieldDemo.dow.text"));
+    private final JLabel lbDow = new JLabel(resourceManager.getString("TextFieldDemo.dow.text"));
 
     private final JFormattedTextField tfDow = new JFormattedTextField();
 
-    private final JButton btnGo = new JButton(getString("TextFieldDemo.go.text"));
+    private final JButton btnGo = new JButton(resourceManager.getString("TextFieldDemo.go.text"));
 
     private final JLabel lbDowResult = new JLabel();
 
-    private final JLabel lbPassword = new JLabel(getString("TextFieldDemo.password.text"));
+    private final JLabel lbPassword = new JLabel(resourceManager.getString("TextFieldDemo.password.text"));
 
     private final JPasswordField tfPassword1 = new JPasswordField(20);
 
@@ -135,7 +138,7 @@ public class TextFieldDemo extends DemoBase {
     }
 
     private void initUI() {
-        tfHistory.setHistory(Arrays.asList(getString("TextFieldDemo.history.words").split("\\,")));
+        tfHistory.setHistory(Arrays.asList(resourceManager.getString("TextFieldDemo.history.words").split("\\,")));
 
         JGridPanel pnDow = new JGridPanel(3, 2);
 

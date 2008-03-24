@@ -47,6 +47,7 @@ import javax.swing.event.ChangeListener;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * JSlider Demo
@@ -65,6 +66,7 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class SliderDemo extends DemoBase {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**
      * main method allows us to run as a standalone demo.
@@ -92,7 +94,7 @@ public class SliderDemo extends DemoBase {
 
         setLayout(new BorderLayout());
 
-        tf = new JLabel(getString("SliderDemo.slidervalue"));
+        tf = new JLabel(resourceManager.getString("SliderDemo.slidervalue"));
         add(tf, BorderLayout.SOUTH);
 
         tp = new JPanel();
@@ -110,7 +112,7 @@ public class SliderDemo extends DemoBase {
         hp.setLayout(new BoxLayout(hp, BoxLayout.Y_AXIS));
         hp.setBorder(new TitledBorder(
                 border,
-                getString("SliderDemo.horizontal"),
+                resourceManager.getString("SliderDemo.horizontal"),
                 TitledBorder.LEFT,
                 TitledBorder.ABOVE_TOP));
         tp.add(hp);
@@ -119,7 +121,7 @@ public class SliderDemo extends DemoBase {
         vp.setLayout(new BoxLayout(vp, BoxLayout.X_AXIS));
         vp.setBorder(new TitledBorder(
                 border,
-                getString("SliderDemo.vertical"),
+                resourceManager.getString("SliderDemo.vertical"),
                 TitledBorder.LEFT,
                 TitledBorder.ABOVE_TOP));
         tp.add(vp);
@@ -127,10 +129,10 @@ public class SliderDemo extends DemoBase {
         // Horizontal Slider 1
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBorder(new TitledBorder(getString("SliderDemo.plain")));
+        p.setBorder(new TitledBorder(resourceManager.getString("SliderDemo.plain")));
         s = new JSlider(-10, 100, 20);
-        s.getAccessibleContext().setAccessibleName(getString("SliderDemo.plain"));
-        s.getAccessibleContext().setAccessibleDescription(getString("SliderDemo.a_plain_slider"));
+        s.getAccessibleContext().setAccessibleName(resourceManager.getString("SliderDemo.plain"));
+        s.getAccessibleContext().setAccessibleDescription(resourceManager.getString("SliderDemo.a_plain_slider"));
         s.addChangeListener(listener);
 
         p.add(Box.createRigidArea(VGAP5));
@@ -142,12 +144,12 @@ public class SliderDemo extends DemoBase {
         // Horizontal Slider 2
         p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBorder(new TitledBorder(getString("SliderDemo.majorticks")));
+        p.setBorder(new TitledBorder(resourceManager.getString("SliderDemo.majorticks")));
         s = new JSlider(100, 1000, 400);
         s.setPaintTicks(true);
         s.setMajorTickSpacing(100);
-        s.getAccessibleContext().setAccessibleName(getString("SliderDemo.majorticks"));
-        s.getAccessibleContext().setAccessibleDescription(getString("SliderDemo.majorticksdescription"));
+        s.getAccessibleContext().setAccessibleName(resourceManager.getString("SliderDemo.majorticks"));
+        s.getAccessibleContext().setAccessibleDescription(resourceManager.getString("SliderDemo.majorticksdescription"));
         s.addChangeListener(listener);
 
         p.add(Box.createRigidArea(VGAP5));
@@ -159,7 +161,7 @@ public class SliderDemo extends DemoBase {
         // Horizontal Slider 3
         p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBorder(new TitledBorder(getString("SliderDemo.ticks")));
+        p.setBorder(new TitledBorder(resourceManager.getString("SliderDemo.ticks")));
         s = new JSlider(0, 11, 6);
 
         s.putClientProperty("JSlider.isFilled", Boolean.TRUE);
@@ -174,8 +176,8 @@ public class SliderDemo extends DemoBase {
         s.getLabelTable().put(new Integer(11), new JLabel(Integer.toString(11), JLabel.CENTER));
         s.setLabelTable(s.getLabelTable());
 
-        s.getAccessibleContext().setAccessibleName(getString("SliderDemo.minorticks"));
-        s.getAccessibleContext().setAccessibleDescription(getString("SliderDemo.minorticksdescription"));
+        s.getAccessibleContext().setAccessibleName(resourceManager.getString("SliderDemo.minorticks"));
+        s.getAccessibleContext().setAccessibleDescription(resourceManager.getString("SliderDemo.minorticksdescription"));
 
         s.addChangeListener(listener);
 
@@ -188,15 +190,15 @@ public class SliderDemo extends DemoBase {
         // Horizontal Slider 4
         p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBorder(new TitledBorder(getString("SliderDemo.disabled")));
+        p.setBorder(new TitledBorder(resourceManager.getString("SliderDemo.disabled")));
         BoundedRangeModel brm = new DefaultBoundedRangeModel(80, 0, 0, 100);
         s = new JSlider(brm);
         s.setPaintTicks(true);
         s.setMajorTickSpacing(20);
         s.setMinorTickSpacing(5);
         s.setEnabled(false);
-        s.getAccessibleContext().setAccessibleName(getString("SliderDemo.disabled"));
-        s.getAccessibleContext().setAccessibleDescription(getString("SliderDemo.disableddescription"));
+        s.getAccessibleContext().setAccessibleName(resourceManager.getString("SliderDemo.disabled"));
+        s.getAccessibleContext().setAccessibleDescription(resourceManager.getString("SliderDemo.disableddescription"));
         s.addChangeListener(listener);
 
         p.add(Box.createRigidArea(VGAP5));
@@ -209,10 +211,10 @@ public class SliderDemo extends DemoBase {
         // Vertical Slider 1
         p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-        p.setBorder(new TitledBorder(getString("SliderDemo.plain")));
+        p.setBorder(new TitledBorder(resourceManager.getString("SliderDemo.plain")));
         s = new JSlider(JSlider.VERTICAL, -10, 100, 20);
-        s.getAccessibleContext().setAccessibleName(getString("SliderDemo.plain"));
-        s.getAccessibleContext().setAccessibleDescription(getString("SliderDemo.a_plain_slider"));
+        s.getAccessibleContext().setAccessibleName(resourceManager.getString("SliderDemo.plain"));
+        s.getAccessibleContext().setAccessibleDescription(resourceManager.getString("SliderDemo.a_plain_slider"));
         s.addChangeListener(listener);
         p.add(Box.createRigidArea(HGAP10));
         p.add(s);
@@ -223,15 +225,15 @@ public class SliderDemo extends DemoBase {
         // Vertical Slider 2
         p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-        p.setBorder(new TitledBorder(getString("SliderDemo.majorticks")));
+        p.setBorder(new TitledBorder(resourceManager.getString("SliderDemo.majorticks")));
         s = new JSlider(JSlider.VERTICAL, 100, 1000, 400);
 
         s.putClientProperty("JSlider.isFilled", Boolean.TRUE);
 
         s.setPaintTicks(true);
         s.setMajorTickSpacing(100);
-        s.getAccessibleContext().setAccessibleName(getString("SliderDemo.majorticks"));
-        s.getAccessibleContext().setAccessibleDescription(getString("SliderDemo.majorticksdescription"));
+        s.getAccessibleContext().setAccessibleName(resourceManager.getString("SliderDemo.majorticks"));
+        s.getAccessibleContext().setAccessibleDescription(resourceManager.getString("SliderDemo.majorticksdescription"));
         s.addChangeListener(listener);
         p.add(Box.createRigidArea(HGAP25));
         p.add(s);
@@ -242,7 +244,7 @@ public class SliderDemo extends DemoBase {
         // Vertical Slider 3
         p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-        p.setBorder(new TitledBorder(getString("SliderDemo.minorticks")));
+        p.setBorder(new TitledBorder(resourceManager.getString("SliderDemo.minorticks")));
         s = new JSlider(JSlider.VERTICAL, 0, 100, 60);
         s.setPaintTicks(true);
         s.setMajorTickSpacing(20);
@@ -250,8 +252,8 @@ public class SliderDemo extends DemoBase {
 
         s.setPaintLabels(true);
 
-        s.getAccessibleContext().setAccessibleName(getString("SliderDemo.minorticks"));
-        s.getAccessibleContext().setAccessibleDescription(getString("SliderDemo.minorticksdescription"));
+        s.getAccessibleContext().setAccessibleName(resourceManager.getString("SliderDemo.minorticks"));
+        s.getAccessibleContext().setAccessibleDescription(resourceManager.getString("SliderDemo.minorticksdescription"));
 
         s.addChangeListener(listener);
         p.add(Box.createRigidArea(HGAP10));
@@ -263,14 +265,14 @@ public class SliderDemo extends DemoBase {
         // Vertical Slider 4
         p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-        p.setBorder(new TitledBorder(getString("SliderDemo.disabled")));
+        p.setBorder(new TitledBorder(resourceManager.getString("SliderDemo.disabled")));
         s = new JSlider(JSlider.VERTICAL, 0, 100, 80);
         s.setPaintTicks(true);
         s.setMajorTickSpacing(20);
         s.setMinorTickSpacing(5);
         s.setEnabled(false);
-        s.getAccessibleContext().setAccessibleName(getString("SliderDemo.disabled"));
-        s.getAccessibleContext().setAccessibleDescription(getString("SliderDemo.disableddescription"));
+        s.getAccessibleContext().setAccessibleName(resourceManager.getString("SliderDemo.disabled"));
+        s.getAccessibleContext().setAccessibleDescription(resourceManager.getString("SliderDemo.disableddescription"));
         s.addChangeListener(listener);
         p.add(Box.createRigidArea(HGAP20));
         p.add(s);
@@ -287,7 +289,7 @@ public class SliderDemo extends DemoBase {
 
         public void stateChanged(ChangeEvent e) {
             JSlider s1 = (JSlider) e.getSource();
-            tf.setText(getString("SliderDemo.slidervalue") + s1.getValue());
+            tf.setText(resourceManager.getString("SliderDemo.slidervalue") + s1.getValue());
         }
     }
 }

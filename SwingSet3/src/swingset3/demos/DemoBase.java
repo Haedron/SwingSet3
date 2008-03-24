@@ -32,10 +32,6 @@
 package swingset3.demos;
 
 import java.awt.*;
-import java.net.URL;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
@@ -46,8 +42,6 @@ import javax.swing.*;
  * @version 1.23 11/17/05
  */
 public class DemoBase extends JPanel {
-    private static final Logger logger = Logger.getLogger(DemoBase.class.getName());
-
     // The preferred size of the demo
     private int PREFERRED_WIDTH = 600;
     private int PREFERRED_HEIGHT = 600;
@@ -70,62 +64,10 @@ public class DemoBase extends JPanel {
     public static Dimension HGAP30 = new Dimension(30, 1);
     public static Dimension VGAP30 = new Dimension(1, 30);
 
-    // Resource bundle for internationalized and accessible text
-    private ResourceBundle bundle = null;
-    private String bundleName = null;
-
 
     protected DemoBase() {
         UIManager.put("swing.boldMetal", Boolean.FALSE);
         setLayout(new BorderLayout());
-    }
-
-    public String getString(String key) {
-        initBundle();
-        return bundle != null ? bundle.getString(key) : key;
-    }
-
-    private void initBundle() {
-        if (bundle == null) {
-            bundleName = "a bundle";
-            try {
-                bundleName = getClass().getPackage().getName() + ".resources." + getClass().getSimpleName();
-                bundle = ResourceBundle.getBundle(bundleName);
-            } catch (MissingResourceException e) {
-                logger.log(Level.SEVERE, "java.util.MissingResourceException: Couldn't load bundle: " + bundleName);
-            }
-        }
-    }
-
-    public Map getStrings() {
-        Map<String, String> result = new HashMap<String, String>();
-        initBundle();
-        if (bundle != null) {
-            try {
-                Set<String> keys = bundle.keySet();
-                for (String key : keys) {
-                    result.put(key, bundle.getString(key));
-                }
-            } catch (MissingResourceException e) {
-                logger.log(Level.SEVERE, "java.util.MissingResourceException: Couldn't load bundle: " + bundleName);
-            }
-        }
-        return result;
-    }
-
-    public char getMnemonic(String key) {
-        return (getString(key)).charAt(0);
-    }
-
-    public ImageIcon createImageIcon(String filename, String description) {
-        String path = "resources/images/" + filename;
-        URL imageURL = getClass().getResource(path);
-        if (imageURL == null) {
-            logger.log(Level.SEVERE, "unable to access image file: " + path);
-        }
-        return imageURL != null ?
-                new ImageIcon(getClass().getResource(path), description) : null;
-
     }
 
     protected void mainImpl() {

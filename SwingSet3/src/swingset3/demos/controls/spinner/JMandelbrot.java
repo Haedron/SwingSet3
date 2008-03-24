@@ -35,7 +35,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.Map;
+
+import swingset3.demos.ResourceManager;
 
 /**
  * @author Mikhail Lapshin
@@ -63,9 +64,9 @@ public class JMandelbrot extends JComponent {
     private int numOfThreads = 2;
     public static final String NUM_OF_THREADS_PROPERTY_NAME = "numOfThreads";
 
-    private final double EPSILON = 1E-16;
-    private int MIN_WIDTH = 50;
-    private int MIN_HEIGHT = 50;
+    private static final double EPSILON = 1E-16;
+    private static final int MIN_WIDTH = 50;
+    private static final int MIN_HEIGHT = 50;
 
     private Image buffer;
     private MandelbrotCalculator[] calculators = new MandelbrotCalculator[numOfThreads];
@@ -73,12 +74,8 @@ public class JMandelbrot extends JComponent {
     private int oldComponentWidth;
     private int oldComponentHeight;
     
-    private Map<String, String> strings;
-   
-
     public JMandelbrot(int width, int height, Palette palette, 
-            Map<String, String> strings) {
-        this.strings = strings;
+            ResourceManager resourceManager) {
         oldComponentWidth = width;
         oldComponentHeight = height;
         setPreferredSize(new Dimension(width, height));
@@ -88,12 +85,7 @@ public class JMandelbrot extends JComponent {
         calcConstants(width, height);
         setPalette(palette);
         installListeners();
-        setToolTipText(getString("SpinnerDemo.toolTip")); 
-    }
-
-    private String getString(String key) {
-        String result = strings.get(key);
-        return (result != null) ? result : "a string";
+        setToolTipText(resourceManager.getString("SpinnerDemo.toolTip")); 
     }
 
     private void calcConstants() {

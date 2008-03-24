@@ -38,6 +38,7 @@ import javax.swing.*;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * JOptionPaneDemo
@@ -55,6 +56,7 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class OptionPaneDemo extends DemoBase {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**
      * main method allows us to run as a standalone demo.
@@ -97,12 +99,12 @@ public class OptionPaneDemo extends DemoBase {
     }
 
     public JButton createWarningDialogButton() {
-        Action a = new AbstractAction(getString("OptionPaneDemo.warningbutton")) {
+        Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.warningbutton")) {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(
                         OptionPaneDemo.this,
-                        getString("OptionPaneDemo.warningtext"),
-                        getString("OptionPaneDemo.warningtitle"),
+                        resourceManager.getString("OptionPaneDemo.warningtext"),
+                        resourceManager.getString("OptionPaneDemo.warningtitle"),
                         JOptionPane.WARNING_MESSAGE
                 );
             }
@@ -111,10 +113,10 @@ public class OptionPaneDemo extends DemoBase {
     }
 
     public JButton createMessageDialogButton() {
-        Action a = new AbstractAction(getString("OptionPaneDemo.messagebutton")) {
+        Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.messagebutton")) {
             final URL img = getClass().getResource("resources/images/optionpane/bottle.gif");
             final String imagesrc = "<img src=\"" + img + "\" width=\"284\" height=\"100\">";
-            final String message = getString("OptionPaneDemo.messagetext");
+            final String message = resourceManager.getString("OptionPaneDemo.messagetext");
 
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(
@@ -127,13 +129,13 @@ public class OptionPaneDemo extends DemoBase {
     }
 
     public JButton createConfirmDialogButton() {
-        Action a = new AbstractAction(getString("OptionPaneDemo.confirmbutton")) {
+        Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.confirmbutton")) {
             public void actionPerformed(ActionEvent e) {
-                int result = JOptionPane.showConfirmDialog(OptionPaneDemo.this, getString("OptionPaneDemo.confirmquestion"));
+                int result = JOptionPane.showConfirmDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.confirmquestion"));
                 if (result == JOptionPane.YES_OPTION) {
-                    JOptionPane.showMessageDialog(OptionPaneDemo.this, getString("OptionPaneDemo.confirmyes"));
+                    JOptionPane.showMessageDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.confirmyes"));
                 } else if (result == JOptionPane.NO_OPTION) {
-                    JOptionPane.showMessageDialog(OptionPaneDemo.this, getString("OptionPaneDemo.confirmno"));
+                    JOptionPane.showMessageDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.confirmno"));
                 }
             }
         };
@@ -141,13 +143,13 @@ public class OptionPaneDemo extends DemoBase {
     }
 
     public JButton createInputDialogButton() {
-        Action a = new AbstractAction(getString("OptionPaneDemo.inputbutton")) {
+        Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.inputbutton")) {
             public void actionPerformed(ActionEvent e) {
-                String result = JOptionPane.showInputDialog(OptionPaneDemo.this, getString("OptionPaneDemo.inputquestion"));
+                String result = JOptionPane.showInputDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.inputquestion"));
                 if ((result != null) && (result.length() > 0)) {
                     JOptionPane.showMessageDialog(OptionPaneDemo.this,
                             result + ": " +
-                                    getString("OptionPaneDemo.inputresponse"));
+                                    resourceManager.getString("OptionPaneDemo.inputresponse"));
                 }
             }
         };
@@ -155,36 +157,36 @@ public class OptionPaneDemo extends DemoBase {
     }
 
     public JButton createComponentDialogButton() {
-        Action a = new AbstractAction(getString("OptionPaneDemo.componentbutton")) {
+        Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.componentbutton")) {
             public void actionPerformed(ActionEvent e) {
                 // In a ComponentDialog, you can show as many message components and
                 // as many options as you want:
 
                 // Messages
                 Object[] message = new Object[4];
-                message[0] = getString("OptionPaneDemo.componentmessage");
-                message[1] = new JTextField(getString("OptionPaneDemo.componenttextfield"));
+                message[0] = resourceManager.getString("OptionPaneDemo.componentmessage");
+                message[1] = new JTextField(resourceManager.getString("OptionPaneDemo.componenttextfield"));
 
                 JComboBox cb = new JComboBox();
-                cb.addItem(getString("OptionPaneDemo.component_cb1"));
-                cb.addItem(getString("OptionPaneDemo.component_cb2"));
-                cb.addItem(getString("OptionPaneDemo.component_cb3"));
+                cb.addItem(resourceManager.getString("OptionPaneDemo.component_cb1"));
+                cb.addItem(resourceManager.getString("OptionPaneDemo.component_cb2"));
+                cb.addItem(resourceManager.getString("OptionPaneDemo.component_cb3"));
                 message[2] = cb;
 
-                message[3] = getString("OptionPaneDemo.componentmessage2");
+                message[3] = resourceManager.getString("OptionPaneDemo.componentmessage2");
 
                 // Options
                 String[] options = {
-                        getString("OptionPaneDemo.component_op1"),
-                        getString("OptionPaneDemo.component_op2"),
-                        getString("OptionPaneDemo.component_op3"),
-                        getString("OptionPaneDemo.component_op4"),
-                        getString("OptionPaneDemo.component_op5")
+                        resourceManager.getString("OptionPaneDemo.component_op1"),
+                        resourceManager.getString("OptionPaneDemo.component_op2"),
+                        resourceManager.getString("OptionPaneDemo.component_op3"),
+                        resourceManager.getString("OptionPaneDemo.component_op4"),
+                        resourceManager.getString("OptionPaneDemo.component_op5")
                 };
                 int result = JOptionPane.showOptionDialog(
                         OptionPaneDemo.this,                        // the parent that the dialog blocks
                         message,                                    // the dialog message array
-                        getString("OptionPaneDemo.componenttitle"), // the title of the dialog window
+                        resourceManager.getString("OptionPaneDemo.componenttitle"), // the title of the dialog window
                         JOptionPane.DEFAULT_OPTION,                 // option type
                         JOptionPane.INFORMATION_MESSAGE,            // message type
                         null,                                       // optional icon, use null to use the default icon
@@ -193,16 +195,16 @@ public class OptionPaneDemo extends DemoBase {
                 );
                 switch (result) {
                     case 0: // yes
-                        JOptionPane.showMessageDialog(OptionPaneDemo.this, getString("OptionPaneDemo.component_r1"));
+                        JOptionPane.showMessageDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.component_r1"));
                         break;
                     case 1: // no
-                        JOptionPane.showMessageDialog(OptionPaneDemo.this, getString("OptionPaneDemo.component_r2"));
+                        JOptionPane.showMessageDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.component_r2"));
                         break;
                     case 2: // maybe
-                        JOptionPane.showMessageDialog(OptionPaneDemo.this, getString("OptionPaneDemo.component_r3"));
+                        JOptionPane.showMessageDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.component_r3"));
                         break;
                     case 3: // probably
-                        JOptionPane.showMessageDialog(OptionPaneDemo.this, getString("OptionPaneDemo.component_r4"));
+                        JOptionPane.showMessageDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.component_r4"));
                         break;
                     default:
                         break;

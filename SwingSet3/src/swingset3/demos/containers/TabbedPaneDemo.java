@@ -50,6 +50,7 @@ import javax.swing.event.ChangeListener;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * JTabbedPane Demo
@@ -67,6 +68,8 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class TabbedPaneDemo extends DemoBase implements ActionListener {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
+
     private final HeadSpin spin;
 
     private final JTabbedPane tabbedpane;
@@ -92,11 +95,11 @@ public class TabbedPaneDemo extends DemoBase implements ActionListener {
     public TabbedPaneDemo() {
         // create tab position controls
         JPanel tabControls = new JPanel();
-        tabControls.add(new JLabel(getString("TabbedPaneDemo.label")));
-        top = (JRadioButton) tabControls.add(new JRadioButton(getString("TabbedPaneDemo.top")));
-        left = (JRadioButton) tabControls.add(new JRadioButton(getString("TabbedPaneDemo.left")));
-        bottom = (JRadioButton) tabControls.add(new JRadioButton(getString("TabbedPaneDemo.bottom")));
-        right = (JRadioButton) tabControls.add(new JRadioButton(getString("TabbedPaneDemo.right")));
+        tabControls.add(new JLabel(resourceManager.getString("TabbedPaneDemo.label")));
+        top = (JRadioButton) tabControls.add(new JRadioButton(resourceManager.getString("TabbedPaneDemo.top")));
+        left = (JRadioButton) tabControls.add(new JRadioButton(resourceManager.getString("TabbedPaneDemo.left")));
+        bottom = (JRadioButton) tabControls.add(new JRadioButton(resourceManager.getString("TabbedPaneDemo.bottom")));
+        right = (JRadioButton) tabControls.add(new JRadioButton(resourceManager.getString("TabbedPaneDemo.right")));
         add(tabControls, BorderLayout.NORTH);
 
         group = new ButtonGroup();
@@ -116,19 +119,19 @@ public class TabbedPaneDemo extends DemoBase implements ActionListener {
         tabbedpane = new JTabbedPane();
         add(tabbedpane, BorderLayout.CENTER);
 
-        String name = getString("TabbedPaneDemo.camille");
-        JLabel pix = new JLabel(createImageIcon("tabbedpane/camille.jpg", name));
+        String name = resourceManager.getString("TabbedPaneDemo.camille");
+        JLabel pix = new JLabel(resourceManager.createImageIcon("tabbedpane/camille.jpg", name));
         tabbedpane.add(name, pix);
 
-        name = getString("TabbedPaneDemo.ewan");
-        pix = new JLabel(createImageIcon("tabbedpane/ewan.jpg", name));
+        name = resourceManager.getString("TabbedPaneDemo.ewan");
+        pix = new JLabel(resourceManager.createImageIcon("tabbedpane/ewan.jpg", name));
         tabbedpane.add(name, pix);
 
-        name = getString("TabbedPaneDemo.hania");
-        pix = new JLabel(createImageIcon("tabbedpane/hania.jpg", name));
+        name = resourceManager.getString("TabbedPaneDemo.hania");
+        pix = new JLabel(resourceManager.createImageIcon("tabbedpane/hania.jpg", name));
         tabbedpane.add(name, pix);
 
-        name = getString("TabbedPaneDemo.bounce");
+        name = resourceManager.getString("TabbedPaneDemo.bounce");
         spin = new HeadSpin();
         tabbedpane.add(name, spin);
 
@@ -175,12 +178,12 @@ public class TabbedPaneDemo extends DemoBase implements ActionListener {
 
         public HeadSpin() {
             setBackground(Color.black);
-            icon[0] = createImageIcon("tabbedpane/ewan.gif", getString("TabbedPaneDemo.ewan"));
-            icon[1] = createImageIcon("tabbedpane/stephen.gif", getString("TabbedPaneDemo.stephen"));
-            icon[2] = createImageIcon("tabbedpane/david.gif", getString("TabbedPaneDemo.david"));
-            icon[3] = createImageIcon("tabbedpane/matthew.gif", getString("TabbedPaneDemo.matthew"));
-            icon[4] = createImageIcon("tabbedpane/blake.gif", getString("TabbedPaneDemo.blake"));
-            icon[5] = createImageIcon("tabbedpane/brooke.gif", getString("TabbedPaneDemo.brooke"));
+            icon[0] = resourceManager.createImageIcon("tabbedpane/ewan.gif", resourceManager.getString("TabbedPaneDemo.ewan"));
+            icon[1] = resourceManager.createImageIcon("tabbedpane/stephen.gif", resourceManager.getString("TabbedPaneDemo.stephen"));
+            icon[2] = resourceManager.createImageIcon("tabbedpane/david.gif", resourceManager.getString("TabbedPaneDemo.david"));
+            icon[3] = resourceManager.createImageIcon("tabbedpane/matthew.gif", resourceManager.getString("TabbedPaneDemo.matthew"));
+            icon[4] = resourceManager.createImageIcon("tabbedpane/blake.gif", resourceManager.getString("TabbedPaneDemo.blake"));
+            icon[5] = resourceManager.createImageIcon("tabbedpane/brooke.gif", resourceManager.getString("TabbedPaneDemo.brooke"));
 
             /*
              for(int i = 0; i < 6; i++) {

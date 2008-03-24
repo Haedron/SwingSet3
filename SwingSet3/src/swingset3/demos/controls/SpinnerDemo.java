@@ -38,6 +38,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 import swingset3.demos.controls.spinner.*;
 
 /**
@@ -63,6 +64,7 @@ import swingset3.demos.controls.spinner.*;
 )
         
 public class SpinnerDemo extends DemoBase {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**
      * main method allows us to run as a standalone demo.
@@ -74,11 +76,11 @@ public class SpinnerDemo extends DemoBase {
 
     public SpinnerDemo() {
         CosinePaletteChooser chooser = 
-                new CosinePaletteChooser(250, 180, getStrings());
+                new CosinePaletteChooser(250, 180, resourceManager);
         final JMandelbrot mandelbrot = 
-                new JMandelbrot(400, 400, chooser.getPalette(), getStrings());
+                new JMandelbrot(400, 400, chooser.getPalette(), resourceManager);
         MandelbrotControl mandelbrotControl = 
-                new MandelbrotControl(mandelbrot, getStrings());
+                new MandelbrotControl(mandelbrot, resourceManager);
 
         chooser.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {

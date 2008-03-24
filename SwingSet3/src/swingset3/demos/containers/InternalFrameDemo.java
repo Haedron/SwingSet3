@@ -35,7 +35,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -54,6 +53,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 
 /**
@@ -88,6 +88,8 @@ public class InternalFrameDemo extends DemoBase {
 
     private static final int FRAME_WIDTH = 300;
     private static final int FRAME_HEIGHT = 300;
+
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     private int windowCount = 0;
     private JDesktopPane desktop = null;
@@ -126,15 +128,23 @@ public class InternalFrameDemo extends DemoBase {
      */
     public InternalFrameDemo() {
         // preload all the icons we need for this demo
-        icon1 = createImageIcon("internalframe/bananas.png", getString("InternalFrameDemo.bananas"));
-        icon2 = createImageIcon("internalframe/globe.png", getString("InternalFrameDemo.globe"));
-        icon3 = createImageIcon("internalframe/package.png", getString("InternalFrameDemo.package"));
-        icon4 = createImageIcon("internalframe/soccer_ball.png", getString("InternalFrameDemo.soccerball"));
+        icon1 = resourceManager.createImageIcon("internalframe/bananas.png", 
+                resourceManager.getString("InternalFrameDemo.bananas"));
+        icon2 = resourceManager.createImageIcon("internalframe/globe.png", 
+                resourceManager.getString("InternalFrameDemo.globe"));
+        icon3 = resourceManager.createImageIcon("internalframe/package.png", 
+                resourceManager.getString("InternalFrameDemo.package"));
+        icon4 = resourceManager.createImageIcon("internalframe/soccer_ball.png", 
+                resourceManager.getString("InternalFrameDemo.soccerball"));
 
-        smIcon1 = createImageIcon("internalframe/bananas_small.png", getString("InternalFrameDemo.bananas"));
-        smIcon2 = createImageIcon("internalframe/globe_small.png", getString("InternalFrameDemo.globe"));
-        smIcon3 = createImageIcon("internalframe/package_small.png", getString("InternalFrameDemo.package"));
-        smIcon4 = createImageIcon("internalframe/soccer_ball_small.png", getString("InternalFrameDemo.soccerball"));
+        smIcon1 = resourceManager.createImageIcon("internalframe/bananas_small.png", 
+                resourceManager.getString("InternalFrameDemo.bananas"));
+        smIcon2 = resourceManager.createImageIcon("internalframe/globe_small.png", 
+                resourceManager.getString("InternalFrameDemo.globe"));
+        smIcon3 = resourceManager.createImageIcon("internalframe/package_small.png", 
+                resourceManager.getString("InternalFrameDemo.package"));
+        smIcon4 = resourceManager.createImageIcon("internalframe/soccer_ball_small.png", 
+                resourceManager.getString("InternalFrameDemo.soccerball"));
 
         //<snip>Create desktop pane
         // The desktop pane will contain all the internal frames
@@ -160,10 +170,11 @@ public class InternalFrameDemo extends DemoBase {
         JInternalFrame internalFrame = new JInternalFrame();
         //</snip>
 
-        if (!windowTitleField.getText().equals(getString("InternalFrameDemo.frame_label"))) {
+        if (!windowTitleField.getText().equals(resourceManager.getString("InternalFrameDemo.frame_label"))) {
             internalFrame.setTitle(windowTitleField.getText() + "  ");
         } else {
-            internalFrame = new JInternalFrame(getString("InternalFrameDemo.frame_label") + " " + windowCount + "  ");
+            internalFrame = new JInternalFrame(
+                    resourceManager.getString("InternalFrameDemo.frame_label") + " " + windowCount + "  ");
         }
 
         //<snip>Set internal frame properties
@@ -197,7 +208,7 @@ public class InternalFrameDemo extends DemoBase {
 
     public JInternalFrame createInternalFramePalette() {
         JInternalFrame palette = new JInternalFrame(
-                getString("InternalFrameDemo.palette_label")
+                resourceManager.getString("InternalFrameDemo.palette_label")
         );
         palette.putClientProperty("JInternalFrame.isPalette", Boolean.TRUE);
         palette.getContentPane().setLayout(new BorderLayout());
@@ -255,8 +266,8 @@ public class InternalFrameDemo extends DemoBase {
 
 
         Box box = new Box(BoxLayout.Y_AXIS);
-        windowResizable = new JCheckBox(getString("InternalFrameDemo.resizable_label"), true);
-        windowIconifiable = new JCheckBox(getString("InternalFrameDemo.iconifiable_label"), true);
+        windowResizable = new JCheckBox(resourceManager.getString("InternalFrameDemo.resizable_label"), true);
+        windowIconifiable = new JCheckBox(resourceManager.getString("InternalFrameDemo.iconifiable_label"), true);
 
         box.add(Box.createGlue());
         box.add(windowResizable);
@@ -265,8 +276,8 @@ public class InternalFrameDemo extends DemoBase {
         p.add(box);
 
         box = new Box(BoxLayout.Y_AXIS);
-        windowClosable = new JCheckBox(getString("InternalFrameDemo.closable_label"), true);
-        windowMaximizable = new JCheckBox(getString("InternalFrameDemo.maximizable_label"), true);
+        windowClosable = new JCheckBox(resourceManager.getString("InternalFrameDemo.closable_label"), true);
+        windowMaximizable = new JCheckBox(resourceManager.getString("InternalFrameDemo.maximizable_label"), true);
 
         box.add(Box.createGlue());
         box.add(windowClosable);
@@ -282,8 +293,8 @@ public class InternalFrameDemo extends DemoBase {
         p = new JPanel();
         p.setBorder(new EmptyBorder(0, 0, 10, 0));
 
-        windowTitleField = new JTextField(getString("InternalFrameDemo.frame_label"));
-        windowTitleLabel = new JLabel(getString("InternalFrameDemo.title_text_field_label"));
+        windowTitleField = new JTextField(resourceManager.getString("InternalFrameDemo.frame_label"));
+        windowTitleLabel = new JLabel(resourceManager.getString("InternalFrameDemo.title_text_field_label"));
 
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
         p.add(Box.createRigidArea(HGAP5));

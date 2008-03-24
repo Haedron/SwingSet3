@@ -43,6 +43,7 @@ import javax.swing.event.ChangeListener;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * JButton, JRadioButton, JToggleButton, JCheckBox Demos
@@ -62,6 +63,7 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class ButtonDemo extends DemoBase implements ChangeListener {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     private final JTabbedPane tab;
 
@@ -114,7 +116,7 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
     }
 
     public void addButtons() {
-        tab.addTab(getString("ButtonDemo.buttons"), buttonPanel);
+        tab.addTab(resourceManager.getString("ButtonDemo.buttons"), buttonPanel);
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setBorder(border5);
 
@@ -125,20 +127,21 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         // Text Buttons
         JPanel p2 = createHorizontalPanel(false);
         p1.add(p2);
-        p2.setBorder(new CompoundBorder(new TitledBorder(null, getString("ButtonDemo.textbuttons"),
+        p2.setBorder(new CompoundBorder(new TitledBorder(null, 
+                resourceManager.getString("ButtonDemo.textbuttons"),
                 TitledBorder.LEFT, TitledBorder.TOP), border5));
 
-        JButton button1 = new JButton(getString("ButtonDemo.button1"));
+        JButton button1 = new JButton(resourceManager.getString("ButtonDemo.button1"));
         buttons.add(button1);
         p2.add(button1);
         p2.add(Box.createRigidArea(HGAP10));
 
-        JButton button2 = new JButton(getString("ButtonDemo.button2"));
+        JButton button2 = new JButton(resourceManager.getString("ButtonDemo.button2"));
         buttons.add(button2);
         p2.add(button2);
         p2.add(Box.createRigidArea(HGAP10));
 
-        JButton button3 = new JButton(getString("ButtonDemo.button3"));
+        JButton button3 = new JButton(resourceManager.getString("ButtonDemo.button3"));
         buttons.add(button3);
         p2.add(button3);
 
@@ -147,37 +150,37 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         JPanel p3 = createHorizontalPanel(false);
         p1.add(p3);
         p3.setLayout(new BoxLayout(p3, BoxLayout.X_AXIS));
-        p3.setBorder(new TitledBorder(null, getString("ButtonDemo.imagebuttons"),
+        p3.setBorder(new TitledBorder(null, resourceManager.getString("ButtonDemo.imagebuttons"),
                 TitledBorder.LEFT, TitledBorder.TOP));
 
         // home image button
-        String description = getString("ButtonDemo.phone");
-        JButton button = new JButton(createImageIcon("buttons/b1.gif", description));
-        button.setPressedIcon(createImageIcon("buttons/b1p.gif", description));
-        button.setRolloverIcon(createImageIcon("buttons/b1r.gif", description));
-        button.setDisabledIcon(createImageIcon("buttons/b1d.gif", description));
+        String description = resourceManager.getString("ButtonDemo.phone");
+        JButton button = new JButton(resourceManager.createImageIcon("buttons/b1.gif", description));
+        button.setPressedIcon(resourceManager.createImageIcon("buttons/b1p.gif", description));
+        button.setRolloverIcon(resourceManager.createImageIcon("buttons/b1r.gif", description));
+        button.setDisabledIcon(resourceManager.createImageIcon("buttons/b1d.gif", description));
         button.setMargin(new Insets(0, 0, 0, 0));
         p3.add(button);
         buttons.add(button);
         p3.add(Box.createRigidArea(HGAP10));
 
         // write image button
-        description = getString("ButtonDemo.write");
-        button = new JButton(createImageIcon("buttons/b2.gif", description));
-        button.setPressedIcon(createImageIcon("buttons/b2p.gif", description));
-        button.setRolloverIcon(createImageIcon("buttons/b2r.gif", description));
-        button.setDisabledIcon(createImageIcon("buttons/b2d.gif", description));
+        description = resourceManager.getString("ButtonDemo.write");
+        button = new JButton(resourceManager.createImageIcon("buttons/b2.gif", description));
+        button.setPressedIcon(resourceManager.createImageIcon("buttons/b2p.gif", description));
+        button.setRolloverIcon(resourceManager.createImageIcon("buttons/b2r.gif", description));
+        button.setDisabledIcon(resourceManager.createImageIcon("buttons/b2d.gif", description));
         button.setMargin(new Insets(0, 0, 0, 0));
         p3.add(button);
         buttons.add(button);
         p3.add(Box.createRigidArea(HGAP10));
 
         // write image button
-        description = getString("ButtonDemo.peace");
-        button = new JButton(createImageIcon("buttons/b3.gif", description));
-        button.setPressedIcon(createImageIcon("buttons/b3p.gif", description));
-        button.setRolloverIcon(createImageIcon("buttons/b3r.gif", description));
-        button.setDisabledIcon(createImageIcon("buttons/b3d.gif", description));
+        description = resourceManager.getString("ButtonDemo.peace");
+        button = new JButton(resourceManager.createImageIcon("buttons/b3.gif", description));
+        button.setPressedIcon(resourceManager.createImageIcon("buttons/b3p.gif", description));
+        button.setRolloverIcon(resourceManager.createImageIcon("buttons/b3r.gif", description));
+        button.setDisabledIcon(resourceManager.createImageIcon("buttons/b3d.gif", description));
         button.setMargin(new Insets(0, 0, 0, 0));
         p3.add(button);
         buttons.add(button);
@@ -192,7 +195,7 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
     public void addRadioButtons() {
         ButtonGroup group = new ButtonGroup();
 
-        tab.addTab(getString("ButtonDemo.radiobuttons"), radioButtonPanel);
+        tab.addTab(resourceManager.getString("ButtonDemo.radiobuttons"), radioButtonPanel);
         radioButtonPanel.setLayout(new BoxLayout(radioButtonPanel, BoxLayout.X_AXIS));
         radioButtonPanel.setBorder(border5);
 
@@ -205,24 +208,24 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         p1.add(p2);
         p2.setBorder(new CompoundBorder(
                 new TitledBorder(
-                        null, getString("ButtonDemo.textradiobuttons"),
+                        null, resourceManager.getString("ButtonDemo.textradiobuttons"),
                         TitledBorder.LEFT, TitledBorder.TOP), border5)
         );
 
         JRadioButton radio = (JRadioButton) p2.add(
-                new JRadioButton(getString("ButtonDemo.radio1")));
+                new JRadioButton(resourceManager.getString("ButtonDemo.radio1")));
         group.add(radio);
         radiobuttons.add(radio);
         p2.add(Box.createRigidArea(HGAP10));
 
         radio = (JRadioButton) p2.add(
-                new JRadioButton(getString("ButtonDemo.radio2")));
+                new JRadioButton(resourceManager.getString("ButtonDemo.radio2")));
         group.add(radio);
         radiobuttons.add(radio);
         p2.add(Box.createRigidArea(HGAP10));
 
         radio = (JRadioButton) p2.add(
-                new JRadioButton(getString("ButtonDemo.radio3")));
+                new JRadioButton(resourceManager.getString("ButtonDemo.radio3")));
         group.add(radio);
         radiobuttons.add(radio);
 
@@ -232,17 +235,17 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         JPanel p3 = createHorizontalPanel(false);
         p1.add(p3);
         p3.setLayout(new BoxLayout(p3, BoxLayout.X_AXIS));
-        p3.setBorder(new TitledBorder(null, getString("ButtonDemo.imageradiobuttons"),
+        p3.setBorder(new TitledBorder(null, resourceManager.getString("ButtonDemo.imageradiobuttons"),
                 TitledBorder.LEFT, TitledBorder.TOP));
 
         // image radio button 1
-        String description = getString("ButtonDemo.customradio");
-        String text = getString("ButtonDemo.radio1");
-        radio = new JRadioButton(text, createImageIcon("buttons/rb.gif", description));
-        radio.setPressedIcon(createImageIcon("buttons/rbp.gif", description));
-        radio.setRolloverIcon(createImageIcon("buttons/rbr.gif", description));
-        radio.setRolloverSelectedIcon(createImageIcon("buttons/rbrs.gif", description));
-        radio.setSelectedIcon(createImageIcon("buttons/rbs.gif", description));
+        String description = resourceManager.getString("ButtonDemo.customradio");
+        String text = resourceManager.getString("ButtonDemo.radio1");
+        radio = new JRadioButton(text, resourceManager.createImageIcon("buttons/rb.gif", description));
+        radio.setPressedIcon(resourceManager.createImageIcon("buttons/rbp.gif", description));
+        radio.setRolloverIcon(resourceManager.createImageIcon("buttons/rbr.gif", description));
+        radio.setRolloverSelectedIcon(resourceManager.createImageIcon("buttons/rbrs.gif", description));
+        radio.setSelectedIcon(resourceManager.createImageIcon("buttons/rbs.gif", description));
         radio.setMargin(new Insets(0, 0, 0, 0));
         group.add(radio);
         p3.add(radio);
@@ -250,12 +253,12 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         p3.add(Box.createRigidArea(HGAP20));
 
         // image radio button 2
-        text = getString("ButtonDemo.radio2");
-        radio = new JRadioButton(text, createImageIcon("buttons/rb.gif", description));
-        radio.setPressedIcon(createImageIcon("buttons/rbp.gif", description));
-        radio.setRolloverIcon(createImageIcon("buttons/rbr.gif", description));
-        radio.setRolloverSelectedIcon(createImageIcon("buttons/rbrs.gif", description));
-        radio.setSelectedIcon(createImageIcon("buttons/rbs.gif", description));
+        text = resourceManager.getString("ButtonDemo.radio2");
+        radio = new JRadioButton(text, resourceManager.createImageIcon("buttons/rb.gif", description));
+        radio.setPressedIcon(resourceManager.createImageIcon("buttons/rbp.gif", description));
+        radio.setRolloverIcon(resourceManager.createImageIcon("buttons/rbr.gif", description));
+        radio.setRolloverSelectedIcon(resourceManager.createImageIcon("buttons/rbrs.gif", description));
+        radio.setSelectedIcon(resourceManager.createImageIcon("buttons/rbs.gif", description));
         radio.setMargin(new Insets(0, 0, 0, 0));
         group.add(radio);
         p3.add(radio);
@@ -263,12 +266,12 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         p3.add(Box.createRigidArea(HGAP20));
 
         // image radio button 3
-        text = getString("ButtonDemo.radio3");
-        radio = new JRadioButton(text, createImageIcon("buttons/rb.gif", description));
-        radio.setPressedIcon(createImageIcon("buttons/rbp.gif", description));
-        radio.setRolloverIcon(createImageIcon("buttons/rbr.gif", description));
-        radio.setRolloverSelectedIcon(createImageIcon("buttons/rbrs.gif", description));
-        radio.setSelectedIcon(createImageIcon("buttons/rbs.gif", description));
+        text = resourceManager.getString("ButtonDemo.radio3");
+        radio = new JRadioButton(text, resourceManager.createImageIcon("buttons/rb.gif", description));
+        radio.setPressedIcon(resourceManager.createImageIcon("buttons/rbp.gif", description));
+        radio.setRolloverIcon(resourceManager.createImageIcon("buttons/rbr.gif", description));
+        radio.setRolloverSelectedIcon(resourceManager.createImageIcon("buttons/rbrs.gif", description));
+        radio.setSelectedIcon(resourceManager.createImageIcon("buttons/rbs.gif", description));
         radio.setMargin(new Insets(0, 0, 0, 0));
         group.add(radio);
         radiobuttons.add(radio);
@@ -284,7 +287,7 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
 
 
     public void addCheckBoxes() {
-        tab.addTab(getString("ButtonDemo.checkboxes"), checkboxPanel);
+        tab.addTab(resourceManager.getString("ButtonDemo.checkboxes"), checkboxPanel);
         checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.X_AXIS));
         checkboxPanel.setBorder(border5);
 
@@ -297,21 +300,21 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         p1.add(p2);
         p2.setBorder(new CompoundBorder(
                 new TitledBorder(
-                        null, getString("ButtonDemo.textcheckboxes"),
+                        null, resourceManager.getString("ButtonDemo.textcheckboxes"),
                         TitledBorder.LEFT, TitledBorder.TOP), border5)
         );
 
-        JCheckBox checkBox1 = new JCheckBox(getString("ButtonDemo.check1"));
+        JCheckBox checkBox1 = new JCheckBox(resourceManager.getString("ButtonDemo.check1"));
         checkboxes.add(checkBox1);
         p2.add(checkBox1);
         p2.add(Box.createRigidArea(HGAP10));
 
-        JCheckBox checkBox2 = new JCheckBox(getString("ButtonDemo.check2"));
+        JCheckBox checkBox2 = new JCheckBox(resourceManager.getString("ButtonDemo.check2"));
         checkboxes.add(checkBox2);
         p2.add(checkBox2);
         p2.add(Box.createRigidArea(HGAP10));
 
-        JCheckBox checkBox3 = new JCheckBox(getString("ButtonDemo.check3"));
+        JCheckBox checkBox3 = new JCheckBox(resourceManager.getString("ButtonDemo.check3"));
         checkboxes.add(checkBox3);
         p2.add(checkBox3);
 
@@ -320,38 +323,39 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         JPanel p3 = createHorizontalPanel(false);
         p1.add(p3);
         p3.setLayout(new BoxLayout(p3, BoxLayout.X_AXIS));
-        p3.setBorder(new TitledBorder(null, getString("ButtonDemo.imagecheckboxes"),
+        p3.setBorder(new TitledBorder(null, resourceManager.getString("ButtonDemo.imagecheckboxes"),
                 TitledBorder.LEFT, TitledBorder.TOP));
 
         // image checkbox 1
-        String description = getString("ButtonDemo.customcheck");
-        String text = getString("ButtonDemo.check1");
-        JCheckBox check = new JCheckBox(text, createImageIcon("buttons/cb.gif", description));
-        check.setRolloverIcon(createImageIcon("buttons/cbr.gif", description));
-        check.setRolloverSelectedIcon(createImageIcon("buttons/cbrs.gif", description));
-        check.setSelectedIcon(createImageIcon("buttons/cbs.gif", description));
+        String description = resourceManager.getString("ButtonDemo.customcheck");
+        String text = resourceManager.getString("ButtonDemo.check1");
+        JCheckBox check = new JCheckBox(text, 
+                resourceManager.createImageIcon("buttons/cb.gif", description));
+        check.setRolloverIcon(resourceManager.createImageIcon("buttons/cbr.gif", description));
+        check.setRolloverSelectedIcon(resourceManager.createImageIcon("buttons/cbrs.gif", description));
+        check.setSelectedIcon(resourceManager.createImageIcon("buttons/cbs.gif", description));
         check.setMargin(new Insets(0, 0, 0, 0));
         p3.add(check);
         checkboxes.add(check);
         p3.add(Box.createRigidArea(HGAP20));
 
         // image checkbox 2
-        text = getString("ButtonDemo.check2");
-        check = new JCheckBox(text, createImageIcon("buttons/cb.gif", description));
-        check.setRolloverIcon(createImageIcon("buttons/cbr.gif", description));
-        check.setRolloverSelectedIcon(createImageIcon("buttons/cbrs.gif", description));
-        check.setSelectedIcon(createImageIcon("buttons/cbs.gif", description));
+        text = resourceManager.getString("ButtonDemo.check2");
+        check = new JCheckBox(text, resourceManager.createImageIcon("buttons/cb.gif", description));
+        check.setRolloverIcon(resourceManager.createImageIcon("buttons/cbr.gif", description));
+        check.setRolloverSelectedIcon(resourceManager.createImageIcon("buttons/cbrs.gif", description));
+        check.setSelectedIcon(resourceManager.createImageIcon("buttons/cbs.gif", description));
         check.setMargin(new Insets(0, 0, 0, 0));
         p3.add(check);
         checkboxes.add(check);
         p3.add(Box.createRigidArea(HGAP20));
 
         // image checkbox 3
-        text = getString("ButtonDemo.check3");
-        check = new JCheckBox(text, createImageIcon("buttons/cb.gif", description));
-        check.setRolloverIcon(createImageIcon("buttons/cbr.gif", description));
-        check.setRolloverSelectedIcon(createImageIcon("buttons/cbrs.gif", description));
-        check.setSelectedIcon(createImageIcon("buttons/cbs.gif", description));
+        text = resourceManager.getString("ButtonDemo.check3");
+        check = new JCheckBox(text, resourceManager.createImageIcon("buttons/cb.gif", description));
+        check.setRolloverIcon(resourceManager.createImageIcon("buttons/cbr.gif", description));
+        check.setRolloverSelectedIcon(resourceManager.createImageIcon("buttons/cbrs.gif", description));
+        check.setSelectedIcon(resourceManager.createImageIcon("buttons/cbs.gif", description));
         check.setMargin(new Insets(0, 0, 0, 0));
         p3.add(check);
         checkboxes.add(check);
@@ -365,7 +369,7 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
     }
 
     public void addToggleButtons() {
-        tab.addTab(getString("ButtonDemo.togglebuttons"), toggleButtonPanel);
+        tab.addTab(resourceManager.getString("ButtonDemo.togglebuttons"), toggleButtonPanel);
     }
 
     public JPanel createControls() {
@@ -386,7 +390,7 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         leftColumn.setAlignmentX(LEFT_ALIGNMENT);
         leftColumn.setAlignmentY(TOP_ALIGNMENT);
 
-        JPanel rightColumn = new LayoutControlPanel(this);
+        JPanel rightColumn = new LayoutControlPanel(this, resourceManager);
 
         buttonControls.add(leftColumn);
         buttonControls.add(Box.createRigidArea(HGAP20));
@@ -398,68 +402,68 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
         createListeners();
 
         // Display Options
-        JLabel l = new JLabel(getString("ButtonDemo.controlpanel_label"));
+        JLabel l = new JLabel(resourceManager.getString("ButtonDemo.controlpanel_label"));
         leftColumn.add(l);
 
-        JCheckBox bordered = new JCheckBox(getString("ButtonDemo.paintborder"));
+        JCheckBox bordered = new JCheckBox(resourceManager.getString("ButtonDemo.paintborder"));
         bordered.setActionCommand("PaintBorder");
-        bordered.setToolTipText(getString("ButtonDemo.paintborder_tooltip"));
-        bordered.setMnemonic(getMnemonic("ButtonDemo.paintborder_mnemonic"));
+        bordered.setToolTipText(resourceManager.getString("ButtonDemo.paintborder_tooltip"));
+        bordered.setMnemonic(resourceManager.getMnemonic("ButtonDemo.paintborder_mnemonic"));
         if (currentControls == buttons) {
             bordered.setSelected(true);
         }
         bordered.addItemListener(buttonDisplayListener);
         leftColumn.add(bordered);
 
-        JCheckBox focused = new JCheckBox(getString("ButtonDemo.paintfocus"));
+        JCheckBox focused = new JCheckBox(resourceManager.getString("ButtonDemo.paintfocus"));
         focused.setActionCommand("PaintFocus");
-        focused.setToolTipText(getString("ButtonDemo.paintfocus_tooltip"));
-        focused.setMnemonic(getMnemonic("ButtonDemo.paintfocus_mnemonic"));
+        focused.setToolTipText(resourceManager.getString("ButtonDemo.paintfocus_tooltip"));
+        focused.setMnemonic(resourceManager.getMnemonic("ButtonDemo.paintfocus_mnemonic"));
         focused.setSelected(true);
         focused.addItemListener(buttonDisplayListener);
         leftColumn.add(focused);
 
-        JCheckBox enabled = new JCheckBox(getString("ButtonDemo.enabled"));
+        JCheckBox enabled = new JCheckBox(resourceManager.getString("ButtonDemo.enabled"));
         enabled.setActionCommand("Enabled");
-        enabled.setToolTipText(getString("ButtonDemo.enabled_tooltip"));
+        enabled.setToolTipText(resourceManager.getString("ButtonDemo.enabled_tooltip"));
         enabled.setSelected(true);
         enabled.addItemListener(buttonDisplayListener);
-        enabled.setMnemonic(getMnemonic("ButtonDemo.enabled_mnemonic"));
+        enabled.setMnemonic(resourceManager.getMnemonic("ButtonDemo.enabled_mnemonic"));
         leftColumn.add(enabled);
 
-        JCheckBox filled = new JCheckBox(getString("ButtonDemo.contentfilled"));
+        JCheckBox filled = new JCheckBox(resourceManager.getString("ButtonDemo.contentfilled"));
         filled.setActionCommand("ContentFilled");
-        filled.setToolTipText(getString("ButtonDemo.contentfilled_tooltip"));
+        filled.setToolTipText(resourceManager.getString("ButtonDemo.contentfilled_tooltip"));
         filled.setSelected(true);
         filled.addItemListener(buttonDisplayListener);
-        filled.setMnemonic(getMnemonic("ButtonDemo.contentfilled_mnemonic"));
+        filled.setMnemonic(resourceManager.getMnemonic("ButtonDemo.contentfilled_mnemonic"));
         leftColumn.add(filled);
 
         leftColumn.add(Box.createRigidArea(VGAP20));
 
-        l = new JLabel(getString("ButtonDemo.padamount_label"));
+        l = new JLabel(resourceManager.getString("ButtonDemo.padamount_label"));
         leftColumn.add(l);
         ButtonGroup group = new ButtonGroup();
-        JRadioButton defaultPad = new JRadioButton(getString("ButtonDemo.default"));
-        defaultPad.setToolTipText(getString("ButtonDemo.default_tooltip"));
-        defaultPad.setMnemonic(getMnemonic("ButtonDemo.default_mnemonic"));
+        JRadioButton defaultPad = new JRadioButton(resourceManager.getString("ButtonDemo.default"));
+        defaultPad.setToolTipText(resourceManager.getString("ButtonDemo.default_tooltip"));
+        defaultPad.setMnemonic(resourceManager.getMnemonic("ButtonDemo.default_mnemonic"));
         defaultPad.addItemListener(buttonPadListener);
         group.add(defaultPad);
         defaultPad.setSelected(true);
         leftColumn.add(defaultPad);
 
-        JRadioButton zeroPad = new JRadioButton(getString("ButtonDemo.zero"));
+        JRadioButton zeroPad = new JRadioButton(resourceManager.getString("ButtonDemo.zero"));
         zeroPad.setActionCommand("ZeroPad");
-        zeroPad.setToolTipText(getString("ButtonDemo.zero_tooltip"));
+        zeroPad.setToolTipText(resourceManager.getString("ButtonDemo.zero_tooltip"));
         zeroPad.addItemListener(buttonPadListener);
-        zeroPad.setMnemonic(getMnemonic("ButtonDemo.zero_mnemonic"));
+        zeroPad.setMnemonic(resourceManager.getMnemonic("ButtonDemo.zero_mnemonic"));
         group.add(zeroPad);
         leftColumn.add(zeroPad);
 
-        JRadioButton tenPad = new JRadioButton(getString("ButtonDemo.ten"));
+        JRadioButton tenPad = new JRadioButton(resourceManager.getString("ButtonDemo.ten"));
         tenPad.setActionCommand("TenPad");
-        tenPad.setMnemonic(getMnemonic("ButtonDemo.ten_mnemonic"));
-        tenPad.setToolTipText(getString("ButtonDemo.ten_tooltip"));
+        tenPad.setMnemonic(resourceManager.getMnemonic("ButtonDemo.ten_mnemonic"));
+        tenPad.setToolTipText(resourceManager.getString("ButtonDemo.ten_tooltip"));
         tenPad.addItemListener(buttonPadListener);
         group.add(tenPad);
         leftColumn.add(tenPad);

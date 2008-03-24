@@ -43,6 +43,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * JTree Demo
@@ -60,8 +61,9 @@ import swingset3.demos.DemoBase;
       }
 )
 public class TreeDemo extends DemoBase {
-
-    JTree tree;
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
+    
+    private JTree tree;
 
     /**
      * main method allows us to run as a standalone demo.
@@ -79,7 +81,7 @@ public class TreeDemo extends DemoBase {
     }
  
     public JScrollPane createTree() {
-        DefaultMutableTreeNode top = new DefaultMutableTreeNode(getString("TreeDemo.music"));
+        DefaultMutableTreeNode top = new DefaultMutableTreeNode(resourceManager.getString("TreeDemo.music"));
         DefaultMutableTreeNode catagory = null ;
 	DefaultMutableTreeNode artist = null;
 	DefaultMutableTreeNode record = null;
@@ -136,9 +138,4 @@ public class TreeDemo extends DemoBase {
             
 	return new JScrollPane(tree);
     }
-    
-    void updateDragEnabled(boolean dragEnabled) {
-        tree.setDragEnabled(dragEnabled);
-    }
-
 }

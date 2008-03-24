@@ -28,61 +28,57 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package swingset3.demos.containers;
+package swingset3.demos;
 
+import java.net.URL;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
-import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
-import swingset3.demos.ResourceManager;
-import swingset3.utilities.JGridPanel;
-
 /**
- * GridBagLayout Demo
- *
  * @author Pavel Porvatov
  */
-@DemoProperties(
-        value = "GridBagLayout Demo",
-        category = "Containers",
-        description = "Demonstrates GridBagLayout, a layout which allows to arrange components in containers.",
-        sourceFiles = {
-                "swingset3/demos/containers/GridBagLayoutDemo.java",
-                "swingset3/demos/containers/Calculator.java",
-                "swingset3/demos/DemoBase.java",
-                "swingset3/utilities/JGridPanel.java"
-                }
-)
-public class GridBagLayoutDemo extends DemoBase {
-    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
+public class ResourceManager {
+    private static final Logger logger = Logger.getLogger(DemoBase.class.getName());
 
-    private final JLabel lbCaption = new JLabel("<html>" +
-            resourceManager.getString("GridBagLayoutDemo.caption.text") + "</html>");
+    private final Class demoClass;
 
-    private final Calculator calculator = new Calculator();
+    // Resource bundle for internationalized and accessible text
+    private ResourceBundle bundle = null;
 
-    /**
-     * main method allows us to run as a standalone demo.
-     */
-    public static void main(String[] args) {
-        GridBagLayoutDemo demo = new GridBagLayoutDemo();
-        demo.mainImpl();
+    public ResourceManager(Class demoClass) {
+        this.demoClass = demoClass;
+
+        String bundleName = demoClass.getPackage().getName() + ".resources." + demoClass.getSimpleName();
+
+        try {
+            bundle = ResourceBundle.getBundle(bundleName);
+        } catch (MissingResourceException e) {
+            logger.log(Level.SEVERE, "Couldn't load bundle: " + bundleName);
+        }
     }
 
-    public GridBagLayoutDemo() {
-        initUI();
+    public String getString(String key) {
+        return bundle != null ? bundle.getString(key) : key;
     }
 
-    private void initUI() {
-        JGridPanel pnContent = new JGridPanel(1, 0, 2);
+    public char getMnemonic(String key) {
+        return (getString(key)).charAt(0);
+    }
 
-        pnContent.setBorderEqual(10);
+    public ImageIcon createImageIcon(String filename, String description) {
+        String path = "resources/images/" + filename;
 
-        pnContent.cell(lbCaption, JGridPanel.Layout.FILL).
-                cell().
-                cell(calculator, JGridPanel.Layout.CENTER, JGridPanel.Layout.FIRST).
-                cell();
+        URL imageURL = demoClass.getResource(path);
 
-        add(pnContent);
+        if (imageURL == null) {
+            logger.log(Level.SEVERE, "unable to access image file: " + path);
+
+            return null;
+        } else {
+            return new ImageIcon(imageURL, description);
+        }
     }
 }

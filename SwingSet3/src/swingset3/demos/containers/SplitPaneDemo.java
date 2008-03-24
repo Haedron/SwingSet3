@@ -39,18 +39,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.text.ParseException;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
@@ -63,6 +57,7 @@ import javax.swing.event.ChangeListener;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * Split Pane demo
@@ -81,6 +76,8 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class SplitPaneDemo extends DemoBase {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
+
     private static final Insets insets = new Insets(4,8,4,8);
 
     private JSplitPane splitPane;
@@ -111,8 +108,10 @@ public class SplitPaneDemo extends DemoBase {
      */
     public SplitPaneDemo() {
         //<snip>Create horizontal SplitPane with day and night       
-        day = new JLabel(createImageIcon("splitpane/day.jpg", getString("SplitPaneDemo.day")));
-        night = new JLabel(createImageIcon("splitpane/night.jpg", getString("SplitPaneDemo.night")));
+        day = new JLabel(resourceManager.createImageIcon("splitpane/day.jpg", 
+                resourceManager.getString("SplitPaneDemo.day")));
+        night = new JLabel(resourceManager.createImageIcon("splitpane/night.jpg", 
+                resourceManager.getString("SplitPaneDemo.night")));
         
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, day, night);        
         //</snip>
@@ -155,13 +154,13 @@ public class SplitPaneDemo extends DemoBase {
         
         OrientationListener orientationListener = new OrientationListener();
         
-        JRadioButton button = new JRadioButton(getString("SplitPaneDemo.vert_split"));
+        JRadioButton button = new JRadioButton(resourceManager.getString("SplitPaneDemo.vert_split"));
         button.setActionCommand("vertical");
         button.addActionListener(orientationListener);
         group.add(button);
         box.add(button);
 
-        button = new JRadioButton(getString("SplitPaneDemo.horz_split"));
+        button = new JRadioButton(resourceManager.getString("SplitPaneDemo.horz_split"));
         button.setActionCommand("horizontal");
         button.setSelected(true);
         button.addActionListener(orientationListener);
@@ -173,7 +172,7 @@ public class SplitPaneDemo extends DemoBase {
                 GridBagConstraints.NONE, GridBagConstraints.WEST);
 
         //<snip>Create checkbox to edit continuous layout
-        JCheckBox checkBox = new JCheckBox(getString("SplitPaneDemo.cont_layout"));
+        JCheckBox checkBox = new JCheckBox(resourceManager.getString("SplitPaneDemo.cont_layout"));
         checkBox.setSelected(true);
 
         checkBox.addChangeListener(new ChangeListener() {
@@ -189,7 +188,7 @@ public class SplitPaneDemo extends DemoBase {
                 GridBagConstraints.NONE, GridBagConstraints.WEST);     
 
         //<snip>Create checkbox to edit one-touch-expandable
-        checkBox = new JCheckBox(getString("SplitPaneDemo.one_touch_expandable"));
+        checkBox = new JCheckBox(resourceManager.getString("SplitPaneDemo.one_touch_expandable"));
         checkBox.setSelected(true);
 
         checkBox.addChangeListener(new ChangeListener() {
@@ -220,7 +219,7 @@ public class SplitPaneDemo extends DemoBase {
         });
         //</snip>
         
-        JLabel label = new JLabel(getString("SplitPaneDemo.divider_size"));
+        JLabel label = new JLabel(resourceManager.getString("SplitPaneDemo.divider_size"));
         label.setLabelFor(spinner);
         addToGridbag(label, 2, 0, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.EAST);
@@ -234,7 +233,7 @@ public class SplitPaneDemo extends DemoBase {
         minSizeSpinner.addChangeListener(new MinimumSizeListener(day));
         //</snip>
                 
-        label = new JLabel(getString("SplitPaneDemo.first_component_min_size"));
+        label = new JLabel(resourceManager.getString("SplitPaneDemo.first_component_min_size"));
         label.setLabelFor(minSizeSpinner);
         addToGridbag(label, 2, 1, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.EAST);
@@ -248,7 +247,7 @@ public class SplitPaneDemo extends DemoBase {
         minSizeSpinner.addChangeListener(new MinimumSizeListener(night));
         //</snip>
 
-        label = new JLabel(getString("SplitPaneDemo.second_component_min_size"));
+        label = new JLabel(resourceManager.getString("SplitPaneDemo.second_component_min_size"));
         label.setLabelFor(minSizeSpinner);
         addToGridbag(label, 2, 2, 1, 1,
                                 GridBagConstraints.NONE, GridBagConstraints.EAST);

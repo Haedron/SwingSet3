@@ -49,6 +49,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 import swingset3.utilities.JGridPanel;
 
 /**
@@ -106,13 +107,15 @@ public class FileChooserDemo extends DemoBase {
             new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null)
     };
 
-    private final JLabel lbImage = new JLabel(getString("FileChooserDemo.image.text"), JLabel.CENTER);
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
+
+    private final JLabel lbImage = new JLabel(resourceManager.getString("FileChooserDemo.image.text"), JLabel.CENTER);
 
     private final JScrollPane pnImage = new JScrollPane(lbImage);
 
-    private final JButton btnSelect = new JButton(getString("FileChooserDemo.select.text"));
+    private final JButton btnSelect = new JButton(resourceManager.getString("FileChooserDemo.select.text"));
 
-    private final JButton btnSelectWithPreview = new JButton(getString("FileChooserDemo.selectwithpreview.text"));
+    private final JButton btnSelectWithPreview = new JButton(resourceManager.getString("FileChooserDemo.selectwithpreview.text"));
 
     private final JComboBox cbFilters = new JComboBox();
 
@@ -126,9 +129,9 @@ public class FileChooserDemo extends DemoBase {
 
     private final JButton btnFlipVertical = createButton("filechooser/flipvert.png", "FileChooserDemo.flipvertical.tooltip");
 
-    private final JButton btnSave = new JButton(getString("FileChooserDemo.save.text"));
+    private final JButton btnSave = new JButton(resourceManager.getString("FileChooserDemo.save.text"));
 
-    private final JButton btnCancel = new JButton(getString("FileChooserDemo.cancel.text"));
+    private final JButton btnCancel = new JButton(resourceManager.getString("FileChooserDemo.cancel.text"));
 
     private final JFileChooser externalChooser = new JFileChooser();
 
@@ -226,8 +229,8 @@ public class FileChooserDemo extends DemoBase {
         btnSave.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (JOptionPane.showConfirmDialog(FileChooserDemo.this,
-                        getString("FileChooserDemo.savequiestion.message"),
-                        getString("FileChooserDemo.savequiestion.title"),
+                        resourceManager.getString("FileChooserDemo.savequiestion.message"),
+                        resourceManager.getString("FileChooserDemo.savequiestion.title"),
                         JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
                     return;
                 }
@@ -242,8 +245,8 @@ public class FileChooserDemo extends DemoBase {
                     setState(State.IMAGE_LOADED, false);
                 } catch (IOException e1) {
                     JOptionPane.showMessageDialog(FileChooserDemo.this,
-                            MessageFormat.format(getString("FileChooserDemo.errorsavefile.message"), e1),
-                            getString("FileChooserDemo.errorsavefile.title"),
+                            MessageFormat.format(resourceManager.getString("FileChooserDemo.errorsavefile.message"), e1),
+                            resourceManager.getString("FileChooserDemo.errorsavefile.title"),
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -282,7 +285,7 @@ public class FileChooserDemo extends DemoBase {
         embeddedChooser.setFileFilter(filter);
 
         for (int i = MIN_FILTER_ID; i <= MAX_FILTER_ID; i++) {
-            cbFilters.addItem(new FilterItem(i, getString(FILTER_NAMES[i])));
+            cbFilters.addItem(new FilterItem(i, resourceManager.getString(FILTER_NAMES[i])));
         }
 
         JGridPanel pnFilter = new JGridPanel(2, 0);
@@ -319,11 +322,11 @@ public class FileChooserDemo extends DemoBase {
     }
 
     private JButton createButton(String image, String toolTip) {
-        JButton res = new JButton(createImageIcon(image, null));
+        JButton res = new JButton(resourceManager.createImageIcon(image, null));
 
         res.setPreferredSize(new Dimension(26, 26));
         res.setMinimumSize(new Dimension(26, 26));
-        res.setToolTipText(getString(toolTip));
+        res.setToolTipText(resourceManager.getString(toolTip));
 
         return res;
     }
@@ -359,8 +362,8 @@ public class FileChooserDemo extends DemoBase {
     private void loadFile(File file) {
         if (file == null) {
             JOptionPane.showMessageDialog(this,
-                    getString("FileChooserDemo.selectfile.message"),
-                    getString("FileChooserDemo.selectfile.title"),
+                    resourceManager.getString("FileChooserDemo.selectfile.message"),
+                    resourceManager.getString("FileChooserDemo.selectfile.title"),
                     JOptionPane.INFORMATION_MESSAGE);
 
             return;
@@ -384,8 +387,8 @@ public class FileChooserDemo extends DemoBase {
         }
 
         JOptionPane.showMessageDialog(this,
-                getString("FileChooserDemo.errorloadfile.message"),
-                getString("FileChooserDemo.errorloadfile.title"),
+                resourceManager.getString("FileChooserDemo.errorloadfile.message"),
+                resourceManager.getString("FileChooserDemo.errorloadfile.title"),
                 JOptionPane.ERROR_MESSAGE);
     }
 
@@ -456,7 +459,7 @@ public class FileChooserDemo extends DemoBase {
 
         private final JLabel lbSize = new JLabel();
 
-        private final JLabel lbPreview = new JLabel(getString("FileChooserDemo.preview.emptytext"), JLabel.CENTER);
+        private final JLabel lbPreview = new JLabel(resourceManager.getString("FileChooserDemo.preview.emptytext"), JLabel.CENTER);
 
         private final Map<String, FileType> knownTypes = new HashMap<String, FileType>();
 
@@ -524,7 +527,7 @@ public class FileChooserDemo extends DemoBase {
 
             if (emptyPreview) {
                 lbPreview.setIcon(null);
-                lbPreview.setText(getString("FileChooserDemo.preview.emptytext"));
+                lbPreview.setText(resourceManager.getString("FileChooserDemo.preview.emptytext"));
 
                 setComponent(lbPreview, 0, 1);
             }
@@ -537,9 +540,9 @@ public class FileChooserDemo extends DemoBase {
 
             JGridPanel pnInfo = new JGridPanel(2, 1);
 
-            pnInfo.cell(new JLabel(getString("FileChooserDemo.preview.type"))).
+            pnInfo.cell(new JLabel(resourceManager.getString("FileChooserDemo.preview.type"))).
                     cell(lbType).
-                    cell(new JLabel(getString("FileChooserDemo.preview.size"))).
+                    cell(new JLabel(resourceManager.getString("FileChooserDemo.preview.size"))).
                     cell(lbSize);
 
             cell(pnInfo);

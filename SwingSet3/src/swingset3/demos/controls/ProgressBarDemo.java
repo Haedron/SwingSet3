@@ -46,6 +46,7 @@ import javax.swing.border.SoftBevelBorder;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * JProgressBar Demo
@@ -65,6 +66,7 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class ProgressBarDemo extends DemoBase {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**
      * main method allows us to run as a standalone demo.
@@ -95,8 +97,10 @@ public class ProgressBarDemo extends DemoBase {
         textWrapper.setAlignmentX(LEFT_ALIGNMENT);
         progressTextArea = new MyTextArea();
 
-        progressTextArea.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_area_name"));
-        progressTextArea.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_area_description"));
+        progressTextArea.getAccessibleContext().setAccessibleName(
+                resourceManager.getString("ProgressBarDemo.accessible_text_area_name"));
+        progressTextArea.getAccessibleContext().setAccessibleName(
+                resourceManager.getString("ProgressBarDemo.accessible_text_area_description"));
         textWrapper.add(new JScrollPane(progressTextArea), BorderLayout.CENTER);
 
         add(textWrapper, BorderLayout.CENTER);
@@ -109,7 +113,8 @@ public class ProgressBarDemo extends DemoBase {
                 return new Dimension(300, super.getPreferredSize().height);
             }
         };
-        progressBar.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_loading_progress"));
+        progressBar.getAccessibleContext().setAccessibleName(
+                resourceManager.getString("ProgressBarDemo.accessible_text_loading_progress"));
 
         progressPanel.add(progressBar);
         progressPanel.add(createLoadButton());
@@ -117,7 +122,7 @@ public class ProgressBarDemo extends DemoBase {
     }
 
     public JButton createLoadButton() {
-        loadAction = new AbstractAction(getString("ProgressBarDemo.start_button")) {
+        loadAction = new AbstractAction(resourceManager.getString("ProgressBarDemo.start_button")) {
             public void actionPerformed(ActionEvent e) {
                 loadAction.setEnabled(false);
                 stopAction.setEnabled(true);
@@ -133,7 +138,7 @@ public class ProgressBarDemo extends DemoBase {
     }
 
     public JButton createStopButton() {
-        stopAction = new AbstractAction(getString("ProgressBarDemo.stop_button")) {
+        stopAction = new AbstractAction(resourceManager.getString("ProgressBarDemo.stop_button")) {
             public void actionPerformed(ActionEvent e) {
                 timer.stop();
                 loadAction.setEnabled(true);
@@ -156,7 +161,7 @@ public class ProgressBarDemo extends DemoBase {
 
     private int textLocation = 0;
 
-    private final String text = getString("ProgressBarDemo.text");
+    private final String text = resourceManager.getString("ProgressBarDemo.text");
 
     public Action createTextLoadAction() {
         return new AbstractAction("text load action") {

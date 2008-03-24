@@ -39,6 +39,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * ToolTip Demo
@@ -56,6 +57,7 @@ import swingset3.demos.DemoBase;
       }
 )
 public class ToolTipDemo extends DemoBase {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**
      * main method allows us to run as a standalone demo.
@@ -91,8 +93,8 @@ public class ToolTipDemo extends DemoBase {
             super();
             setLayout(null);
             
-            background = new JLabel(createImageIcon("tooltip/tooltip_background.png",
-                                                     getString("ToolTipDemo.toolbox")));
+            background = new JLabel(resourceManager.createImageIcon("tooltip/tooltip_background.png",
+                                                     resourceManager.getString("ToolTipDemo.toolbox")));
             
             background.setVerticalAlignment(JLabel.TOP);
             background.setHorizontalAlignment(JLabel.LEFT);
@@ -102,12 +104,12 @@ public class ToolTipDemo extends DemoBase {
             
             
             //<snip>Create region for displaying plain tooltip
-            plainToolTipRegion = createToolTipRegion(getString("ToolTipDemo.plain"));
+            plainToolTipRegion = createToolTipRegion(resourceManager.getString("ToolTipDemo.plain"));
             plainToolTipRegion.setToolTipText("A simple one line tip.");
             //</snip>
 
             //<snip>Create region for displaying HTML tooltip
-            htmlToolTipRegion = createToolTipRegion(getString("ToolTipDemo.html"));
+            htmlToolTipRegion = createToolTipRegion(resourceManager.getString("ToolTipDemo.html"));
             htmlToolTipRegion.setToolTipText("<html><body bgcolor=\"#AABBFF\">In case you thought that tooltips had to be<p>"+
                     "boring, one line descriptions, the <font color=blue size=+2>Swing!</font> team<p>"+
                     "is happy to shatter your illusions.<p>"+
@@ -117,7 +119,7 @@ public class ToolTipDemo extends DemoBase {
             //</snip>
             
             //<snip>Create region for displaying styled tooltip            
-            styledToolTipRegion = createToolTipRegion(getString("ToolTipDemo.styled"));
+            styledToolTipRegion = createToolTipRegion(resourceManager.getString("ToolTipDemo.styled"));
             styledToolTipRegion.setToolTipText("<html>Tips can be styled to be"+ 
                     "<br><b>interesting</b> and <i>fun</i></html>");
             //</snip>
@@ -127,8 +129,7 @@ public class ToolTipDemo extends DemoBase {
             add(plainToolTipRegion);
  
             add(background);
-
-;        }
+        }
 
         public void doLayout() {
             background.setBounds(0, 0, getWidth(), getHeight());

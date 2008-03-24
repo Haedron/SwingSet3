@@ -41,6 +41,7 @@ import javax.swing.JScrollPane;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
+import swingset3.demos.ResourceManager;
 
 /**
  * Scroll Pane Demo
@@ -58,6 +59,7 @@ import swingset3.demos.DemoBase;
                 }
 )
 public class ScrollPaneDemo extends DemoBase {
+    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**
      * main method allows us to run as a standalone demo.
@@ -71,8 +73,8 @@ public class ScrollPaneDemo extends DemoBase {
      * ScrollPaneDemo Constructor
      */
     public ScrollPaneDemo() {
-        ImageIcon crayons = createImageIcon("scrollpane/crayons.jpg", getString("ScrollPaneDemo.crayons"));
-        add(new ImageScroller(this, crayons), BorderLayout.CENTER);
+        ImageIcon crayons = resourceManager.createImageIcon("scrollpane/crayons.jpg", resourceManager.getString("ScrollPaneDemo.crayons"));
+        add(new ImageScroller(crayons), BorderLayout.CENTER);
     }
 
 
@@ -81,7 +83,7 @@ public class ScrollPaneDemo extends DemoBase {
      * and corners.
      */
     private class ImageScroller extends JScrollPane {
-        public ImageScroller(ScrollPaneDemo demo, Icon icon) {
+        public ImageScroller(Icon icon) {
             super();
 
             // Panel to hold the icon image
@@ -91,27 +93,27 @@ public class ScrollPaneDemo extends DemoBase {
 
             // Create and add a column header to the scrollpane
             JLabel colHeader = new JLabel(
-                    demo.createImageIcon("scrollpane/colheader.jpg", getString("ScrollPaneDemo.colheader")));
+                    resourceManager.createImageIcon("scrollpane/colheader.jpg", resourceManager.getString("ScrollPaneDemo.colheader")));
             setColumnHeaderView(colHeader);
 
             // Create and add a row header to the scrollpane
             JLabel rowHeader = new JLabel(
-                    demo.createImageIcon("scrollpane/rowheader.jpg", getString("ScrollPaneDemo.rowheader")));
+                    resourceManager.createImageIcon("scrollpane/rowheader.jpg", resourceManager.getString("ScrollPaneDemo.rowheader")));
             setRowHeaderView(rowHeader);
 
             // Create and add the upper left corner
             JLabel cornerUL = new JLabel(
-                    demo.createImageIcon("scrollpane/upperleft.jpg", getString("ScrollPaneDemo.upperleft")));
+                    resourceManager.createImageIcon("scrollpane/upperleft.jpg", resourceManager.getString("ScrollPaneDemo.upperleft")));
             setCorner(UPPER_LEFT_CORNER, cornerUL);
 
             // Create and add the upper right corner
             JLabel cornerUR = new JLabel(
-                    demo.createImageIcon("scrollpane/upperright.jpg", getString("ScrollPaneDemo.upperright")));
+                    resourceManager.createImageIcon("scrollpane/upperright.jpg", resourceManager.getString("ScrollPaneDemo.upperright")));
             setCorner(UPPER_RIGHT_CORNER, cornerUR);
 
             // Create and add the lower left corner
             JLabel cornerLL = new JLabel(
-                    demo.createImageIcon("scrollpane/lowerleft.jpg", getString("ScrollPaneDemo.lowerleft")));
+                    resourceManager.createImageIcon("scrollpane/lowerleft.jpg", resourceManager.getString("ScrollPaneDemo.lowerleft")));
             setCorner(LOWER_LEFT_CORNER, cornerLL);
 
             JScrollBar vsb = getVerticalScrollBar();
