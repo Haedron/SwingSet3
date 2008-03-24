@@ -85,6 +85,9 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
     private final Insets insets0 = new Insets(0, 0, 0, 0);
     private final Insets insets10 = new Insets(10, 10, 10, 10);
 
+    private final Border loweredBorder = new CompoundBorder(
+            new SoftBevelBorder(SoftBevelBorder.LOWERED), new EmptyBorder(5, 5, 5, 5));
+
     /**
      * main method allows us to run as a standalone demo.
      */
@@ -97,16 +100,11 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
      * ButtonDemo Constructor
      */
     public ButtonDemo() {
-        // Set the title for this demo, and an icon used to represent this
-        // demo inside the SwingSet2 app.
-        super();
-
         tab = new JTabbedPane();
         tab.getModel().addChangeListener(this);
 
-        JPanel demo = getDemoPanel();
-        demo.setLayout(new BoxLayout(demo, BoxLayout.Y_AXIS));
-        demo.add(tab);
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(tab);
 
         //addButtons();
         addRadioButtons();
@@ -555,5 +553,27 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
 
     public List<? extends JComponent> getCurrentControls() {
         return currentControls;
+    }
+    
+    private JPanel createHorizontalPanel(boolean threeD) {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
+        p.setAlignmentY(TOP_ALIGNMENT);
+        p.setAlignmentX(LEFT_ALIGNMENT);
+        if(threeD) {
+            p.setBorder(loweredBorder);
+        }
+        return p;
+    }
+    
+    private JPanel createVerticalPanel(boolean threeD) {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setAlignmentY(TOP_ALIGNMENT);
+        p.setAlignmentX(LEFT_ALIGNMENT);
+        if(threeD) {
+            p.setBorder(loweredBorder);
+        }
+        return p;
     }
 }

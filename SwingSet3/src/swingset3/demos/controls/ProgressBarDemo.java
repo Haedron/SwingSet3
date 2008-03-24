@@ -78,10 +78,6 @@ public class ProgressBarDemo extends DemoBase {
      * ProgressBarDemo Constructor
      */
     public ProgressBarDemo() {
-        // Set the title for this demo, and an icon used to represent this
-        // demo inside the SwingSet2 app.
-        super();
-
         createProgressPanel();
     }
 
@@ -92,7 +88,7 @@ public class ProgressBarDemo extends DemoBase {
     private JTextArea progressTextArea;
 
     public void createProgressPanel() {
-        getDemoPanel().setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
         JPanel textWrapper = new JPanel(new BorderLayout());
         textWrapper.setBorder(new SoftBevelBorder(BevelBorder.LOWERED));
@@ -103,10 +99,10 @@ public class ProgressBarDemo extends DemoBase {
         progressTextArea.getAccessibleContext().setAccessibleName(getString("ProgressBarDemo.accessible_text_area_description"));
         textWrapper.add(new JScrollPane(progressTextArea), BorderLayout.CENTER);
 
-        getDemoPanel().add(textWrapper, BorderLayout.CENTER);
+        add(textWrapper, BorderLayout.CENTER);
 
         JPanel progressPanel = new JPanel();
-        getDemoPanel().add(progressPanel, BorderLayout.SOUTH);
+        add(progressPanel, BorderLayout.SOUTH);
 
         progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, text.length()) {
             public Dimension getPreferredSize() {

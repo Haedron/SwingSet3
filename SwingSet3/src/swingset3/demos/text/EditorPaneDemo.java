@@ -77,12 +77,8 @@ public class EditorPaneDemo extends DemoBase {
      * EditorPaneDemo Constructor
      */
     public EditorPaneDemo() {
-        // Set the title for this demo, and an icon used to represent this
-        // demo inside the SwingSet2 app.
-        super();
-	
         try {
-	    URL url = null;
+	    URL url;
 	    // System.getProperty("user.dir") +
 	    // System.getProperty("file.separator");
 	    String path = null;
@@ -102,7 +98,7 @@ public class EditorPaneDemo extends DemoBase {
 		JScrollPane scroller = new JScrollPane();
 		JViewport vp = scroller.getViewport();
 		vp.add(html);
-                getDemoPanel().add(scroller, BorderLayout.CENTER);
+                add(scroller, BorderLayout.CENTER);
             }
         } catch (MalformedURLException e) {
             System.out.println("Malformed URL: " + e);

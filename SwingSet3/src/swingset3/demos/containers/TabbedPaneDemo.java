@@ -90,8 +90,6 @@ public class TabbedPaneDemo extends DemoBase implements ActionListener {
      * TabbedPaneDemo Constructor
      */
     public TabbedPaneDemo() {
-        super();
-
         // create tab position controls
         JPanel tabControls = new JPanel();
         tabControls.add(new JLabel(getString("TabbedPaneDemo.label")));
@@ -99,7 +97,7 @@ public class TabbedPaneDemo extends DemoBase implements ActionListener {
         left = (JRadioButton) tabControls.add(new JRadioButton(getString("TabbedPaneDemo.left")));
         bottom = (JRadioButton) tabControls.add(new JRadioButton(getString("TabbedPaneDemo.bottom")));
         right = (JRadioButton) tabControls.add(new JRadioButton(getString("TabbedPaneDemo.right")));
-        getDemoPanel().add(tabControls, BorderLayout.NORTH);
+        add(tabControls, BorderLayout.NORTH);
 
         group = new ButtonGroup();
         group.add(top);
@@ -116,7 +114,7 @@ public class TabbedPaneDemo extends DemoBase implements ActionListener {
 
         // create tab 
         tabbedpane = new JTabbedPane();
-        getDemoPanel().add(tabbedpane, BorderLayout.CENTER);
+        add(tabbedpane, BorderLayout.CENTER);
 
         String name = getString("TabbedPaneDemo.camille");
         JLabel pix = new JLabel(createImageIcon("tabbedpane/camille.jpg", name));

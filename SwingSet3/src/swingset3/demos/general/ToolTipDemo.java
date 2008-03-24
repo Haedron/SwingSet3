@@ -69,15 +69,12 @@ public class ToolTipDemo extends DemoBase {
      * ToolTipDemo Constructor
      */
     public ToolTipDemo() {
-	super();
-
-	JPanel p = getDemoPanel();
-        p.setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
 	// Create a panel which contains specific tooltip regions.
         Toolbox toolbox = new Toolbox();
                 
-	p.add(toolbox, BorderLayout.CENTER);
+	add(toolbox, BorderLayout.CENTER);
     }
     
     public class Toolbox extends JPanel {

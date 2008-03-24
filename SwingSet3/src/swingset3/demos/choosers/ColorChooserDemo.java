@@ -110,7 +110,7 @@ public class ColorChooserDemo extends DemoBase {
                     }
                 };
 
-                JDialog dialog = JColorChooser.createDialog(getDemoPanel(),
+                JDialog dialog = JColorChooser.createDialog(ColorChooserDemo.this,
                         getString("ColorChooserDemo.chooser_title"),
                         true,
                         chooser,
@@ -142,7 +142,7 @@ public class ColorChooserDemo extends DemoBase {
 
         pnContent.setBorder(new EmptyBorder(10, 0, 0, 0));
         
-        getDemoPanel().add(pnContent);
+        add(pnContent);
     }
 
     private class ColorSwatch implements Icon {

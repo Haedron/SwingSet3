@@ -110,8 +110,6 @@ public class SplitPaneDemo extends DemoBase {
      * SplitPaneDemo Constructor
      */
     public SplitPaneDemo() {
-        super();
-
         //<snip>Create horizontal SplitPane with day and night       
         day = new JLabel(createImageIcon("splitpane/day.jpg", getString("SplitPaneDemo.day")));
         night = new JLabel(createImageIcon("splitpane/night.jpg", getString("SplitPaneDemo.night")));
@@ -136,10 +134,10 @@ public class SplitPaneDemo extends DemoBase {
         night.setMinimumSize(new Dimension(20, 20));
         //</snip>
 
-        getDemoPanel().add(splitPane, BorderLayout.CENTER);
-        getDemoPanel().setBackground(Color.black);
+        add(splitPane, BorderLayout.CENTER);
+        setBackground(Color.black);
 
-        getDemoPanel().add(createSplitPaneControls(), BorderLayout.SOUTH);
+        add(createSplitPaneControls(), BorderLayout.SOUTH);
     }
 
     /**

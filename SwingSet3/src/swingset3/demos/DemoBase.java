@@ -31,69 +31,44 @@
 
 package swingset3.demos;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JApplet;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.SoftBevelBorder;
-
-
+import javax.swing.*;
 
 /**
  * Base class for demos ported from SwingSet2 (previously named DemoModule)
  * Demos may extend this class, but it is NOT required.
  *
- * @version 1.23 11/17/05
  * @author Jeff Dinkins
+ * @version 1.23 11/17/05
  */
 public class DemoBase extends JPanel {
-    static final Logger logger = Logger.getLogger(DemoBase.class.getName());
+    private static final Logger logger = Logger.getLogger(DemoBase.class.getName());
 
     // The preferred size of the demo
-    protected int PREFERRED_WIDTH = 600;
-    protected int PREFERRED_HEIGHT = 600;
+    private int PREFERRED_WIDTH = 600;
+    private int PREFERRED_HEIGHT = 600;
 
-    Border loweredBorder = new CompoundBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED), 
-					      new EmptyBorder(5,5,5,5));
+    public static Dimension HGAP5 = new Dimension(5, 1);
+    public static Dimension VGAP5 = new Dimension(1, 5);
 
-    // Premade convenience dimensions, for use wherever you need 'em.
-    public static Dimension HGAP2 = new Dimension(2,1);
-    public static Dimension VGAP2 = new Dimension(1,2);
+    public static Dimension HGAP10 = new Dimension(10, 1);
+    public static Dimension VGAP10 = new Dimension(1, 10);
 
-    public static Dimension HGAP5 = new Dimension(5,1);
-    public static Dimension VGAP5 = new Dimension(1,5);
-    
-    public static Dimension HGAP10 = new Dimension(10,1);
-    public static Dimension VGAP10 = new Dimension(1,10);
+    public static Dimension HGAP15 = new Dimension(15, 1);
+    public static Dimension VGAP15 = new Dimension(1, 15);
 
-    public static Dimension HGAP15 = new Dimension(15,1);
-    public static Dimension VGAP15 = new Dimension(1,15);
-    
-    public static Dimension HGAP20 = new Dimension(20,1);
-    public static Dimension VGAP20 = new Dimension(1,20);
+    public static Dimension HGAP20 = new Dimension(20, 1);
+    public static Dimension VGAP20 = new Dimension(1, 20);
 
-    public static Dimension HGAP25 = new Dimension(25,1);
-    public static Dimension VGAP25 = new Dimension(1,25);
+    public static Dimension HGAP25 = new Dimension(25, 1);
+    public static Dimension VGAP25 = new Dimension(1, 25);
 
-    public static Dimension HGAP30 = new Dimension(30,1);
-    public static Dimension VGAP30 = new Dimension(1,30);
-	
+    public static Dimension HGAP30 = new Dimension(30, 1);
+    public static Dimension VGAP30 = new Dimension(1, 30);
 
     // Resource bundle for internationalized and accessible text
     private ResourceBundle bundle = null;
@@ -102,32 +77,26 @@ public class DemoBase extends JPanel {
 
     protected DemoBase() {
         UIManager.put("swing.boldMetal", Boolean.FALSE);
-	setLayout(new BorderLayout());    
-    }
-
-    public JPanel getDemoPanel() {
-	return this;
+        setLayout(new BorderLayout());
     }
 
     public String getString(String key) {
-        String value = "nada";
         initBundle();
-        value = bundle != null? bundle.getString(key) : key;
-        return value;
+        return bundle != null ? bundle.getString(key) : key;
     }
-    
+
     private void initBundle() {
-        if(bundle == null) {
+        if (bundle == null) {
             bundleName = "a bundle";
             try {
-                bundleName = getClass().getPackage().getName()+".resources."+getClass().getSimpleName();
+                bundleName = getClass().getPackage().getName() + ".resources." + getClass().getSimpleName();
                 bundle = ResourceBundle.getBundle(bundleName);
             } catch (MissingResourceException e) {
                 logger.log(Level.SEVERE, "java.util.MissingResourceException: Couldn't load bundle: " + bundleName);
             }
         }
     }
-    
+
     public Map getStrings() {
         Map<String, String> result = new HashMap<String, String>();
         initBundle();
@@ -145,55 +114,31 @@ public class DemoBase extends JPanel {
     }
 
     public char getMnemonic(String key) {
-	return (getString(key)).charAt(0);
+        return (getString(key)).charAt(0);
     }
 
     public ImageIcon createImageIcon(String filename, String description) {
         String path = "resources/images/" + filename;
         URL imageURL = getClass().getResource(path);
         if (imageURL == null) {
-            logger.log(Level.SEVERE, "unable to access image file: "+path);
-        }        
-        return imageURL != null? 
-            new ImageIcon(getClass().getResource(path), description) : null;
-        
-    }    
+            logger.log(Level.SEVERE, "unable to access image file: " + path);
+        }
+        return imageURL != null ?
+                new ImageIcon(getClass().getResource(path), description) : null;
 
-    public JPanel createHorizontalPanel(boolean threeD) {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-        p.setAlignmentY(TOP_ALIGNMENT);
-        p.setAlignmentX(LEFT_ALIGNMENT);
-        if(threeD) {
-            p.setBorder(loweredBorder);
-        }
-        return p;
     }
-    
-    public JPanel createVerticalPanel(boolean threeD) {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setAlignmentY(TOP_ALIGNMENT);
-        p.setAlignmentX(LEFT_ALIGNMENT);
-        if(threeD) {
-            p.setBorder(loweredBorder);
-        }
-        return p;
-    }
-    
+
     protected void mainImpl() {
-	JFrame frame = new JFrame(getName());
+        JFrame frame = new JFrame(getName());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.getContentPane().setLayout(new BorderLayout());
-	frame.getContentPane().add(getDemoPanel(), BorderLayout.CENTER);
-	getDemoPanel().setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+        frame.getContentPane().add(this, BorderLayout.CENTER);
+        setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 
         frame.pack();
         frame.setLocationRelativeTo(null);
-	frame.setVisible(true);
+        frame.setVisible(true);
     }
-    
-    void updateDragEnabled(boolean dragEnabled) {}
 }
 

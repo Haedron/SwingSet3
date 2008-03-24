@@ -71,10 +71,8 @@ public class ScrollPaneDemo extends DemoBase {
      * ScrollPaneDemo Constructor
      */
     public ScrollPaneDemo() {
-        super();
-
         ImageIcon crayons = createImageIcon("scrollpane/crayons.jpg", getString("ScrollPaneDemo.crayons"));
-        getDemoPanel().add(new ImageScroller(this, crayons), BorderLayout.CENTER);
+        add(new ImageScroller(this, crayons), BorderLayout.CENTER);
     }
 
 

@@ -75,11 +75,7 @@ public class TreeDemo extends DemoBase {
      * TreeDemo Constructor
      */
     public TreeDemo() {
-	// Set the title for this demo, and an icon used to represent this
-	// demo inside the SwingSet2 app.
-	super();
-
-	getDemoPanel().add(createTree(), BorderLayout.CENTER);
+	add(createTree(), BorderLayout.CENTER);
     }
  
     public JScrollPane createTree() {

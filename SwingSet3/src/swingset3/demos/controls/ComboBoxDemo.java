@@ -82,23 +82,18 @@ public class ComboBoxDemo extends DemoBase implements ActionListener {
      * ComboBoxDemo Constructor
      */
     public ComboBoxDemo() {
-        // Set the title for this demo, and an icon used to represent this
-        // demo inside the SwingSet2 app.
-        super();
-
         createComboBoxDemo();
     }
 
     public void createComboBoxDemo() {
-        JPanel demoPanel = getDemoPanel();
-        demoPanel.setLayout(new BoxLayout(demoPanel, BoxLayout.Y_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JPanel innerPanel = new JPanel();
         innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
 
-        demoPanel.add(Box.createRigidArea(VGAP20));
-        demoPanel.add(innerPanel);
-        demoPanel.add(Box.createRigidArea(VGAP20));
+        add(Box.createRigidArea(VGAP20));
+        add(innerPanel);
+        add(Box.createRigidArea(VGAP20));
 
         innerPanel.add(Box.createRigidArea(HGAP20));
 

@@ -78,10 +78,6 @@ public class SliderDemo extends DemoBase {
      * SliderDemo Constructor
      */
     public SliderDemo() {
-        // Set the title for this demo, and an icon used to represent this
-        // demo inside the SwingSet2 app.
-        super();
-
         createSliderDemo();
     }
 
@@ -94,17 +90,17 @@ public class SliderDemo extends DemoBase {
         JLabel tf;
         ChangeListener listener;
 
-        getDemoPanel().setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
         tf = new JLabel(getString("SliderDemo.slidervalue"));
-        getDemoPanel().add(tf, BorderLayout.SOUTH);
+        add(tf, BorderLayout.SOUTH);
 
         tp = new JPanel();
         g = new GridLayout(1, 2);
         g.setHgap(5);
         g.setVgap(5);
         tp.setLayout(g);
-        getDemoPanel().add(tp, BorderLayout.CENTER);
+        add(tp, BorderLayout.CENTER);
 
         listener = new SliderListener(tf);
 

@@ -125,8 +125,6 @@ public class InternalFrameDemo extends DemoBase {
      * InternalFrameDemo Constructor
      */
     public InternalFrameDemo() {
-        super();
-
         // preload all the icons we need for this demo
         icon1 = createImageIcon("internalframe/bananas.png", getString("InternalFrameDemo.bananas"));
         icon2 = createImageIcon("internalframe/globe.png", getString("InternalFrameDemo.globe"));
@@ -141,7 +139,7 @@ public class InternalFrameDemo extends DemoBase {
         //<snip>Create desktop pane
         // The desktop pane will contain all the internal frames
         desktop = new JDesktopPane();
-        getDemoPanel().add(desktop, BorderLayout.CENTER);
+        add(desktop, BorderLayout.CENTER);
         //</snip>
 
         // Create the "frame maker" palette

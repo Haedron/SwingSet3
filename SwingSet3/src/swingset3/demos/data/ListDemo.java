@@ -103,17 +103,15 @@ public class ListDemo extends DemoBase {
      * ListDemo Constructor
      */
     public ListDemo() {
-	super();
-
 	loadImages();
 
 	JLabel description = new JLabel(getString("ListDemo.description"));
-	getDemoPanel().add(description, BorderLayout.NORTH);
+	add(description, BorderLayout.NORTH);
 
 	JPanel centerPanel = new JPanel();
 	centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.X_AXIS));
 	centerPanel.add(Box.createRigidArea(HGAP10));
-	getDemoPanel().add(centerPanel, BorderLayout.CENTER);
+	add(centerPanel, BorderLayout.CENTER);
 
 	JPanel listPanel = new JPanel();
 	listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
