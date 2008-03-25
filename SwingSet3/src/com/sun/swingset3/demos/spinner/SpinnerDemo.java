@@ -49,14 +49,14 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates JSpinner and SwingWorker",
         sourceFiles = {
-                "swingset3/demos/controls/SpinnerDemo.java",
-                "swingset3/demos/controls/spinner/Coords.java",
-                "swingset3/demos/controls/spinner/CosinePalette.java",
-                "swingset3/demos/controls/spinner/CosinePaletteChooser.java",
-                "swingset3/demos/controls/spinner/JMandelbrot.java",
-                "swingset3/demos/controls/spinner/MandelbrotControl.java",
-                "swingset3/demos/controls/spinner/Palette.java",
-                "swingset3/demos/controls/spinner/JPaletteShower.java"
+                "com/sun/swingset3/demos/SpinnerDemo.java",
+                "com/sun/swingset3/demos/spinner/Coords.java",
+                "com/sun/swingset3/demos/spinner/CosinePalette.java",
+                "com/sun/swingset3/demos/spinner/CosinePaletteChooser.java",
+                "com/sun/swingset3/demos/spinner/JMandelbrot.java",
+                "com/sun/swingset3/demos/spinner/MandelbrotControl.java",
+                "com/sun/swingset3/demos/spinner/Palette.java",
+                "com/sun/swingset3/demos/spinner/JPaletteShower.java"
                 }
 )
 
@@ -68,7 +68,6 @@ public class SpinnerDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(SpinnerDemo.class.getAnnotation(DemoProperties.class).value());
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new SpinnerDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -81,7 +80,7 @@ public class SpinnerDemo extends JPanel {
         setLayout(new BorderLayout());
 
         CosinePaletteChooser chooser =
-                new CosinePaletteChooser(250, 180, resourceManager);
+                new CosinePaletteChooser(resourceManager);
         final JMandelbrot mandelbrot =
                 new JMandelbrot(400, 400, chooser.getPalette(), resourceManager);
         MandelbrotControl mandelbrotControl =

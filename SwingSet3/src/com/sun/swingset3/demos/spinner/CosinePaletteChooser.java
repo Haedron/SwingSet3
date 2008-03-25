@@ -31,6 +31,7 @@
 package com.sun.swingset3.demos.spinner;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicPanelUI;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
@@ -51,9 +52,9 @@ public class CosinePaletteChooser extends JPanel {
     private static final int B_ANGLE = 0;
     
     private final ResourceManager resourceManager;
+    public static final String PALETTE_PROPERTY_NAME = "palette";
 
     private CosinePalette palette;
-    public static final String PALETTE_PROPERTY_NAME = "palette";
     private JPaletteShower shower;
     private ChangeListener changeListener;
 
@@ -63,14 +64,13 @@ public class CosinePaletteChooser extends JPanel {
     private JSpinner raSpinner;
     private JSpinner gaSpinner;
     private JSpinner baSpinner;
-    //todo add minColorSpinner and maxColorSpinner
 
-    public CosinePaletteChooser(int width, int height, ResourceManager resourceManager) {
+    public CosinePaletteChooser(ResourceManager resourceManager) {
         this.resourceManager = resourceManager;
-        palette = new CosinePalette(width, MIN_COLOR, MAX_COLOR,
+        palette = new CosinePalette(MAX_COLOR - MIN_COLOR, MIN_COLOR, MAX_COLOR,
                 R_ANGLE * Math.PI / 180, G_ANGLE * Math.PI / 180, B_ANGLE * Math.PI / 180,
                 R_STEPS, G_STEPS, B_STEPS);
-        shower = new JPaletteShower(palette, width, 25);
+        shower = new JPaletteShower(palette, 250, 25);
         changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 setPalette(createPalette());
@@ -79,7 +79,6 @@ public class CosinePaletteChooser extends JPanel {
             }
         };
 
-        setPreferredSize(new Dimension(width, height));
         setBorder(BorderFactory.createTitledBorder(resourceManager.getString("SpinnerDemo.colorPalette")));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(shower);
@@ -149,6 +148,7 @@ public class CosinePaletteChooser extends JPanel {
 
     private JSpinner createSpinner(String labelText, JComponent parent, SpinnerModel model) {
         JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 1));
         panel.add(new JLabel(labelText));
         JSpinner spinner = new JSpinner(model);
         spinner.addChangeListener(changeListener);

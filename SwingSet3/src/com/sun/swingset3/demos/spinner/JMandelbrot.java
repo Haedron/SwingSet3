@@ -52,7 +52,7 @@ public class JMandelbrot extends JComponent {
 
     private double xScale;
     private double yScale;
-    private double zoomRate = 2;
+    private double zoomRate = 3;
     public static final String ZOOM_RATE_PROPERTY_NAME = "zoomRate";
 
     private int maxIteration = 300; //10 - 100000
@@ -61,7 +61,7 @@ public class JMandelbrot extends JComponent {
     private Palette palette;
     public static final String PALETTE_PROPERTY_NAME = "palette";
 
-    private int numOfThreads = 2;
+    private int numOfThreads = 4;
     public static final String NUM_OF_THREADS_PROPERTY_NAME = "numOfThreads";
 
     private static final double EPSILON = 1E-16;
@@ -69,7 +69,8 @@ public class JMandelbrot extends JComponent {
     private static final int MIN_HEIGHT = 50;
 
     private Image buffer;
-    private MandelbrotCalculator[] calculators = new MandelbrotCalculator[numOfThreads];
+    private MandelbrotCalculator[] calculators =
+            new MandelbrotCalculator[numOfThreads];
 
     private int oldComponentWidth;
     private int oldComponentHeight;
