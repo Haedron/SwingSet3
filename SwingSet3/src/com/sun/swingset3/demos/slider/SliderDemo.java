@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.controls;
+package com.sun.swingset3.demos.slider;
 
 import java.awt.*;
 import javax.swing.*;
@@ -71,7 +71,7 @@ public class SliderDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(SliderDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new SliderDemo());
         frame.setPreferredSize(new Dimension(800, 600));

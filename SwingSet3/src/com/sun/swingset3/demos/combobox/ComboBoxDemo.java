@@ -29,24 +29,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.controls;
+package com.sun.swingset3.demos.combobox;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import javax.accessibility.AccessibleRelation;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
-import swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
+import swingset3.DemoProperties;
 
 /**
  * JComboBox Demo
  *
- * @version 1.13 11/17/05
  * @author Jeff Dinkins
+ * @version 1.13 11/17/05
  */
 @DemoProperties(
         value = "JComboBox Demo",
@@ -81,7 +82,7 @@ public class ComboBoxDemo extends JPanel implements ActionListener {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(ComboBoxDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new ComboBoxDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -213,13 +214,13 @@ public class ComboBoxDemo extends JPanel implements ActionListener {
         parts.put(i18n_name, name); // i18n name lookup
         parts.put(name, i18n_name); // reverse name lookup
 
-        i = resourceManager.createImageIcon("combobox/" + name + "hair.jpg", i18n_name + i18n_hair);
+        i = resourceManager.createImageIcon(name + "hair.jpg", i18n_name + i18n_hair);
         parts.put(name + "hair", i);
 
-        i = resourceManager.createImageIcon("combobox/" + name + "eyes.jpg", i18n_name + i18n_eyes);
+        i = resourceManager.createImageIcon(name + "eyes.jpg", i18n_name + i18n_eyes);
         parts.put(name + "eyes", i);
 
-        i = resourceManager.createImageIcon("combobox/" + name + "mouth.jpg", i18n_name + i18n_mouth);
+        i = resourceManager.createImageIcon(name + "mouth.jpg", i18n_name + i18n_mouth);
         parts.put(name + "mouth", i);
     }
 

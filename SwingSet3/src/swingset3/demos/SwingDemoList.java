@@ -59,9 +59,9 @@ public class SwingDemoList implements DemoList {
                 
        "swingset3.demos.controls.ButtonDemo",
        "swingset3.demos.controls.JButtonDemo",
-       "swingset3.demos.controls.ComboBoxDemo",
-       "swingset3.demos.controls.ProgressBarDemo",
-       "swingset3.demos.controls.SliderDemo",
+       "com.sun.swingset3.demos.combobox.ComboBoxDemo",
+       "com.sun.swingset3.demos.progressbar.ProgressBarDemo",
+       "com.sun.swingset3.demos.slider.SliderDemo",
        "swingset3.demos.controls.SpinnerDemo",
 
        "com.sun.swingset3.demos.textfield.TextFieldDemo",

@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.controls;
+package com.sun.swingset3.demos.progressbar;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
