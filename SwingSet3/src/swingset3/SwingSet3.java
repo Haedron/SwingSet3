@@ -209,7 +209,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         resourceMap = getContext().getResourceMap();
         
         title = resourceMap.getString("mainFrame.title");
-        runningDemoCache = new HashMap();
+        runningDemoCache = new HashMap<String, DemoPanel>();
         setDemoList(resourceMap.getString("demos.title"), getDemoClassNames(args));
 
         JPanel introPanel = new RoundedPanel(new BorderLayout());
@@ -321,7 +321,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         show(view);     
     } 
     
-    protected void configureDefaults() {
+    private static void configureDefaults() {
         
         // Color palette algorithm courtesy of Jasper Potts
         Color controlColor = UIManager.getColor("control");
@@ -719,7 +719,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
     }
     
-    public class EditPropertiesAction extends AbstractAction {
+    public static class EditPropertiesAction extends AbstractAction {
         public EditPropertiesAction() {
             super("Edit Properties");
         }

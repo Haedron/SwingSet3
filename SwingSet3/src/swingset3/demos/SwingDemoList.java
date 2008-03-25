@@ -65,13 +65,13 @@ public class SwingDemoList implements DemoList {
        "swingset3.demos.controls.SpinnerDemo",
 
        "com.sun.swingset3.demos.textfield.TextFieldDemo",
-       "swingset3.demos.text.EditorPaneDemo",               
+       "com.sun.swingset3.demos.editorpane.EditorPaneDemo",               
                 
        "com.sun.swingset3.demos.colorchooser.ColorChooserDemo",
        "com.sun.swingset3.demos.filechooser.FileChooserDemo",
        "com.sun.swingset3.demos.optionpane.OptionPaneDemo",
                 
-       "swingset3.demos.general.ToolTipDemo");
+       "com.sun.swingset3.demos.tooltip.ToolTipDemo");
     }
     
 }
