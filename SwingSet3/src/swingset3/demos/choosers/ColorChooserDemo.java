@@ -38,7 +38,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 import swingset3.utilities.JGridPanel;
 
@@ -56,11 +55,10 @@ import swingset3.utilities.JGridPanel;
         sourceFiles = {
                 "swingset3/demos/choosers/ColorChooserDemo.java",
                 "swingset3/utilities/JGridPanel.java",
-                "swingset3/demos/DemoBase.java",
                 "swingset3/demos/choosers/BezierAnimationPanel.java"
                 }
 )
-public class ColorChooserDemo extends DemoBase {
+public class ColorChooserDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     private final BezierAnimationPanel bezAnim = new BezierAnimationPanel();

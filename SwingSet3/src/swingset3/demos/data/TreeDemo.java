@@ -40,7 +40,6 @@ import java.net.URL;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -54,11 +53,10 @@ import swingset3.demos.ResourceManager;
       category = "Data",
       description = "Demonstrates JTree, a component which supports display/editing of hierarchical data",
       sourceFiles = {
-        "swingset3/demos/data/TreeDemo.java",
-        "swingset3/demos/DemoBase.java"
+        "swingset3/demos/data/TreeDemo.java"
       }
 )
-public class TreeDemo extends DemoBase {
+public class TreeDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
     
     private JTree tree;

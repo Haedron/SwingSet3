@@ -37,7 +37,6 @@ import java.net.URL;
 import javax.swing.*;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -51,11 +50,13 @@ import swingset3.demos.ResourceManager;
         category = "Choosers",
         description = "Demonstrates JOptionPane, a component which displays standard message dialogs (question, warning, error, etc).",
         sourceFiles = {
-                "swingset3/demos/choosers/OptionPaneDemo.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/demos/choosers/OptionPaneDemo.java"
                 }
 )
-public class OptionPaneDemo extends DemoBase {
+public class OptionPaneDemo extends JPanel {
+    private static final Dimension VGAP15 = new Dimension(1, 15);
+    private static final Dimension VGAP30 = new Dimension(1, 30);
+
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**

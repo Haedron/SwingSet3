@@ -44,7 +44,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -59,11 +58,10 @@ import swingset3.demos.ResourceManager;
         category = "Containers",
         description = "Demonstrates JSplitPane, a container which lays out two components in an adjustable split view (horizontal or vertical)",
         sourceFiles = {
-                "swingset3/demos/containers/SplitPaneDemo.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/demos/containers/SplitPaneDemo.java"
                 }
 )
-public class SplitPaneDemo extends DemoBase {
+public class SplitPaneDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     private static final Insets insets = new Insets(4,8,4,8);
@@ -76,12 +74,6 @@ public class SplitPaneDemo extends DemoBase {
     private GridBagLayout gridbag;
     private GridBagConstraints c;
 
-
-    private JTextField divSize;
-    private JTextField daySize;
-    private JTextField nightSize;
-    
-    private InputVerifier fieldVerifier;
 
     /**
      * main method allows us to run as a standalone demo.

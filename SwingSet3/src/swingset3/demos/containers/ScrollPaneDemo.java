@@ -35,7 +35,6 @@ import java.awt.*;
 import javax.swing.*;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -49,11 +48,10 @@ import swingset3.demos.ResourceManager;
         category = "Containers",
         description = "Demonstrates JScrollPane, a container for scrolling contents within a view port",
         sourceFiles = {
-                "swingset3/demos/containers/ScrollPaneDemo.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/demos/containers/ScrollPaneDemo.java"
                 }
 )
-public class ScrollPaneDemo extends DemoBase {
+public class ScrollPaneDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**

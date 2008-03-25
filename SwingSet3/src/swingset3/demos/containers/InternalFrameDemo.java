@@ -40,7 +40,6 @@ import javax.swing.*;
 
 import javax.swing.border.EmptyBorder;
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 
@@ -56,11 +55,14 @@ import swingset3.demos.ResourceManager;
         description = "Demonstrates JInternalFrame, a frame which can be embedded within another container to" +
                 "implement an MDI style interface.",
         sourceFiles = {
-                "swingset3/demos/containers/InternalFrameDemo.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/demos/containers/InternalFrameDemo.java"
                 }
 )
-public class InternalFrameDemo extends DemoBase { 
+public class InternalFrameDemo extends JPanel { 
+    private static final Dimension HGAP5 = new Dimension(5, 1);
+    private static final Dimension VGAP10 = new Dimension(1, 10);
+    private static final Dimension HGAP15 = new Dimension(15, 1);
+    private static final Dimension VGAP15 = new Dimension(1, 15);
 
     private static final int PALETTE_X = 20;
     private static final int PALETTE_Y = 20;

@@ -39,7 +39,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -54,11 +53,17 @@ import swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates the JSlider, a control which supports linear adjustment",
         sourceFiles = {
-                "swingset3/demos/controls/SliderDemo.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/demos/controls/SliderDemo.java"
                 }
 )
-public class SliderDemo extends DemoBase {
+public class SliderDemo extends JPanel {
+    private static final Dimension HGAP5 = new Dimension(5, 1);
+    private static final Dimension VGAP5 = new Dimension(1, 5);
+    private static final Dimension HGAP10 = new Dimension(10, 1);
+    private static final Dimension VGAP10 = new Dimension(1, 10);
+    private static final Dimension HGAP20 = new Dimension(20, 1);
+    private static final Dimension HGAP25 = new Dimension(25, 1);
+
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**

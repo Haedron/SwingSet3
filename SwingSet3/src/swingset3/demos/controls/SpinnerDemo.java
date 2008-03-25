@@ -37,7 +37,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 import swingset3.demos.controls.spinner.*;
 
@@ -51,7 +50,6 @@ import swingset3.demos.controls.spinner.*;
         category = "Controls",
         description = "Demonstrates JSpinner and SwingWorker",
         sourceFiles = {
-                "swingset3/demos/DemoBase.java",
                 "swingset3/demos/controls/SpinnerDemo.java",
                 "swingset3/demos/controls/spinner/Coords.java",
                 "swingset3/demos/controls/spinner/CosinePalette.java",
@@ -63,7 +61,7 @@ import swingset3.demos.controls.spinner.*;
                 }
 )
         
-public class SpinnerDemo extends DemoBase {
+public class SpinnerDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**

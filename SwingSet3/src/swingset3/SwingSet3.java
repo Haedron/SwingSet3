@@ -144,6 +144,7 @@ public class SwingSet3 extends SingleFrameApplication  {
             }
         }
         UIManager.setInstalledLookAndFeels(lafInfo);
+        UIManager.put("swing.boldMetal", Boolean.FALSE);
     }
     
     public static void main(String[] args) {

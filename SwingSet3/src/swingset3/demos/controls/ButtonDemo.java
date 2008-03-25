@@ -42,7 +42,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -57,12 +56,16 @@ import swingset3.demos.ResourceManager;
         description = "Demonstrates JCheckBox & JRadioButton",
         sourceFiles = {
                 "swingset3/demos/controls/ButtonDemo.java",
-                "swingset3/demos/DemoBase.java",
                 "swingset3/demos/controls/LayoutControlPanel.java",
                 "swingset3/demos/controls/DirectionPanel.java"
                 }
 )
-public class ButtonDemo extends DemoBase implements ChangeListener {
+public class ButtonDemo extends JPanel implements ChangeListener {
+    private static final Dimension HGAP10 = new Dimension(10, 1);
+    private static final Dimension HGAP20 = new Dimension(20, 1);
+    private static final Dimension VGAP20 = new Dimension(1, 20);
+    private static final Dimension VGAP30 = new Dimension(1, 30);
+
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     private final JTabbedPane tab;

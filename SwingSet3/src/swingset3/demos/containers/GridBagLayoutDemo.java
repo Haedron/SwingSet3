@@ -34,7 +34,6 @@ import java.awt.*;
 import javax.swing.*;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 import swingset3.utilities.JGridPanel;
 
@@ -50,11 +49,10 @@ import swingset3.utilities.JGridPanel;
         sourceFiles = {
                 "swingset3/demos/containers/GridBagLayoutDemo.java",
                 "swingset3/demos/containers/Calculator.java",
-                "swingset3/demos/DemoBase.java",
                 "swingset3/utilities/JGridPanel.java"
                 }
 )
-public class GridBagLayoutDemo extends DemoBase {
+public class GridBagLayoutDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     private final JLabel lbCaption = new JLabel("<html>" +

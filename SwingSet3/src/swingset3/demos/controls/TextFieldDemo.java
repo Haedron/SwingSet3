@@ -39,7 +39,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 import swingset3.utilities.JGridPanel;
 
@@ -55,11 +54,10 @@ import swingset3.utilities.JGridPanel;
         sourceFiles = {
                 "swingset3/demos/controls/TextFieldDemo.java",
                 "swingset3/demos/controls/JHistoryTextField.java",
-                "swingset3/utilities/JGridPanel.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/utilities/JGridPanel.java"
                 }
 )
-public class TextFieldDemo extends DemoBase {
+public class TextFieldDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     private final JLabel lbHistoryTextField = new JLabel(resourceManager.getString("TextFieldDemo.historytextfield.text"));

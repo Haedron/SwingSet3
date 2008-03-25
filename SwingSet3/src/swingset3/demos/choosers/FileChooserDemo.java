@@ -48,7 +48,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 import swingset3.utilities.JGridPanel;
 
@@ -64,11 +63,10 @@ import swingset3.utilities.JGridPanel;
         sourceFiles = {
                 "swingset3/demos/choosers/FileChooserDemo.java",
                 "swingset3/demos/choosers/ExampleFileView.java",
-                "swingset3/utilities/JGridPanel.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/utilities/JGridPanel.java"
                 }
 )
-public class FileChooserDemo extends DemoBase {
+public class FileChooserDemo extends JPanel {
     private enum State {
         EMPTY,
         IMAGE_LOADED,

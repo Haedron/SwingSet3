@@ -39,7 +39,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -54,12 +53,10 @@ import swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates the JProgressBar, a control which displays progress to the user",
         sourceFiles = {
-                "swingset3/demos/controls/ProgressBarDemo.java",
-                "swingset3/demos/DemoBase.java"
-
+                "swingset3/demos/controls/ProgressBarDemo.java"
                 }
 )
-public class ProgressBarDemo extends DemoBase {
+public class ProgressBarDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**

@@ -40,7 +40,6 @@ import java.util.Vector;
 import javax.swing.*;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -61,11 +60,15 @@ import swingset3.demos.ResourceManager;
       description = "Demonstrates JList, a component which supports display/editing of a data list",
       sourceFiles = {
         "swingset3/demos/data/ListDemo.java",
-        "swingset3/demos/DemoBase.java",
         "swingset3/demos/data/Permuter.java"
       }
 )
-public class ListDemo extends DemoBase {
+public class ListDemo extends JPanel {
+    private static final Dimension HGAP10 = new Dimension(10, 1);
+    private static final Dimension VGAP10 = new Dimension(1, 10);
+    private static final Dimension HGAP15 = new Dimension(15, 1);
+    private static final Dimension HGAP30 = new Dimension(30, 1);
+
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
     
     JList list;

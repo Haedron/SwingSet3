@@ -35,7 +35,6 @@ import java.awt.*;
 import javax.swing.*;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -49,11 +48,10 @@ import swingset3.demos.ResourceManager;
       category = "General",
       description = "Demonstrates how tooltips can be easily added to Swing GUI components",
       sourceFiles = {
-        "swingset3/demos/general/ToolTipDemo.java",
-        "swingset3/demos/DemoBase.java"
+        "swingset3/demos/general/ToolTipDemo.java"
       }
 )
-public class ToolTipDemo extends DemoBase {
+public class ToolTipDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     /**

@@ -40,7 +40,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -54,11 +53,10 @@ import swingset3.demos.ResourceManager;
         category = "Containers",
         description = "Demonstrates JTabbedPane, a container which allows tabbed navigation of components",
         sourceFiles = {
-                "swingset3/demos/containers/TabbedPaneDemo.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/demos/containers/TabbedPaneDemo.java"
                 }
 )
-public class TabbedPaneDemo extends DemoBase implements ActionListener {
+public class TabbedPaneDemo extends JPanel implements ActionListener {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     private final HeadSpin spin;

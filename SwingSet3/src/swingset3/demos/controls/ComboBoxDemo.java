@@ -40,7 +40,6 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /**
@@ -54,11 +53,16 @@ import swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates JComboBox, a control which allows the user to make a selection from a popup list",
         sourceFiles = {
-                "swingset3/demos/controls/ComboBoxDemo.java",
-                "swingset3/demos/DemoBase.java"
+                "swingset3/demos/controls/ComboBoxDemo.java"
                 }
 )
-public class ComboBoxDemo extends DemoBase implements ActionListener {
+public class ComboBoxDemo extends JPanel implements ActionListener {
+    private static final Dimension VGAP15 = new Dimension(1, 15);
+    private static final Dimension HGAP20 = new Dimension(20, 1);
+    private static final Dimension VGAP20 = new Dimension(1, 20);
+    private static final Dimension HGAP30 = new Dimension(30, 1);
+    private static final Dimension VGAP30 = new Dimension(1, 30);
+
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
     private Face face;

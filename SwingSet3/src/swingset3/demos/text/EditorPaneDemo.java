@@ -41,8 +41,6 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 import swingset3.DemoProperties;
-import swingset3.demos.DemoBase;
-
 
 /**
  * EditorPane Demo (was HTMLDemo in SwingSet2)
@@ -55,11 +53,10 @@ import swingset3.demos.DemoBase;
       category = "Text",
       description = "Demonstrates JEditorPane, a text component which supports display and editing of rich text formats (such as HTML)",
       sourceFiles = {
-        "swingset3/demos/text/EditorPaneDemo.java",
-        "swingset3/demos/DemoBase.java"
+        "swingset3/demos/text/EditorPaneDemo.java"
       }
 )
-public class EditorPaneDemo extends DemoBase {
+public class EditorPaneDemo extends JPanel {
 
     JEditorPane html;
     

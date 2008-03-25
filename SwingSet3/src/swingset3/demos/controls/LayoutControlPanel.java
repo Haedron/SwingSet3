@@ -31,14 +31,13 @@
 
 package swingset3.demos.controls;
 
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.*;
 
-import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
 
 /*
@@ -48,6 +47,7 @@ import swingset3.demos.ResourceManager;
  */
 
 public class LayoutControlPanel extends JPanel implements SwingConstants {
+    private static final Dimension VGAP20 = new Dimension(1, 20);
 
     private boolean absolutePositions;
     private DirectionPanel textPosition = null;
@@ -115,7 +115,7 @@ public class LayoutControlPanel extends JPanel implements SwingConstants {
         add(l);
         add(textPosition);
 
-        add(Box.createRigidArea(DemoBase.VGAP20));
+        add(Box.createRigidArea(VGAP20));
 
         l = new JLabel(resourceManager.getString("LayoutControlPanel.contentalignment_label"));
         add(l);

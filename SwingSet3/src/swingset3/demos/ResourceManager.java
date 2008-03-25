@@ -41,7 +41,7 @@ import javax.swing.*;
  * @author Pavel Porvatov
  */
 public class ResourceManager {
-    private static final Logger logger = Logger.getLogger(DemoBase.class.getName());
+    private static final Logger logger = Logger.getLogger(ResourceManager.class.getName());
 
     private final Class demoClass;
 
