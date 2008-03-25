@@ -40,7 +40,7 @@ import java.util.Vector;
 import javax.swing.*;
 
 import swingset3.DemoProperties;
-import swingset3.demos.ResourceManager;
+import com.sun.swingset3.demos.ResourceManager;
 
 /**
  * List Demo. This demo shows that it is not

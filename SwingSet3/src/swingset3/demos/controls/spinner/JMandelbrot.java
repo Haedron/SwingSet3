@@ -36,7 +36,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import swingset3.demos.ResourceManager;
+import com.sun.swingset3.demos.ResourceManager;
 
 /**
  * @author Mikhail Lapshin

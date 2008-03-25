@@ -39,7 +39,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
 
 import swingset3.DemoProperties;
-import swingset3.demos.ResourceManager;
+import com.sun.swingset3.demos.ResourceManager;
 
 /**
  * JProgressBar Demo

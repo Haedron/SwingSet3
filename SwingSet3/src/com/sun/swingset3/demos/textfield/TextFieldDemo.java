@@ -28,7 +28,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package swingset3.demos.controls;
+package com.sun.swingset3.demos.textfield;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -38,9 +38,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.sun.swingset3.demos.JGridPanel;
+import com.sun.swingset3.demos.ResourceManager;
 import swingset3.DemoProperties;
-import swingset3.demos.ResourceManager;
-import swingset3.utilities.JGridPanel;
 
 /**
  * JTextField Demo
@@ -111,7 +111,7 @@ public class TextFieldDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(TextFieldDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new TextFieldDemo());
         frame.setPreferredSize(new Dimension(800, 600));

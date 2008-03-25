@@ -40,7 +40,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 import swingset3.DemoProperties;
-import swingset3.demos.ResourceManager;
+import com.sun.swingset3.demos.ResourceManager;
 
 /**
  * JComboBox Demo

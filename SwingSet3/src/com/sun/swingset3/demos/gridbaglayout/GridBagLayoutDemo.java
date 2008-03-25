@@ -33,9 +33,9 @@ package com.sun.swingset3.demos.gridbaglayout;
 import java.awt.*;
 import javax.swing.*;
 
+import com.sun.swingset3.demos.JGridPanel;
+import com.sun.swingset3.demos.ResourceManager;
 import swingset3.DemoProperties;
-import swingset3.demos.ResourceManager;
-import swingset3.utilities.JGridPanel;
 
 /**
  * GridBagLayout Demo

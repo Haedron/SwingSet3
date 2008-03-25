@@ -64,7 +64,7 @@ public class SwingDemoList implements DemoList {
        "swingset3.demos.controls.SliderDemo",
        "swingset3.demos.controls.SpinnerDemo",
 
-       "swingset3.demos.controls.TextFieldDemo",
+       "com.sun.swingset3.demos.textfield.TextFieldDemo",
        "swingset3.demos.text.EditorPaneDemo",               
                 
        "com.sun.swingset3.demos.colorchooser.ColorChooserDemo",

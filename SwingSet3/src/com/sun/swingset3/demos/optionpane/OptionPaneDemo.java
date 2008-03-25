@@ -36,8 +36,8 @@ import java.awt.event.ActionEvent;
 import java.net.URL;
 import javax.swing.*;
 
+import com.sun.swingset3.demos.ResourceManager;
 import swingset3.DemoProperties;
-import swingset3.demos.ResourceManager;
 
 /**
  * JOptionPaneDemo

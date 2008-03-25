@@ -47,9 +47,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.sun.swingset3.demos.JGridPanel;
+import com.sun.swingset3.demos.ResourceManager;
 import swingset3.DemoProperties;
-import swingset3.demos.ResourceManager;
-import swingset3.utilities.JGridPanel;
 
 /**
  * JFileChooserDemo
