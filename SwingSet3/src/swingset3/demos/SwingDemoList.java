@@ -57,7 +57,7 @@ public class SwingDemoList implements DemoList {
        "swingset3.demos.data.TreeDemo",
        "com.sun.swingset3.demos.list.ListDemo",
                 
-       "swingset3.demos.controls.ButtonDemo",
+       "com.sun.swingset3.demos.togglebutton.ToggleButtonDemo",
        "swingset3.demos.controls.JButtonDemo",
        "com.sun.swingset3.demos.combobox.ComboBoxDemo",
        "com.sun.swingset3.demos.progressbar.ProgressBarDemo",

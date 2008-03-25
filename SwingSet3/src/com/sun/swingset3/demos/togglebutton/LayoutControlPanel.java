@@ -29,13 +29,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.controls;
+package com.sun.swingset3.demos.togglebutton;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import javax.swing.*;
 
 import com.sun.swingset3.demos.ResourceManager;
@@ -50,13 +48,11 @@ public class LayoutControlPanel extends JPanel implements SwingConstants {
     private static final Dimension VGAP20 = new Dimension(1, 20);
 
     private boolean absolutePositions;
-    private DirectionPanel textPosition = null;
-    private DirectionPanel labelAlignment = null;
-    private ButtonDemo demo = null;
+    private ToggleButtonDemo demo = null;
 
     // private ComponentOrientChanger componentOrientChanger = null;
 
-    LayoutControlPanel(ButtonDemo demo, ResourceManager resourceManager) {
+    LayoutControlPanel(ToggleButtonDemo demo, ResourceManager resourceManager) {
         this.demo = demo;
 
         // this.componentOrientationChanger = componentOrientationChanger;
@@ -101,8 +97,8 @@ public class LayoutControlPanel extends JPanel implements SwingConstants {
         absolutePositions = true;
         //}
 
-        textPosition = new DirectionPanel(true, "E", new TextPositionListener());
-        labelAlignment = new DirectionPanel(true, "C", new LabelAlignmentListener());
+        DirectionPanel textPosition = new DirectionPanel(true, "E", new TextPositionListener());
+        DirectionPanel labelAlignment = new DirectionPanel(true, "C", new LabelAlignmentListener());
 
         // Make sure the controls' text position and label alignment match
         // the initial value of the associated direction panel.
@@ -122,81 +118,6 @@ public class LayoutControlPanel extends JPanel implements SwingConstants {
         add(labelAlignment);
 
         add(Box.createGlue());
-    }
-
-
-    private class OrientationChangeListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            if (!e.getActionCommand().equals("OrientationChanged")) {
-                return;
-            }
-            if (absolutePositions) {
-                return;
-            }
-
-            String currentTextPosition = textPosition.getSelection();
-            if (currentTextPosition.equals("NW"))
-                textPosition.setSelection("NE");
-            else if (currentTextPosition.equals("NE"))
-                textPosition.setSelection("NW");
-            else if (currentTextPosition.equals("E"))
-                textPosition.setSelection("W");
-            else if (currentTextPosition.equals("W"))
-                textPosition.setSelection("E");
-            else if (currentTextPosition.equals("SE"))
-                textPosition.setSelection("SW");
-            else if (currentTextPosition.equals("SW"))
-                textPosition.setSelection("SE");
-
-            String currentLabelAlignment = labelAlignment.getSelection();
-            if (currentLabelAlignment.equals("NW"))
-                labelAlignment.setSelection("NE");
-            else if (currentLabelAlignment.equals("NE"))
-                labelAlignment.setSelection("NW");
-            else if (currentLabelAlignment.equals("E"))
-                labelAlignment.setSelection("W");
-            else if (currentLabelAlignment.equals("W"))
-                labelAlignment.setSelection("E");
-            else if (currentLabelAlignment.equals("SE"))
-                labelAlignment.setSelection("SW");
-            else if (currentLabelAlignment.equals("SW"))
-                labelAlignment.setSelection("SE");
-        }
-    }
-
-    private class PositioningListener implements ItemListener {
-
-        public void itemStateChanged(ItemEvent e) {
-            JRadioButton rb = (JRadioButton) e.getSource();
-            if (rb.getText().equals("Absolute") && rb.isSelected()) {
-                absolutePositions = true;
-            } else if (rb.getText().equals("Relative") && rb.isSelected()) {
-                absolutePositions = false;
-            }
-
-            for (JComponent control : demo.getCurrentControls()) {
-                int hPos, vPos, hAlign, vAlign;
-                if (control instanceof AbstractButton) {
-                    hPos = ((AbstractButton) control).getHorizontalTextPosition();
-                    vPos = ((AbstractButton) control).getVerticalTextPosition();
-                    hAlign = ((AbstractButton) control).getHorizontalAlignment();
-                    vAlign = ((AbstractButton) control).getVerticalAlignment();
-                } else if (control instanceof JLabel) {
-                    hPos = ((JLabel) control).getHorizontalTextPosition();
-                    vPos = ((JLabel) control).getVerticalTextPosition();
-                    hAlign = ((JLabel) control).getHorizontalAlignment();
-                    vAlign = ((JLabel) control).getVerticalAlignment();
-                } else {
-                    continue;
-                }
-                setPosition(control, hPos, vPos);
-                setAlignment(control, hAlign, vAlign);
-            }
-
-            demo.invalidate();
-            demo.validate();
-            demo.repaint();
-        }
     }
 
     // Text Position Listener

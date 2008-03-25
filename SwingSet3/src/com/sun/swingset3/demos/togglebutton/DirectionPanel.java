@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.controls;
+package com.sun.swingset3.demos.togglebutton;
 
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
@@ -127,7 +127,7 @@ public class DirectionPanel extends JPanel {
     private final ImageIcon trdn_dot = loadImageIcon("trdn.gif", "selected top right layout button");
 
     public ImageIcon loadImageIcon(String filename, String description) {
-        String path = "resources/images/buttons/" + filename;
+        String path = "resources/images/" + filename;
         return new ImageIcon(getClass().getResource(path), description);
     }
 
