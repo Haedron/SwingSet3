@@ -33,6 +33,7 @@ package swingset3.demos;
 
 import java.util.Arrays;
 import java.util.List;
+
 import swingset3.DemoList;
 
 /**
@@ -43,35 +44,34 @@ public class SwingDemoList implements DemoList {
 
     public List<String> getDemoClassNames() {
         return Arrays.asList(
-        "swingset3.demos.toplevels.JFrameDemo",
-       "swingset3.demos.toplevels.JDialogDemo",
-       "swingset3.demos.toplevels.JWindowDemo",
-                
-       "com.sun.swingset3.demos.internalframe.InternalFrameDemo",
-       "com.sun.swingset3.demos.tabbedpane.TabbedPaneDemo",
-       "com.sun.swingset3.demos.scrollpane.ScrollPaneDemo",
-       "com.sun.swingset3.demos.splitpane.SplitPaneDemo",
-       "com.sun.swingset3.demos.gridbaglayout.GridBagLayoutDemo",
-                
-       "swingset3.demos.data.TableDemo",
-       "swingset3.demos.data.TreeDemo",
-       "com.sun.swingset3.demos.list.ListDemo",
-                
-       "com.sun.swingset3.demos.togglebutton.ToggleButtonDemo",
-       "swingset3.demos.controls.JButtonDemo",
-       "com.sun.swingset3.demos.combobox.ComboBoxDemo",
-       "com.sun.swingset3.demos.progressbar.ProgressBarDemo",
-       "com.sun.swingset3.demos.slider.SliderDemo",
-       "com.sun.swingset3.demos.spinner.SpinnerDemo",
+                "swingset3.demos.toplevels.JFrameDemo",
+                "swingset3.demos.toplevels.JDialogDemo",
+                "swingset3.demos.toplevels.JWindowDemo",
 
-       "com.sun.swingset3.demos.textfield.TextFieldDemo",
-       "com.sun.swingset3.demos.editorpane.EditorPaneDemo",               
-                
-       "com.sun.swingset3.demos.colorchooser.ColorChooserDemo",
-       "com.sun.swingset3.demos.filechooser.FileChooserDemo",
-       "com.sun.swingset3.demos.optionpane.OptionPaneDemo",
-                
-       "com.sun.swingset3.demos.tooltip.ToolTipDemo");
+                "com.sun.swingset3.demos.internalframe.InternalFrameDemo",
+                "com.sun.swingset3.demos.tabbedpane.TabbedPaneDemo",
+                "com.sun.swingset3.demos.scrollpane.ScrollPaneDemo",
+                "com.sun.swingset3.demos.splitpane.SplitPaneDemo",
+                "com.sun.swingset3.demos.gridbaglayout.GridBagLayoutDemo",
+
+                "swingset3.demos.data.TableDemo",
+                "swingset3.demos.data.TreeDemo",
+                "com.sun.swingset3.demos.list.ListDemo",
+
+                "com.sun.swingset3.demos.togglebutton.ToggleButtonDemo",
+                "swingset3.demos.controls.JButtonDemo",
+                "com.sun.swingset3.demos.combobox.ComboBoxDemo",
+                "com.sun.swingset3.demos.progressbar.ProgressBarDemo",
+                "com.sun.swingset3.demos.slider.SliderDemo",
+                "com.sun.swingset3.demos.spinner.SpinnerDemo",
+
+                "com.sun.swingset3.demos.textfield.TextFieldDemo",
+                "com.sun.swingset3.demos.editorpane.EditorPaneDemo",
+
+                "com.sun.swingset3.demos.colorchooser.ColorChooserDemo",
+                "com.sun.swingset3.demos.filechooser.FileChooserDemo",
+                "com.sun.swingset3.demos.optionpane.OptionPaneDemo",
+
+                "com.sun.swingset3.demos.tooltip.ToolTipDemo");
     }
-    
 }
