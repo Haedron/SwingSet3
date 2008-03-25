@@ -28,17 +28,42 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package swingset3.demos.controls.spinner;
+package com.sun.swingset3.demos.spinner;
 
+import javax.swing.*;
 import java.awt.*;
 
 /**
  * @author Mikhail Lapshin
  */
-public interface Palette {
-    public Color getColor(int index);
+public class JPaletteShower extends JComponent {
+    private Palette palette;
 
-    public int getSize();
+    public JPaletteShower(Palette palette, int width, int height) {
+        setPreferredSize(new Dimension(width, height));
+        setMinimumSize(new Dimension(width, height));
+        this.palette = palette;
+    }
 
-    public void setSize(int newSize);
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        int w = getSize().width;
+        int h = getSize().height;
+        int maxIndex = palette.getSize() - 1;
+        double rate = (double) maxIndex / w;
+        for (int x = 0; x < w; x++) {
+            g.setColor(palette.getColor((int) (x * rate)));
+            g.fillRect(x, 0, 1, h);
+        }
+    }
+
+    public Palette getPalette() {
+        return palette;
+    }
+
+    public void setPalette(Palette palette) {
+        this.palette = palette;
+        repaint();
+    }
 }

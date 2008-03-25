@@ -28,7 +28,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package swingset3.demos.controls;
+package com.sun.swingset3.demos.spinner;
 
 import java.awt.BorderLayout;
 import java.awt.*;
@@ -38,7 +38,6 @@ import javax.swing.*;
 
 import swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
-import swingset3.demos.controls.spinner.*;
 
 /**
  * JSpinner, SwingWorker demos
@@ -60,7 +59,7 @@ import swingset3.demos.controls.spinner.*;
                 "swingset3/demos/controls/spinner/JPaletteShower.java"
                 }
 )
-        
+
 public class SpinnerDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
@@ -69,7 +68,7 @@ public class SpinnerDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(SpinnerDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new SpinnerDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -81,11 +80,11 @@ public class SpinnerDemo extends JPanel {
     public SpinnerDemo() {
         setLayout(new BorderLayout());
 
-        CosinePaletteChooser chooser = 
+        CosinePaletteChooser chooser =
                 new CosinePaletteChooser(250, 180, resourceManager);
-        final JMandelbrot mandelbrot = 
+        final JMandelbrot mandelbrot =
                 new JMandelbrot(400, 400, chooser.getPalette(), resourceManager);
-        MandelbrotControl mandelbrotControl = 
+        MandelbrotControl mandelbrotControl =
                 new MandelbrotControl(mandelbrot, resourceManager);
 
         chooser.addPropertyChangeListener(new PropertyChangeListener() {

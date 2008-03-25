@@ -28,7 +28,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package swingset3.demos.controls.spinner;
+package com.sun.swingset3.demos.spinner;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;

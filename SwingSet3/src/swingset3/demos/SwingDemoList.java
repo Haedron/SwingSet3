@@ -55,14 +55,14 @@ public class SwingDemoList implements DemoList {
                 
        "swingset3.demos.data.TableDemo",
        "swingset3.demos.data.TreeDemo",
-       "swingset3.demos.data.ListDemo",
+       "com.sun.swingset3.demos.list.ListDemo",
                 
        "swingset3.demos.controls.ButtonDemo",
        "swingset3.demos.controls.JButtonDemo",
        "com.sun.swingset3.demos.combobox.ComboBoxDemo",
        "com.sun.swingset3.demos.progressbar.ProgressBarDemo",
        "com.sun.swingset3.demos.slider.SliderDemo",
-       "swingset3.demos.controls.SpinnerDemo",
+       "com.sun.swingset3.demos.spinner.SpinnerDemo",
 
        "com.sun.swingset3.demos.textfield.TextFieldDemo",
        "com.sun.swingset3.demos.editorpane.EditorPaneDemo",               
