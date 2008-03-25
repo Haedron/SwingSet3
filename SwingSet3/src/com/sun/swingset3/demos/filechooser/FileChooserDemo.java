@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.choosers;
+package com.sun.swingset3.demos.filechooser;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -117,15 +117,15 @@ public class FileChooserDemo extends JPanel {
 
     private final JComboBox cbFilters = new JComboBox();
 
-    private final JButton btnApplyFilter = createButton("filechooser/apply.png", "FileChooserDemo.applyfilter.tooltip");
+    private final JButton btnApplyFilter = createButton("apply.png", "FileChooserDemo.applyfilter.tooltip");
 
-    private final JButton btnRotateLeft = createButton("filechooser/rotateleft.png", "FileChooserDemo.rotateleft.tooltip");
+    private final JButton btnRotateLeft = createButton("rotateleft.png", "FileChooserDemo.rotateleft.tooltip");
 
-    private final JButton btnRotateRight = createButton("filechooser/rotateright.png", "FileChooserDemo.rotateright.tooltip");
+    private final JButton btnRotateRight = createButton("rotateright.png", "FileChooserDemo.rotateright.tooltip");
 
-    private final JButton btnFlipHorizontal = createButton("filechooser/fliphor.png", "FileChooserDemo.fliphorizontal.tooltip");
+    private final JButton btnFlipHorizontal = createButton("fliphor.png", "FileChooserDemo.fliphorizontal.tooltip");
 
-    private final JButton btnFlipVertical = createButton("filechooser/flipvert.png", "FileChooserDemo.flipvertical.tooltip");
+    private final JButton btnFlipVertical = createButton("flipvert.png", "FileChooserDemo.flipvertical.tooltip");
 
     private final JButton btnSave = new JButton(resourceManager.getString("FileChooserDemo.save.text"));
 
@@ -150,7 +150,7 @@ public class FileChooserDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(FileChooserDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new FileChooserDemo());
         frame.setPreferredSize(new Dimension(800, 600));

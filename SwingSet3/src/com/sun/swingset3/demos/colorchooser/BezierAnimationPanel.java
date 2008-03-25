@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.choosers;
+package com.sun.swingset3.demos.colorchooser;
 
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
@@ -40,7 +40,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import javax.swing.*;
 
-import static swingset3.demos.choosers.BezierAnimationPanel.BezierColor.*;
+import static com.sun.swingset3.demos.colorchooser.BezierAnimationPanel.BezierColor.*;
 
 
 /**

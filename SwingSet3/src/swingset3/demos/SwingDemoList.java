@@ -51,7 +51,7 @@ public class SwingDemoList implements DemoList {
        "swingset3.demos.containers.TabbedPaneDemo",
        "swingset3.demos.containers.ScrollPaneDemo",
        "swingset3.demos.containers.SplitPaneDemo",
-       "swingset3.demos.containers.GridBagLayoutDemo",
+       "com.sun.swingset3.demos.gridbaglayout.GridBagLayoutDemo",
                 
        "swingset3.demos.data.TableDemo",
        "swingset3.demos.data.TreeDemo",
@@ -67,9 +67,9 @@ public class SwingDemoList implements DemoList {
        "swingset3.demos.controls.TextFieldDemo",
        "swingset3.demos.text.EditorPaneDemo",               
                 
-       "swingset3.demos.choosers.ColorChooserDemo",
-       "swingset3.demos.choosers.FileChooserDemo",
-       "swingset3.demos.choosers.OptionPaneDemo",
+       "com.sun.swingset3.demos.colorchooser.ColorChooserDemo",
+       "com.sun.swingset3.demos.filechooser.FileChooserDemo",
+       "com.sun.swingset3.demos.optionpane.OptionPaneDemo",
                 
        "swingset3.demos.general.ToolTipDemo");
     }

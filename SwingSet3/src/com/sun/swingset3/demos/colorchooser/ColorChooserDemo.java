@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.choosers;
+package com.sun.swingset3.demos.colorchooser;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -76,7 +76,7 @@ public class ColorChooserDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(ColorChooserDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new ColorChooserDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -150,7 +150,7 @@ public class ColorChooserDemo extends JPanel {
                 cell(bezAnim);
 
         pnContent.setBorder(new EmptyBorder(10, 0, 0, 0));
-        
+
         add(pnContent);
     }
 

@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.choosers;
+package com.sun.swingset3.demos.optionpane;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -64,7 +64,7 @@ public class OptionPaneDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(OptionPaneDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new OptionPaneDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -121,7 +121,7 @@ public class OptionPaneDemo extends JPanel {
 
     public JButton createMessageDialogButton() {
         Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.messagebutton")) {
-            final URL img = getClass().getResource("resources/images/optionpane/bottle.gif");
+            final URL img = getClass().getResource("resources/images/bottle.gif");
             final String imagesrc = "<img src=\"" + img + "\" width=\"284\" height=\"100\">";
             final String message = resourceManager.getString("OptionPaneDemo.messagetext");
 

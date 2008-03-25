@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.containers;
+package com.sun.swingset3.demos.gridbaglayout;
 
 import java.awt.*;
 import java.awt.event.*;

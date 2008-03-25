@@ -28,7 +28,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package swingset3.demos.containers;
+package com.sun.swingset3.demos.gridbaglayout;
 
 import java.awt.*;
 import javax.swing.*;
@@ -65,7 +65,7 @@ public class GridBagLayoutDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(GridBagLayoutDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new GridBagLayoutDemo());
         frame.setPreferredSize(new Dimension(800, 600));
