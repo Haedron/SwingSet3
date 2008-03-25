@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.containers;
+package com.sun.swingset3.demos.scrollpane;
 
 import java.awt.*;
 import javax.swing.*;
@@ -59,7 +59,7 @@ public class ScrollPaneDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(ScrollPaneDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new ScrollPaneDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -74,7 +74,7 @@ public class ScrollPaneDemo extends JPanel {
     public ScrollPaneDemo() {
         setLayout(new BorderLayout());
 
-        ImageIcon crayons = resourceManager.createImageIcon("scrollpane/crayons.jpg", 
+        ImageIcon crayons = resourceManager.createImageIcon("crayons.jpg",
                 resourceManager.getString("ScrollPaneDemo.crayons"));
         add(new ImageScroller(crayons), BorderLayout.CENTER);
     }
@@ -95,27 +95,27 @@ public class ScrollPaneDemo extends JPanel {
 
             // Create and add a column header to the scrollpane
             JLabel colHeader = new JLabel(
-                    resourceManager.createImageIcon("scrollpane/colheader.jpg", resourceManager.getString("ScrollPaneDemo.colheader")));
+                    resourceManager.createImageIcon("colheader.jpg", resourceManager.getString("ScrollPaneDemo.colheader")));
             setColumnHeaderView(colHeader);
 
             // Create and add a row header to the scrollpane
             JLabel rowHeader = new JLabel(
-                    resourceManager.createImageIcon("scrollpane/rowheader.jpg", resourceManager.getString("ScrollPaneDemo.rowheader")));
+                    resourceManager.createImageIcon("rowheader.jpg", resourceManager.getString("ScrollPaneDemo.rowheader")));
             setRowHeaderView(rowHeader);
 
             // Create and add the upper left corner
             JLabel cornerUL = new JLabel(
-                    resourceManager.createImageIcon("scrollpane/upperleft.jpg", resourceManager.getString("ScrollPaneDemo.upperleft")));
+                    resourceManager.createImageIcon("upperleft.jpg", resourceManager.getString("ScrollPaneDemo.upperleft")));
             setCorner(UPPER_LEFT_CORNER, cornerUL);
 
             // Create and add the upper right corner
             JLabel cornerUR = new JLabel(
-                    resourceManager.createImageIcon("scrollpane/upperright.jpg", resourceManager.getString("ScrollPaneDemo.upperright")));
+                    resourceManager.createImageIcon("upperright.jpg", resourceManager.getString("ScrollPaneDemo.upperright")));
             setCorner(UPPER_RIGHT_CORNER, cornerUR);
 
             // Create and add the lower left corner
             JLabel cornerLL = new JLabel(
-                    resourceManager.createImageIcon("scrollpane/lowerleft.jpg", resourceManager.getString("ScrollPaneDemo.lowerleft")));
+                    resourceManager.createImageIcon("lowerleft.jpg", resourceManager.getString("ScrollPaneDemo.lowerleft")));
             setCorner(LOWER_LEFT_CORNER, cornerLL);
 
             JScrollBar vsb = getVerticalScrollBar();

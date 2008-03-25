@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.containers;
+package com.sun.swingset3.demos.internalframe;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -39,6 +39,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 
 import javax.swing.border.EmptyBorder;
+
 import swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
 
@@ -58,7 +59,7 @@ import com.sun.swingset3.demos.ResourceManager;
                 "swingset3/demos/containers/InternalFrameDemo.java"
                 }
 )
-public class InternalFrameDemo extends JPanel { 
+public class InternalFrameDemo extends JPanel {
     private static final Dimension HGAP5 = new Dimension(5, 1);
     private static final Dimension VGAP10 = new Dimension(1, 10);
     private static final Dimension HGAP15 = new Dimension(15, 1);
@@ -68,8 +69,8 @@ public class InternalFrameDemo extends JPanel {
     private static final int PALETTE_Y = 20;
 
     private static final int PALETTE_WIDTH = 250;
-    private static final int PALETTE_HEIGHT = 250;    
-    
+    private static final int PALETTE_HEIGHT = 250;
+
     private static final int FRAME0_X = PALETTE_X + PALETTE_WIDTH + 20;
     private static final int FRAME0_Y = 20;
 
@@ -110,7 +111,7 @@ public class InternalFrameDemo extends JPanel {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(InternalFrameDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new InternalFrameDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -126,22 +127,22 @@ public class InternalFrameDemo extends JPanel {
         setLayout(new BorderLayout());
 
         // preload all the icons we need for this demo
-        icon1 = resourceManager.createImageIcon("internalframe/bananas.png", 
+        icon1 = resourceManager.createImageIcon("bananas.png",
                 resourceManager.getString("InternalFrameDemo.bananas"));
-        icon2 = resourceManager.createImageIcon("internalframe/globe.png", 
+        icon2 = resourceManager.createImageIcon("globe.png",
                 resourceManager.getString("InternalFrameDemo.globe"));
-        icon3 = resourceManager.createImageIcon("internalframe/package.png", 
+        icon3 = resourceManager.createImageIcon("package.png",
                 resourceManager.getString("InternalFrameDemo.package"));
-        icon4 = resourceManager.createImageIcon("internalframe/soccer_ball.png", 
+        icon4 = resourceManager.createImageIcon("soccer_ball.png",
                 resourceManager.getString("InternalFrameDemo.soccerball"));
 
-        smIcon1 = resourceManager.createImageIcon("internalframe/bananas_small.png", 
+        smIcon1 = resourceManager.createImageIcon("bananas_small.png",
                 resourceManager.getString("InternalFrameDemo.bananas"));
-        smIcon2 = resourceManager.createImageIcon("internalframe/globe_small.png", 
+        smIcon2 = resourceManager.createImageIcon("globe_small.png",
                 resourceManager.getString("InternalFrameDemo.globe"));
-        smIcon3 = resourceManager.createImageIcon("internalframe/package_small.png", 
+        smIcon3 = resourceManager.createImageIcon("package_small.png",
                 resourceManager.getString("InternalFrameDemo.package"));
-        smIcon4 = resourceManager.createImageIcon("internalframe/soccer_ball_small.png", 
+        smIcon4 = resourceManager.createImageIcon("soccer_ball_small.png",
                 resourceManager.getString("InternalFrameDemo.soccerball"));
 
         //<snip>Create desktop pane
@@ -182,8 +183,8 @@ public class InternalFrameDemo extends JPanel {
         internalFrame.setResizable(windowResizable.isSelected());
         //</snip>
 
-        internalFrame.setBounds(FRAME0_X + 20 * (windowCount % 10), 
-                                FRAME0_Y + 20 * (windowCount % 10), width, height);
+        internalFrame.setBounds(FRAME0_X + 20 * (windowCount % 10),
+                FRAME0_Y + 20 * (windowCount % 10), width, height);
         internalFrame.setContentPane(new ImageScroller(icon));
 
         windowCount++;
@@ -321,18 +322,10 @@ public class InternalFrameDemo extends JPanel {
         public void actionPerformed(ActionEvent e) {
             demo.createInternalFrame(icon,
                     getDemoFrameLayer(),
-                    getFrameWidth(),
-                    getFrameHeight()
+                    FRAME_WIDTH,
+                    FRAME_HEIGHT
             );
         }
-    }
-
-    public int getFrameWidth() {
-        return FRAME_WIDTH;
-    }
-
-    public int getFrameHeight() {
-        return FRAME_HEIGHT;
     }
 
     public Integer getDemoFrameLayer() {

@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.containers;
+package com.sun.swingset3.demos.tabbedpane;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -75,7 +75,7 @@ public class TabbedPaneDemo extends JPanel implements ActionListener {
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(TabbedPaneDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new TabbedPaneDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -117,15 +117,15 @@ public class TabbedPaneDemo extends JPanel implements ActionListener {
         add(tabbedpane, BorderLayout.CENTER);
 
         String name = resourceManager.getString("TabbedPaneDemo.camille");
-        JLabel pix = new JLabel(resourceManager.createImageIcon("tabbedpane/camille.jpg", name));
+        JLabel pix = new JLabel(resourceManager.createImageIcon("camille.jpg", name));
         tabbedpane.add(name, pix);
 
         name = resourceManager.getString("TabbedPaneDemo.ewan");
-        pix = new JLabel(resourceManager.createImageIcon("tabbedpane/ewan.jpg", name));
+        pix = new JLabel(resourceManager.createImageIcon("ewan.jpg", name));
         tabbedpane.add(name, pix);
 
         name = resourceManager.getString("TabbedPaneDemo.hania");
-        pix = new JLabel(resourceManager.createImageIcon("tabbedpane/hania.jpg", name));
+        pix = new JLabel(resourceManager.createImageIcon("hania.jpg", name));
         tabbedpane.add(name, pix);
 
         name = resourceManager.getString("TabbedPaneDemo.bounce");
@@ -156,7 +156,7 @@ public class TabbedPaneDemo extends JPanel implements ActionListener {
         }
     }
 
-    class HeadSpin extends JComponent implements ActionListener {
+    private class HeadSpin extends JComponent implements ActionListener {
         private javax.swing.Timer animator;
 
         private final ImageIcon[] icon = new ImageIcon[6];
@@ -175,12 +175,12 @@ public class TabbedPaneDemo extends JPanel implements ActionListener {
 
         public HeadSpin() {
             setBackground(Color.black);
-            icon[0] = resourceManager.createImageIcon("tabbedpane/ewan.gif", resourceManager.getString("TabbedPaneDemo.ewan"));
-            icon[1] = resourceManager.createImageIcon("tabbedpane/stephen.gif", resourceManager.getString("TabbedPaneDemo.stephen"));
-            icon[2] = resourceManager.createImageIcon("tabbedpane/david.gif", resourceManager.getString("TabbedPaneDemo.david"));
-            icon[3] = resourceManager.createImageIcon("tabbedpane/matthew.gif", resourceManager.getString("TabbedPaneDemo.matthew"));
-            icon[4] = resourceManager.createImageIcon("tabbedpane/blake.gif", resourceManager.getString("TabbedPaneDemo.blake"));
-            icon[5] = resourceManager.createImageIcon("tabbedpane/brooke.gif", resourceManager.getString("TabbedPaneDemo.brooke"));
+            icon[0] = resourceManager.createImageIcon("ewan.gif", resourceManager.getString("TabbedPaneDemo.ewan"));
+            icon[1] = resourceManager.createImageIcon("stephen.gif", resourceManager.getString("TabbedPaneDemo.stephen"));
+            icon[2] = resourceManager.createImageIcon("david.gif", resourceManager.getString("TabbedPaneDemo.david"));
+            icon[3] = resourceManager.createImageIcon("matthew.gif", resourceManager.getString("TabbedPaneDemo.matthew"));
+            icon[4] = resourceManager.createImageIcon("blake.gif", resourceManager.getString("TabbedPaneDemo.blake"));
+            icon[5] = resourceManager.createImageIcon("brooke.gif", resourceManager.getString("TabbedPaneDemo.brooke"));
 
             /*
              for(int i = 0; i < 6; i++) {

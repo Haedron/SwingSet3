@@ -47,10 +47,10 @@ public class SwingDemoList implements DemoList {
        "swingset3.demos.toplevels.JDialogDemo",
        "swingset3.demos.toplevels.JWindowDemo",
                 
-       "swingset3.demos.containers.InternalFrameDemo",
-       "swingset3.demos.containers.TabbedPaneDemo",
-       "swingset3.demos.containers.ScrollPaneDemo",
-       "swingset3.demos.containers.SplitPaneDemo",
+       "com.sun.swingset3.demos.internalframe.InternalFrameDemo",
+       "com.sun.swingset3.demos.tabbedpane.TabbedPaneDemo",
+       "com.sun.swingset3.demos.scrollpane.ScrollPaneDemo",
+       "com.sun.swingset3.demos.splitpane.SplitPaneDemo",
        "com.sun.swingset3.demos.gridbaglayout.GridBagLayoutDemo",
                 
        "swingset3.demos.data.TableDemo",
