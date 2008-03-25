@@ -31,12 +31,9 @@
 
 package swingset3.demos.general;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Rectangle;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import java.awt.*;
+import javax.swing.*;
+
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
@@ -63,8 +60,14 @@ public class ToolTipDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-	ToolTipDemo demo = new ToolTipDemo();
-	demo.mainImpl();
+        JFrame frame = new JFrame(ToolTipDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new ToolTipDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     /**

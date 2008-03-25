@@ -42,10 +42,6 @@ import javax.swing.*;
  * @version 1.23 11/17/05
  */
 public class DemoBase extends JPanel {
-    // The preferred size of the demo
-    private static int PREFERRED_WIDTH = 600;
-    private static int PREFERRED_HEIGHT = 600;
-
     public static final Dimension HGAP5 = new Dimension(5, 1);
     public static final Dimension VGAP5 = new Dimension(1, 5);
 
@@ -67,19 +63,6 @@ public class DemoBase extends JPanel {
 
     protected DemoBase() {
         UIManager.put("swing.boldMetal", Boolean.FALSE);
-    }
-
-    protected void mainImpl() {
-        JFrame frame = new JFrame(getName());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        frame.getContentPane().setLayout(new BorderLayout());
-        frame.getContentPane().add(this, BorderLayout.CENTER);
-        setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
-
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
     }
 }
 

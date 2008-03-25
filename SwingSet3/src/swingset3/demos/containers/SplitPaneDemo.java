@@ -39,19 +39,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.InputVerifier;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -99,8 +87,14 @@ public class SplitPaneDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-        SplitPaneDemo demo = new SplitPaneDemo();
-        demo.mainImpl();
+        JFrame frame = new JFrame(SplitPaneDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new SplitPaneDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     /**

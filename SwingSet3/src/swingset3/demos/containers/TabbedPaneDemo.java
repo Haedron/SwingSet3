@@ -31,20 +31,11 @@
 
 package swingset3.demos.containers;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTabbedPane;
-import javax.swing.SingleSelectionModel;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -85,8 +76,14 @@ public class TabbedPaneDemo extends DemoBase implements ActionListener {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-        TabbedPaneDemo demo = new TabbedPaneDemo();
-        demo.mainImpl();
+        JFrame frame = new JFrame(TabbedPaneDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new TabbedPaneDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     /**

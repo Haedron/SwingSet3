@@ -31,28 +31,14 @@
 
 package swingset3.demos.data;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Insets;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Vector;
-import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
+
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
@@ -98,8 +84,14 @@ public class ListDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-	ListDemo demo = new ListDemo();
-	demo.mainImpl();
+        JFrame frame = new JFrame(ListDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new ListDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     /**

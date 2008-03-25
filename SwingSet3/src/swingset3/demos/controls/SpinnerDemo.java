@@ -31,11 +31,11 @@
 package swingset3.demos.controls;
 
 import java.awt.BorderLayout;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JPanel;
+import javax.swing.*;
+
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
 import swingset3.demos.ResourceManager;
@@ -70,8 +70,14 @@ public class SpinnerDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-        SpinnerDemo demo = new SpinnerDemo();
-        demo.mainImpl();
+        JFrame frame = new JFrame(SpinnerDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new SpinnerDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     public SpinnerDemo() {

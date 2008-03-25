@@ -94,8 +94,14 @@ public class ButtonDemo extends DemoBase implements ChangeListener {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-        ButtonDemo demo = new ButtonDemo();
-        demo.mainImpl();
+        JFrame frame = new JFrame(ButtonDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new ButtonDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     /**

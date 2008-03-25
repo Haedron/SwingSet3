@@ -77,8 +77,14 @@ public class ColorChooserDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-        ColorChooserDemo demo = new ColorChooserDemo();
-        demo.mainImpl();
+        JFrame frame = new JFrame(ColorChooserDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new ColorChooserDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
 

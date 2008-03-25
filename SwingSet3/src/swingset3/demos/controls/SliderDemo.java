@@ -31,15 +31,8 @@
 
 package swingset3.demos.controls;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import javax.swing.BoundedRangeModel;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
+import java.awt.*;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -72,8 +65,14 @@ public class SliderDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-        SliderDemo demo = new SliderDemo();
-        demo.mainImpl();
+        JFrame frame = new JFrame(SliderDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new SliderDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     /**

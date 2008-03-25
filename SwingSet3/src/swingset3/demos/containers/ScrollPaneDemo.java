@@ -31,13 +31,8 @@
 
 package swingset3.demos.containers;
 
-import java.awt.BorderLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
+import java.awt.*;
+import javax.swing.*;
 
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
@@ -65,8 +60,14 @@ public class ScrollPaneDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-        ScrollPaneDemo demo = new ScrollPaneDemo();
-        demo.mainImpl();
+        JFrame frame = new JFrame(ScrollPaneDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new ScrollPaneDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     /**

@@ -31,15 +31,13 @@
 
 package swingset3.demos.data;
 
-import java.awt.BorderLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import swingset3.DemoProperties;
 import swingset3.demos.DemoBase;
@@ -69,8 +67,14 @@ public class TreeDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-	TreeDemo demo = new TreeDemo();
-	demo.mainImpl();
+        JFrame frame = new JFrame(TreeDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new TreeDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     /**

@@ -66,8 +66,14 @@ public class GridBagLayoutDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-        GridBagLayoutDemo demo = new GridBagLayoutDemo();
-        demo.mainImpl();
+        JFrame frame = new JFrame(GridBagLayoutDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new GridBagLayoutDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     public GridBagLayoutDemo() {

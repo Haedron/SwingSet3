@@ -112,9 +112,14 @@ public class TextFieldDemo extends DemoBase {
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
-        TextFieldDemo demo = new TextFieldDemo();
-
-        demo.mainImpl();
+        JFrame frame = new JFrame(TextFieldDemo.class.getAnnotation(DemoProperties.class).value());
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new TextFieldDemo());
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     public TextFieldDemo() {
