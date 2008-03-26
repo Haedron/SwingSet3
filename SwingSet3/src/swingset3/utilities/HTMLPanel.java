@@ -31,10 +31,8 @@
 
 package swingset3.utilities;
 
-import swingset3.utilities.Utilities;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.util.EventListener;
 import javax.swing.JEditorPane;
@@ -49,6 +47,8 @@ import javax.swing.text.ViewFactory;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.ObjectView;
+
+import com.sun.swingset3.demos.DemoUtilities;
 
 /**
  *
@@ -78,12 +78,13 @@ public class HTMLPanel extends JEditorPane {
     public static interface ComponentCreationListener extends EventListener {
         public void componentCreated(HTMLPanel htmlPanel, Component component);
     }
-        
+
     private static HyperlinkHandler hyperlinkHandler;
-    
-    /** Creates a new instance of HTMLPanel with a default content type of &quot;text/html&quot;
+
+    /**
+     * Creates a new instance of HTMLPanel with a default content type of &quot;text/html&quot;
      */
-    public HTMLPanel() {        
+    public HTMLPanel() {
         setContentType("text/html");
         setEditorKit(new ComponentEditorKit()); // brute force
         setEditable(false); // VERY IMPORTANT!
@@ -92,55 +93,57 @@ public class HTMLPanel extends JEditorPane {
         }
         addHyperlinkListener(hyperlinkHandler);
     }
-    
+
     public void addComponentCreationListener(HTMLPanel.ComponentCreationListener l) {
         listenerList.add(ComponentCreationListener.class, l);
     }
-    
+
     public void removeComponentCreationListener(HTMLPanel.ComponentCreationListener l) {
         listenerList.remove(HTMLPanel.ComponentCreationListener.class, l);
     }
-    
+
     protected class ComponentEditorKit extends HTMLEditorKit {
         @Override
         public ViewFactory getViewFactory() {
             return new ComponentFactory();
-        }        
+        }
     }
-    
+
     protected class ComponentFactory extends HTMLEditorKit.HTMLFactory {
         public ComponentFactory() {
             super();
         }
+
         @Override
         public View create(Element element) {
             AttributeSet attrs = element.getAttributes();
- 	    Object elementName = 
-                attrs.getAttribute(AbstractDocument.ElementNameAttribute);
-	    Object o = (elementName != null) ? 
-		null : attrs.getAttribute(StyleConstants.NameAttribute);
-	    if (o instanceof HTML.Tag) {        
-                if ((HTML.Tag) o == HTML.Tag.OBJECT) {
+            Object elementName =
+                    attrs.getAttribute(AbstractDocument.ElementNameAttribute);
+            Object o = (elementName != null) ?
+                    null : attrs.getAttribute(StyleConstants.NameAttribute);
+            if (o instanceof HTML.Tag) {
+                if (o == HTML.Tag.OBJECT) {
                     return new ComponentView(element);
                 }
             }
             return super.create(element);
         }
     }
-    
+
     protected class ComponentView extends ObjectView {
         public ComponentView(Element element) {
             super(element);
         }
+
         @Override
         protected Component createComponent() {
             final Component component = super.createComponent();
-                        
+
             Runnable notifier = new Runnable() {
                 public void run() {
                     final ComponentCreationListener listeners[] =
                             HTMLPanel.this.listenerList.getListeners(ComponentCreationListener.class);
-                    for(ComponentCreationListener l: listeners) {
+                    for (ComponentCreationListener l : listeners) {
                         l.componentCreated(HTMLPanel.this, component);
                     }
                 }
@@ -150,34 +153,33 @@ public class HTMLPanel extends JEditorPane {
                 notifier.run();
             } else {
                 EventQueue.invokeLater(notifier);
-            }           
-	    return component;	
+            }
+            return component;
         }
     }
-    
-     // single instance of handler is shared for ALL DemoPanel instances
+
+    // single instance of handler is shared for ALL DemoPanel instances
     public static class HyperlinkHandler implements HyperlinkListener {
         Cursor defaultCursor;
-        
+
         public void hyperlinkUpdate(HyperlinkEvent event) {
-            JEditorPane descriptionPane = (JEditorPane)event.getSource();
+            JEditorPane descriptionPane = (JEditorPane) event.getSource();
             HyperlinkEvent.EventType type = event.getEventType();
-            if (type == HyperlinkEvent.EventType.ACTIVATED) {                    
+            if (type == HyperlinkEvent.EventType.ACTIVATED) {
                 try {
-                    Utilities.browse(event.getURL().toURI());
-                       
+                    DemoUtilities.browse(event.getURL().toURI());
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.err.println(e);
                 }
-                
+
             } else if (type == HyperlinkEvent.EventType.ENTERED) {
                 defaultCursor = descriptionPane.getCursor();
                 descriptionPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                
+
             } else if (type == HyperlinkEvent.EventType.EXITED) {
-                descriptionPane.setCursor(defaultCursor);                  
+                descriptionPane.setCursor(defaultCursor);
             }
         }
-    }    
+    }
 }

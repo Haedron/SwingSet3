@@ -52,8 +52,8 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
-import swingset3.utilities.Utilities;
 import com.sun.swingset3.demos.JHyperlink;
+import com.sun.swingset3.demos.DemoUtilities;
 
 /**
  * Table renderer which renders cell value as hyperlink with optional rollover underline.
@@ -337,7 +337,7 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
             if (source instanceof Link) {
                 Link link = (Link) source;
                 try {
-                    Utilities.browse(link.getUri());
+                    DemoUtilities.browse(link.getUri());
 
                 } catch (Exception ex) {
                     ex.printStackTrace();

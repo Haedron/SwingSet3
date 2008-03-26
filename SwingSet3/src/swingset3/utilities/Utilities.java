@@ -32,26 +32,15 @@
 package swingset3.utilities;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Transparency;
-import java.awt.Window;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
-import javax.jnlp.BasicService;
 import javax.jnlp.ServiceManager;
-import javax.jnlp.UnavailableServiceException;
-import javax.swing.JFrame;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -66,70 +55,7 @@ public class Utilities {
     public static boolean runningFromWebStart() {
         return ServiceManager.getServiceNames() != null;        
     }
-    
-    public static void setToplevelLocation(Window toplevel, Component component,
-                                           int relativePosition) {
-    
-        Rectangle compBounds = component.getBounds();
-        
-        // Convert component location to screen coordinates
-        Point p = new Point();
-        SwingUtilities.convertPointToScreen(p, component);
 
-        int x;
-        int y;
-        
-        // Set frame location to be centered on panel
-        switch(relativePosition) {
-            case SwingConstants.NORTH: {
-                x = (p.x + (compBounds.width/2)) - (toplevel.getWidth() / 2);
-                y = p.y - toplevel.getHeight();
-                break;                
-            }
-            case SwingConstants.EAST: {
-                x = p.x + compBounds.width;
-                y = (p.y + (compBounds.height/2)) - (toplevel.getHeight() / 2);
-                break;
-            }
-            case SwingConstants.SOUTH: {
-                x = (p.x + (compBounds.width/2)) - (toplevel.getWidth() / 2);            
-                y = p.y + compBounds.height;
-                break;
-            }
-            case SwingConstants.WEST: {
-                x = p.x - toplevel.getWidth();
-                y = (p.y + (compBounds.height/2)) - (toplevel.getHeight() / 2);
-                break;                                
-            }
-            case SwingConstants.NORTH_EAST: {
-                x = p.x + compBounds.width;
-                y = p.y - toplevel.getHeight();
-                break;                
-            }
-            case SwingConstants.NORTH_WEST: {
-                x = p.x - toplevel.getWidth();
-                y = p.y - toplevel.getHeight();
-                break;                                     
-            }
-            case SwingConstants.SOUTH_EAST: {
-                x = p.x + compBounds.width;            
-                y = p.y + compBounds.height; 
-                break;
-            }
-            case SwingConstants.SOUTH_WEST: {
-                x = p.x - toplevel.getWidth();
-                y = p.y + compBounds.height; 
-                break;                
-            }
-            default:
-            case SwingConstants.CENTER: {               
-                x = (p.x + (compBounds.width/2)) - (toplevel.getWidth() / 2);
-                y = (p.y + (compBounds.height/2)) - (toplevel.getHeight() / 2);
-            }
-        }
-        toplevel.setLocation(x, y);        
-    }
-    
     public static String getURLFileName(URL url) {
         String path = url.getPath();
         return path.substring(path.lastIndexOf("/") + 1);
@@ -180,26 +106,7 @@ public class Utilities {
 
         return gradient;
     }
-    
-    public static boolean browse(URI uri) throws IOException, UnavailableServiceException {
-        // Try using the Desktop api first
-        try {
-            Desktop desktop = Desktop.getDesktop();
-            desktop.browse(uri);
-            return true;
-            
-        } catch (SecurityException sex) {
-            // Running in sandbox, try using WebStart service
-            BasicService basicService = 
-                        (BasicService)ServiceManager.lookup("javax.jnlp.BasicService");
-                
-            if (basicService.isWebBrowserSupported()) {
-                return basicService.showDocument(uri.toURL());
-            } 
-        }
-        return false;
-    }
-    
+
     public static Color deriveColorAlpha(Color base, int alpha) {
         return new Color(base.getRed(), base.getGreen(), base.getBlue(), alpha);
     }
@@ -272,29 +179,4 @@ public class Utilities {
                             String.format("%.3f%n",hsb[1]) + "," + 
                             String.format("%.3f%n", hsb[2]));
    }
-    
-    private static void testSetToplevelLocation(Window base, int relativePosition) {        
-        JFrame frame = new JFrame("frame "+ relativePosition);
-        frame.setSize(130,130);
-        setToplevelLocation(frame, base, relativePosition);
-        frame.setVisible(true);        
-    }
-    
-    public static void main(String args[]) {
-        JFrame baseframe = new JFrame("base");
-        baseframe.setSize(230,230);
-        baseframe.setLocation(new Point(400,400));
-        baseframe.setVisible(true);
-        
-        testSetToplevelLocation(baseframe, SwingConstants.CENTER);
-        testSetToplevelLocation(baseframe, SwingConstants.NORTH);
-        testSetToplevelLocation(baseframe, SwingConstants.EAST);
-        testSetToplevelLocation(baseframe, SwingConstants.SOUTH); 
-        testSetToplevelLocation(baseframe, SwingConstants.WEST);
-        testSetToplevelLocation(baseframe, SwingConstants.NORTH_EAST);
-        testSetToplevelLocation(baseframe, SwingConstants.NORTH_WEST);
-        testSetToplevelLocation(baseframe, SwingConstants.SOUTH_EAST);
-        testSetToplevelLocation(baseframe, SwingConstants.SOUTH_WEST);
-    }
-    
 }

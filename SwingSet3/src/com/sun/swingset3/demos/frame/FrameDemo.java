@@ -46,7 +46,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import swingset3.DemoProperties;
-import swingset3.utilities.Utilities;
+import com.sun.swingset3.demos.DemoUtilities;
 
 /**
  * Demo for Swing's JFrame toplevel component.
@@ -184,7 +184,7 @@ public class FrameDemo extends JPanel {
     }
 
     public void start() {
-        Utilities.setToplevelLocation(frame, frameSpaceholder, SwingConstants.CENTER);
+        DemoUtilities.setToplevelLocation(frame, frameSpaceholder, SwingConstants.CENTER);
         showFrame();
     }
 

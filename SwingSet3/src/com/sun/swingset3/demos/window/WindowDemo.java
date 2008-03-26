@@ -39,7 +39,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import swingset3.DemoProperties;
-import swingset3.utilities.Utilities;
+import com.sun.swingset3.demos.DemoUtilities;
 
 /**
  * @author aim
@@ -116,7 +116,7 @@ public class WindowDemo extends JPanel {
     }
 
     public void start() {
-        Utilities.setToplevelLocation(window, windowSpaceholder, SwingConstants.CENTER);
+        DemoUtilities.setToplevelLocation(window, windowSpaceholder, SwingConstants.CENTER);
         showWindow();
     }
 

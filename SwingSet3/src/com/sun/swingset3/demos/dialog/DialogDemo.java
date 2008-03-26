@@ -37,7 +37,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import swingset3.DemoProperties;
-import swingset3.utilities.Utilities;
+import com.sun.swingset3.demos.DemoUtilities;
 
 /**
  *
@@ -115,7 +115,7 @@ public class DialogDemo extends JPanel {
     }
     
     public void start() {
-        Utilities.setToplevelLocation(dialog, dialogSpaceholder, SwingConstants.CENTER);
+        DemoUtilities.setToplevelLocation(dialog, dialogSpaceholder, SwingConstants.CENTER);
         showDialog();
     }
     

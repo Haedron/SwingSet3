@@ -46,7 +46,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import swingset3.utilities.Utilities;
 
 
 /**
@@ -216,7 +215,7 @@ public class JHyperlink extends JButton {
             URI targetURI = hyperlink.getTarget();
             if (targetURI != null) {
                 try {
-                    Utilities.browse(targetURI);
+                    DemoUtilities.browse(targetURI);
                     hyperlink.setVisited(true);
                 } catch (Exception ex) {
                     ex.printStackTrace();
