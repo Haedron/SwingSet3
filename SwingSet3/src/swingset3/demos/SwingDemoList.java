@@ -44,9 +44,9 @@ public class SwingDemoList implements DemoList {
 
     public List<String> getDemoClassNames() {
         return Arrays.asList(
-                "swingset3.demos.toplevels.JFrameDemo",
-                "swingset3.demos.toplevels.JDialogDemo",
-                "swingset3.demos.toplevels.JWindowDemo",
+                "com.sun.swingset3.demos.frame.FrameDemo",
+                "com.sun.swingset3.demos.dialog.DialogDemo",
+                "com.sun.swingset3.demos.window.WindowDemo",
 
                 "com.sun.swingset3.demos.internalframe.InternalFrameDemo",
                 "com.sun.swingset3.demos.tabbedpane.TabbedPaneDemo",

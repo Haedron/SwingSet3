@@ -29,10 +29,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.toplevels;
+package com.sun.swingset3.demos.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -49,13 +48,13 @@ import swingset3.utilities.Utilities;
       category = "Toplevel Containers",
       description = "Demonstrates JDialog, Swing's top-level dialog container."
 )
-public class JDialogDemo extends JPanel { 
+public class DialogDemo extends JPanel { 
     
     private JDialog dialog;
     
     private JComponent dialogSpaceholder;    
         
-    public JDialogDemo() {        
+    public DialogDemo() {        
         initComponents();
     }
     
@@ -69,7 +68,7 @@ public class JDialogDemo extends JPanel {
         add(dialogSpaceholder, BorderLayout.CENTER);
     }
                 
-    protected JComponent createDialogSpaceholder(JDialog dialog) {
+    protected static JComponent createDialogSpaceholder(JDialog dialog) {
         // Create placeholder panel to provide space in which to
         // display the toplevel dialog so that the control panel is not
         // obscured by it.
@@ -94,7 +93,7 @@ public class JDialogDemo extends JPanel {
         return panel;
     }
     
-    protected JDialog createDialog() {
+    protected static JDialog createDialog() {
  
         //<snip>Create dialog
         JDialog dialog = new JDialog(new JFrame(), "Demo JDialog", false);
@@ -124,7 +123,7 @@ public class JDialogDemo extends JPanel {
         //<snip>Hide dialog
         dialog.setVisible(false);
         //</snip>
-    };
+    }
     
     public void showDialog() {
         //<snip>Show dialog
@@ -143,4 +142,17 @@ public class JDialogDemo extends JPanel {
         }
     }
 
+    public static void main(String args[]) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                JFrame frame = new JFrame();
+                DialogDemo demo = new DialogDemo();
+                frame.add(demo);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.setVisible(true);
+                demo.start();
+            }
+        });
+    }
 }

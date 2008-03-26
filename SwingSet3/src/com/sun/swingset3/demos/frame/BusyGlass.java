@@ -29,11 +29,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.toplevels;
+package com.sun.swingset3.demos.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;         
+import java.awt.Cursor;
 import java.awt.Graphics;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
@@ -45,35 +45,32 @@ import javax.swing.event.MouseInputAdapter;
  * Example usage:
  * <pre><code>
  *    // Install glasspane
- *    frame.setGlassPane(new BusyGlass()); 
+ *    frame.setGlassPane(new BusyGlass());
  *
  *    // Make frame busy
  *    frame.getGlassPane().setVisible(true);
  * </code></pre>
- * 
+ *
  * Caution: A well-written client should rarely need to make
  * a window "busy" because the app should be as responsive as possible;
  * long-winded operations should be off-loaded to non-GUI threads
- * whenever possible.  
+ * whenever possible.
  *
  * @author aim
  */
 //<snip>Make toplevel "busy"
 public class BusyGlass extends JPanel {
-    
+
     /**
      * Create GlassPane component to block input on toplevel
-     */    
+     */
     public BusyGlass() {
         setLayout(new BorderLayout());
         setVisible(false); //initially invisible
         setOpaque(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        MouseInputAdapter inputBlocker = new MouseInputAdapter() {};
-        addMouseListener(inputBlocker);
-        addMouseMotionListener(inputBlocker);
     }
-    
+
     protected void paintComponent(Graphics g) {
         // Render partially opaque to 'veil' the frame's contents so
         // that the user has visual feedback that the components
@@ -83,7 +80,6 @@ public class BusyGlass extends JPanel {
                 bgColor.getGreen(),
                 bgColor.getBlue(), 150));
         g.fillRect(0, 0, getWidth(), getHeight());
-        
     }
- }
+}
 //</snip>
