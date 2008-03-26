@@ -55,7 +55,7 @@ public class SwingDemoList implements DemoList {
                 "com.sun.swingset3.demos.gridbaglayout.GridBagLayoutDemo",
 
                 "com.sun.swingset3.demos.table.TableDemo",
-                "swingset3.demos.data.TreeDemo",
+                "com.sun.swingset3.demos.tree.TreeDemo",
                 "com.sun.swingset3.demos.list.ListDemo",
 
                 "com.sun.swingset3.demos.togglebutton.ToggleButtonDemo",

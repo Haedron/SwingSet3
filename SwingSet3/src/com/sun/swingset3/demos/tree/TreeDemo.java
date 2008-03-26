@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.data;
+package com.sun.swingset3.demos.tree;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -39,6 +39,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
 
@@ -49,24 +50,22 @@ import com.sun.swingset3.demos.ResourceManager;
  * @author Jeff Dinkins
  */
 @DemoProperties(
-      value = "JTree Demo", 
-      category = "Data",
-      description = "Demonstrates JTree, a component which supports display/editing of hierarchical data",
-      sourceFiles = {
-        "swingset3/demos/data/TreeDemo.java"
-      }
+        value = "JTree Demo",
+        category = "Data",
+        description = "Demonstrates JTree, a component which supports display/editing of hierarchical data",
+        sourceFiles = {
+                "swingset3/demos/data/TreeDemo.java"
+                }
 )
 public class TreeDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
-    
-    private JTree tree;
 
     /**
      * main method allows us to run as a standalone demo.
      */
     public static void main(String[] args) {
         JFrame frame = new JFrame(TreeDemo.class.getAnnotation(DemoProperties.class).value());
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new TreeDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -81,65 +80,65 @@ public class TreeDemo extends JPanel {
     public TreeDemo() {
         setLayout(new BorderLayout());
 
-        add(createTree(), BorderLayout.CENTER);
+        add(new JScrollPane(createTree()), BorderLayout.CENTER);
     }
- 
-    public JScrollPane createTree() {
+
+    public JTree createTree() {
         DefaultMutableTreeNode top = new DefaultMutableTreeNode(resourceManager.getString("TreeDemo.music"));
-        DefaultMutableTreeNode catagory = null ;
-	DefaultMutableTreeNode artist = null;
-	DefaultMutableTreeNode record = null;
+        DefaultMutableTreeNode catagory = null;
+        DefaultMutableTreeNode artist = null;
+        DefaultMutableTreeNode record = null;
 
-	// open tree data 
-	URL url = getClass().getResource("resources/tree.txt");
+        // open tree data 
+        URL url = getClass().getResource("resources/tree.txt");
 
-	try {
-	    // convert url to buffered string
-	    InputStream is = url.openStream();
-	    InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-	    BufferedReader reader = new BufferedReader(isr);
+        try {
+            // convert url to buffered string
+            InputStream is = url.openStream();
+            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+            BufferedReader reader = new BufferedReader(isr);
 
-	    // read one line at a time, put into tree
-	    String line = reader.readLine();
-	    while(line != null) {
-		// System.out.println("reading in: ->" + line + "<-");
-		char linetype = line.charAt(0);
-		switch(linetype) {
-		   case 'C':
-		     catagory = new DefaultMutableTreeNode(line.substring(2));
-		     top.add(catagory);
-		     break;
-		   case 'A':
-		     if(catagory != null) {
-		         catagory.add(artist = new DefaultMutableTreeNode(line.substring(2)));
-		     }
-		     break;
-		   case 'R':
-		     if(artist != null) {
-		         artist.add(record = new DefaultMutableTreeNode(line.substring(2)));
-		     }
-		     break;
-		   case 'S':
-		     if(record != null) {
-		         record.add(new DefaultMutableTreeNode(line.substring(2)));
-		     }
-		     break;
-		   default:
-		     break;
-		}
-		line = reader.readLine();
-	    }
-	} catch (IOException e) {
-	}
+            // read one line at a time, put into tree
+            String line = reader.readLine();
+            while (line != null) {
+                // System.out.println("reading in: ->" + line + "<-");
+                char linetype = line.charAt(0);
+                switch (linetype) {
+                    case 'C':
+                        catagory = new DefaultMutableTreeNode(line.substring(2));
+                        top.add(catagory);
+                        break;
+                    case 'A':
+                        if (catagory != null) {
+                            catagory.add(artist = new DefaultMutableTreeNode(line.substring(2)));
+                        }
+                        break;
+                    case 'R':
+                        if (artist != null) {
+                            artist.add(record = new DefaultMutableTreeNode(line.substring(2)));
+                        }
+                        break;
+                    case 'S':
+                        if (record != null) {
+                            record.add(new DefaultMutableTreeNode(line.substring(2)));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+        }
 
-	tree = new JTree(top) {
-	    public Insets getInsets() {
-		return new Insets(5,5,5,5);
-	    }
-	};
-        
+        JTree tree = new JTree(top) {
+            public Insets getInsets() {
+                return new Insets(5, 5, 5, 5);
+            }
+        };
+
         tree.setEditable(true);
-            
-	return new JScrollPane(tree);
+
+        return tree;
     }
 }
