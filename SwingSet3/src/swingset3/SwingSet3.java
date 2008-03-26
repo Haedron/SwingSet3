@@ -89,6 +89,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import swingset3.codeview.CodeViewer;
@@ -213,10 +214,16 @@ public class SwingSet3 extends SingleFrameApplication  {
         setDemoList(resourceMap.getString("demos.title"), getDemoClassNames(args));
 
         JPanel introPanel = new RoundedPanel(new BorderLayout());
+        introPanel.setBackground(new Color(100, 130, 160));
         introPanel.setBorder(new RoundedBorder());
+        // need extra panel wrapper to add border around label's image
+        JPanel introBorder = new JPanel(new BorderLayout());
+        introBorder.setBorder(new EmptyBorder(0,4,0,4));
+        introBorder.setBackground(introPanel.getBackground());
         JLabel intro = new JLabel(new ImageIcon(SwingSet3.class.getResource("resources/images/home.png")));
         intro.setVerticalAlignment(JLabel.TOP);
-        introPanel.add(intro);
+        introBorder.add(intro, BorderLayout.CENTER);
+        introPanel.add(introBorder, BorderLayout.CENTER);
         setDemoPlaceholder(introPanel);
 
     }
@@ -383,8 +390,6 @@ public class SwingSet3 extends SingleFrameApplication  {
         demoSplitPane.setTopComponent(demoContainer);
 
         currentDemoPanel = demoPlaceholder;
-        demoPlaceholder.setBackground(Color.orange);
-        demoPlaceholder.setOpaque(true);
         demoContainer.add(demoPlaceholder, BorderLayout.CENTER);
                 
         // Create collapsible source code pane
