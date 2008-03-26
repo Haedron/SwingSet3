@@ -79,7 +79,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
 
 import swingset3.DemoProperties;
-import swingset3.hyperlink.HyperlinkCellRenderer;
+import swingset3.utilities.Utilities;
 
 /**
  *
@@ -579,7 +579,7 @@ public class TableDemo extends JPanel {
                     }
                 }
                 if (imdbURI != null) {
-                    swingset3.utilities.Utilities.browse(imdbURI);
+                    Utilities.browse(imdbURI);
                 } else {
                     showMessage("IMDB Link",
                             getString("AdvancedTableDemo.imdbLinkNotFound",

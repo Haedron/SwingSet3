@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.hyperlink;
+package com.sun.swingset3.demos.table;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -51,58 +51,58 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
+
 import swingset3.utilities.Utilities;
+import com.sun.swingset3.demos.JHyperlink;
 
 /**
  * Table renderer which renders cell value as hyperlink with optional rollover underline.
+ *
  * @author aim
  */
 public class HyperlinkCellRenderer extends JHyperlink implements TableCellRenderer {
     private JTable table;
-    private ArrayList columnModelIndeces;
-    private Action action;
-    
+    private final ArrayList<Integer> columnModelIndeces = new ArrayList<Integer>();
+
     private Color rowColors[];
     private Border noFocusBorder;
-    
+
     private boolean underlineOnRollover = true;
-    
+
     private transient int hitColumnIndex = -1;
     private transient int hitRowIndex = -1;
-    
-    private HashMap<Object,int[]> visitedCache;
-    
+
+    private HashMap<Object, int[]> visitedCache;
+
     public HyperlinkCellRenderer(Action action, boolean underlineOnRollover) {
-        super();
         setOpaque(true);
         setBorderPainted(true);
         setAction(action);
         setHorizontalAlignment(JHyperlink.LEFT);
         rowColors = new Color[1];
         rowColors[0] = UIManager.getColor("Table.background");
-        columnModelIndeces = new ArrayList();
         this.underlineOnRollover = underlineOnRollover;
     }
-    
+
     public void setRowColors(Color[] colors) {
         this.rowColors = colors;
     }
-    
+
     public void updateUI() {
-        super.updateUI(); 
-	setForeground(null);
-	setBackground(null);
-        
+        super.updateUI();
+        setForeground(null);
+        setBackground(null);
+
         // Make sure border used on non-focussed cells is same size as focussed border
         Border focusBorder = UIManager.getBorder("Table.focusCellHighlightBorder");
         if (focusBorder != null) {
             Insets insets = focusBorder.getBorderInsets(this);
             noFocusBorder = new EmptyBorder(insets.top, insets.left, insets.bottom, insets.right);
         } else {
-            noFocusBorder = new EmptyBorder(1,1,1,1);
+            noFocusBorder = new EmptyBorder(1, 1, 1, 1);
         }
     }
-    
+
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
         if (this.table == null) {
@@ -115,18 +115,18 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
         if (!columnModelIndeces.contains(columnModelIndex)) {
             columnModelIndeces.add(columnModelIndex);
         }
-        
+
         if (value instanceof Link) {
-            Link link = (Link)value;
+            Link link = (Link) value;
             setText(link.getDisplayText());
             setToolTipText(link.getDescription());
-        } else {        
-            setText(value != null? value.toString() : "");
+        } else {
+            setText(value != null ? value.toString() : "");
         }
-        setVisited(isCellLinkVisited(value, row, column));            
+        setVisited(isCellLinkVisited(value, row, column));
         setDrawUnderline(!underlineOnRollover ||
                 (row == hitRowIndex && column == hitColumnIndex));
-        
+
         if (!isSelected) {
             setBackground(rowColors[row % rowColors.length]);
             //setForeground(table.getForeground());
@@ -134,7 +134,7 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
             setBackground(table.getSelectionBackground());
             //setForeground(table.getSelectionForeground());
         }
-        
+
         Border border = null;
         if (hasFocus) {
             if (isSelected) {
@@ -143,31 +143,31 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
             if (border == null) {
                 border = UIManager.getBorder("Table.focusCellHighlightBorder");
             }
-        } 
-        setBorder(border != null? border : noFocusBorder);
-        
+        }
+        setBorder(border != null ? border : noFocusBorder);
+
         return this;
     }
-    
+
     protected void setCellLinkVisited(Object value, int row, int column) {
         if (!isCellLinkVisited(value, row, column)) {
             if (value instanceof Link) {
-                ((Link)value).setVisited(true);
-            } else {                
+                ((Link) value).setVisited(true);
+            } else {
                 if (visitedCache == null) {
-                    visitedCache = new HashMap();
+                    visitedCache = new HashMap<Object, int[]>();
                 }
                 int position[] = new int[2];
                 position[0] = table.convertRowIndexToModel(row);
                 position[1] = table.convertColumnIndexToModel(column);
-                visitedCache.put(value, position);                
+                visitedCache.put(value, position);
             }
         }
     }
-    
+
     protected boolean isCellLinkVisited(Object value, int row, int column) {
         if (value instanceof Link) {
-            return ((Link)value).isVisited();           
+            return ((Link) value).isVisited();
         }
         if (visitedCache != null) {
             int position[] = visitedCache.get(value);
@@ -178,11 +178,11 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
         }
         return false;
     }
-    
+
     public int getActiveHyperlinkRow() {
         return hitRowIndex;
     }
-    
+
     public int getActiveHyperlinkColumn() {
         return hitColumnIndex;
     }
@@ -197,35 +197,46 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
 
         // Process the listeners last to first, notifying
         // those that are interested in this event
-        for (int i = listeners.length-2; i>=0; i-=2) {
-            if (listeners[i]==ActionListener.class) {                
-                ((ActionListener)listeners[i+1]).actionPerformed(event);
-            }          
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == ActionListener.class) {
+                ((ActionListener) listeners[i + 1]).actionPerformed(event);
+            }
         }
-    }  
-    
-    public void invalidate() {}
-    public void validate() {}
-    public void revalidate() {}
-    public void repaint(long tm, int x, int y, int width, int height) {}
-    public void repaint(Rectangle r) {}
-    public void repaint() {}
+    }
+
+    public void invalidate() {
+    }
+
+    public void validate() {
+    }
+
+    public void revalidate() {
+    }
+
+    public void repaint(long tm, int x, int y, int width, int height) {
+    }
+
+    public void repaint(Rectangle r) {
+    }
+
+    public void repaint() {
+    }
 
     private class HyperlinkMouseListener extends MouseAdapter {
         private transient Rectangle cellRect;
         private transient Rectangle iconRect = new Rectangle();
         private transient Rectangle textRect = new Rectangle();
         private transient Cursor tableCursor;
-        
+
         @Override
         public void mouseMoved(MouseEvent event) {
             // This should only be called if underlineOnRollover is true
-            JTable table = (JTable)event.getSource();
-            
+            JTable table = (JTable) event.getSource();
+
             // Locate the table cell under the event location
             int oldHitColumnIndex = hitColumnIndex;
             int oldHitRowIndex = hitRowIndex;
-            
+
             checkIfPointInsideHyperlink(event.getPoint());
 
             if (hitRowIndex != oldHitRowIndex ||
@@ -240,7 +251,7 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
                 }
 
                 // repaint the cells affected by rollover
-                Rectangle repaintRect = null;
+                Rectangle repaintRect;
                 if (hitRowIndex != -1 && hitColumnIndex != -1) {
                     // we need to repaint new cell with rollover underline
                     // cellRect already contains rect of hit cell
@@ -260,37 +271,37 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
                 }
                 table.repaint(repaintRect);
             }
-            
+
         }
-        
+
         @Override
         public void mouseClicked(MouseEvent event) {
             if (checkIfPointInsideHyperlink(event.getPoint())) {
-   
-                ActionEvent actionEvent = new ActionEvent(new Integer(hitRowIndex), 
+
+                ActionEvent actionEvent = new ActionEvent(new Integer(hitRowIndex),
                         ActionEvent.ACTION_PERFORMED,
                         "hyperlink");
-                    
+
                 HyperlinkCellRenderer.this.fireActionPerformed(actionEvent);
-                
+
                 setCellLinkVisited(table.getValueAt(hitRowIndex, hitColumnIndex),
                         hitRowIndex, hitColumnIndex);
-                
+
             }
         }
-        
+
         protected boolean checkIfPointInsideHyperlink(Point p) {
             hitColumnIndex = table.columnAtPoint(p);
             hitRowIndex = table.rowAtPoint(p);
-            
+
             if (hitColumnIndex != -1 && hitRowIndex != -1 &&
                     columnModelIndeces.contains(table.getColumnModel().
-                    getColumn(hitColumnIndex).getModelIndex())) {
+                            getColumn(hitColumnIndex).getModelIndex())) {
                 // We know point is within a hyperlink column, however we do further hit testing
                 // to see if point is within the text bounds on the hyperlink
                 TableCellRenderer renderer = table.getCellRenderer(hitRowIndex, hitColumnIndex);
-                JHyperlink hyperlink = (JHyperlink)table.prepareRenderer(renderer, hitRowIndex, hitColumnIndex);
-                
+                JHyperlink hyperlink = (JHyperlink) table.prepareRenderer(renderer, hitRowIndex, hitColumnIndex);
+
                 // Convert the event to the renderer's coordinate system
                 cellRect = table.getCellRect(hitRowIndex, hitColumnIndex, false);
                 hyperlink.setSize(cellRect.width, cellRect.height);
@@ -306,7 +317,7 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
                         hyperlink.getVerticalTextPosition(),
                         hyperlink.getHorizontalTextPosition(),
                         cellRect, iconRect, textRect, hyperlink.getIconTextGap());
-                
+
                 if (textRect.contains(p)) {
                     // point is within hyperlink text bounds
                     return true;
@@ -318,21 +329,21 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
             return false;
         }
     }
-    
-    public class DefaultAction extends AbstractAction {
+
+    public static class DefaultAction extends AbstractAction {
 
         public void actionPerformed(ActionEvent event) {
             Object source = event.getSource();
             if (source instanceof Link) {
-                Link link = (Link)source;
-                try {                    
+                Link link = (Link) source;
+                try {
                     Utilities.browse(link.getUri());
-                    
+
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     System.err.println(ex);
                 }
-                
+
             }
         }
     }

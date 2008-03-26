@@ -29,21 +29,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.hyperlink;
+package com.sun.swingset3.demos;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Desktop;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ButtonModel;
 import javax.swing.Icon;

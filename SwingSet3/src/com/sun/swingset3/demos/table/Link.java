@@ -29,14 +29,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.hyperlink;
+package com.sun.swingset3.demos.table;
 
 import java.net.URI;
 
 /**
  * Class representing the state of a hyperlink
- * This class may be used in conjunction with HyperlinkCellRenderer, 
+ * This class may be used in conjunction with HyperlinkCellRenderer,
  * but it is not required.
+ *
  * @author aim
  */
 public class Link {
@@ -44,12 +45,14 @@ public class Link {
     protected URI uri;
     protected String description;
     protected boolean visited;
-    
-    /** Creates a new instance of Link */
+
+    /**
+     * Creates a new instance of Link
+     */
     public Link(String text) {
         setDisplayText(text);
     }
-    
+
     public Link(String text, URI uri) {
         this(text);
         setUri(uri);
@@ -72,8 +75,8 @@ public class Link {
     }
 
     public String getDescription() {
-        return description != null? description : 
-            uri != null? uri.getPath() : null;
+        return description != null ? description :
+                uri != null ? uri.getPath() : null;
     }
 
     public void setDescription(String description) {
@@ -87,5 +90,5 @@ public class Link {
     public void setVisited(boolean visited) {
         this.visited = visited;
     }
-    
+
 }
