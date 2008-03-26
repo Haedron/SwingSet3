@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.controls;
+package com.sun.swingset3.demos.button;
 
 
 import java.awt.Color;
@@ -58,11 +58,11 @@ import swingset3.hyperlink.JHyperlink;
         category = "Controls",
         description = "Demonstrates the many uses of JButton, Swing's push button component.",
         sourceFiles = {
-                "swingset3/demos/controls/JButtonDemo.java",
+                "swingset3/demos/controls/ButtonDemo.java",
                 "swingset3/hyperlink/JHyperlink.java"
                 }
 )
-public class JButtonDemo extends JPanel {
+public class ButtonDemo extends JPanel {
 
     // remind: replace with annotation?
     public static String getShortDescription() {
@@ -71,9 +71,9 @@ public class JButtonDemo extends JPanel {
 
     public static URL[] getSourceFiles() {
         URL sourceFiles[] = new URL[2];
-        String className = JButtonDemo.class.getName();
+        String className = ButtonDemo.class.getName();
 
-        ClassLoader cl = JButtonDemo.class.getClassLoader();
+        ClassLoader cl = ButtonDemo.class.getClassLoader();
         sourceFiles[0] = cl.getResource("sources/" +
                 className.replace(".", "/") + ".java");
         sourceFiles[1] = cl.getResource("sources/" +
@@ -81,7 +81,7 @@ public class JButtonDemo extends JPanel {
         return sourceFiles;
     }
 
-    public JButtonDemo() {
+    public ButtonDemo() {
         setToolTipText(getShortDescription());
         initComponents();
         setOpaque(false);
@@ -219,7 +219,7 @@ public class JButtonDemo extends JPanel {
     }
 
     public static void main(String args[]) {
-        final JButtonDemo buttonDemo = new JButtonDemo();
+        final ButtonDemo buttonDemo = new ButtonDemo();
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {

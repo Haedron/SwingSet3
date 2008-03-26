@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.data;
+package com.sun.swingset3.demos.table;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +37,7 @@ import javax.swing.table.AbstractTableModel;
 
 /**
  * Data model for oscar candidate data: a list of OscarCandidate beans.
+ *
  * @author aim
  */
 
@@ -47,47 +48,42 @@ public class OscarTableModel extends AbstractTableModel {
     public static final int MOVIE_COLUMN = 3;
     public static final int PERSONS_COLUMN = 4;
     public static final int COLUMN_COUNT = 5;
-    
-    List<OscarCandidate> candidates;
-    
-    public OscarTableModel() {
-        super();
-        this.candidates = new ArrayList();
-    }
-    
+
+    private final List<OscarCandidate> candidates = new ArrayList<OscarCandidate>();
+
     public void add(List<OscarCandidate> newCandidates) {
         int first = candidates.size();
         int last = first + newCandidates.size() - 1;
         candidates.addAll(newCandidates);
         fireTableRowsInserted(first, last);
     }
-    
+
     public void add(OscarCandidate candidate) {
         int index = candidates.size();
         candidates.add(candidate);
         fireTableRowsInserted(index, index);
     }
-    
+
     public int getRowCount() {
         return candidates.size();
     }
-    
+
     public int getColumnCount() {
         return COLUMN_COUNT;
     }
-    
+
     @Override
     public Class getColumnClass(int column) {
         return getValueAt(0, column).getClass();
     }
-    
+
     public OscarCandidate getCandidate(int row) {
         return candidates.get(row);
     }
-    
+
     public Object getValueAt(int row, int column) {
         OscarCandidate oscarCandidate = candidates.get(row);
-        switch(column) {
+        switch (column) {
             case CATEGORY_COLUMN:
                 return oscarCandidate.getCategory();
             case YEAR_COLUMN:
@@ -95,11 +91,10 @@ public class OscarTableModel extends AbstractTableModel {
             case MOVIE_COLUMN:
                 return oscarCandidate.getMovieTitle();
             case WINNER_COLUMN:
-                return oscarCandidate.isWinner()? Boolean.TRUE : Boolean.FALSE;
+                return oscarCandidate.isWinner() ? Boolean.TRUE : Boolean.FALSE;
             case PERSONS_COLUMN:
                 return oscarCandidate.getPersons();
         }
         return null;
     }
-    
 }

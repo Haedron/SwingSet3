@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.data;
+package com.sun.swingset3.demos.table;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -43,6 +43,7 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
+
 import swingset3.hyperlink.HyperlinkCellRenderer;
 
 /**
@@ -50,54 +51,53 @@ import swingset3.hyperlink.HyperlinkCellRenderer;
  * @author aim
  */
 public class OscarCellRenderers {
-    
+
     //<snip>Render table rows with alternating colors
     public static class RowRenderer extends DefaultTableCellRenderer {
-        protected Color rowColors[];
-        
+        private Color rowColors[];
+
         public RowRenderer() {
-            super();
             // initialize default colors from look-and-feel
             rowColors = new Color[1];
             rowColors[0] = UIManager.getColor("Table.background");
         }
-        
+
         public RowRenderer(Color colors[]) {
             super();
             setRowColors(colors);
         }
-        
+
         public void setRowColors(Color colors[]) {
             rowColors = colors;
         }
-        
+
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
-            
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            setText(value != null? value.toString() : "unknown");
+            setText(value != null ? value.toString() : "unknown");
             if (!isSelected) {
                 setBackground(rowColors[row % rowColors.length]);
             }
             return this;
         }
-        
+
         public boolean isOpaque() {
             return true;
         }
     }
     //<snip>
-    
+
     //<snip>Render "year" table column with font representing style of decade
     // currently only used on OS X because fonts are Mac centric.
+
     public static class YearRenderer extends RowRenderer {
-        HashMap<String,Font> eraFonts;
-        
+        private HashMap<String, Font> eraFonts;
+
         public YearRenderer() {
             setHorizontalAlignment(JLabel.CENTER);
-            
+
             if (System.getProperty("os.name").equals("Mac OS X")) {
-                eraFonts = new HashMap();
+                eraFonts = new HashMap<String, Font>();
                 eraFonts.put("192"/*1920's*/, new Font("Jazz LET", Font.PLAIN, 12));
                 eraFonts.put("193"/*1930's*/, new Font("Mona Lisa Solid ITC TT", Font.BOLD, 18));
                 eraFonts.put("194"/*1940's*/, new Font("American Typewriter", Font.BOLD, 12));
@@ -109,21 +109,21 @@ public class OscarCellRenderers {
                 eraFonts.put("200"/*2000's*/, new Font("Calisto MT", Font.PLAIN, 14));
             }
         }
-        
+
         public YearRenderer(Color colors[]) {
             this();
             setRowColors(colors);
         }
-        
+
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
-            
+
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            
+
             String year = table.getValueAt(row,
                     table.convertColumnIndexToView(OscarTableModel.YEAR_COLUMN)).toString();
             if (eraFonts != null && year != null && year.length() == 4) {
-                String era = ((String)year).substring(0, 3);
+                String era = year.substring(0, 3);
                 Font eraFont = eraFonts.get(era);
                 setFont(eraFont);
             }
@@ -131,64 +131,64 @@ public class OscarCellRenderers {
         }
     }
     //</snip>
-    
+
     //<snip>Render "nominee" table column with special icon for winners
+
     public static class NomineeRenderer extends RowRenderer {
         private ImageIcon winnerIcon;
         private ImageIcon nomineeIcon; // nice way of saying "loser" :)
-        
-        private boolean isWinner;
-        
+
         public NomineeRenderer() {
             winnerIcon = new ImageIcon(
-                    getClass().getResource("resources/images/table/goldstar.png"));
+                    getClass().getResource("resources/images/goldstar.png"));
             nomineeIcon = new ImageIcon(
-                    getClass().getResource("resources/images/table/nominee.png"));
+                    getClass().getResource("resources/images/nominee.png"));
             setHorizontalTextPosition(JLabel.TRAILING);
         }
-        
+
         public NomineeRenderer(Color colors[]) {
             this();
             setRowColors(colors);
         }
-        
+
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
-            
+
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            
+
             TableModel model = table.getModel();
-            isWinner = ((Boolean)model.getValueAt(table.convertRowIndexToModel(row),
+            boolean winner = ((Boolean) model.getValueAt(table.convertRowIndexToModel(row),
                     OscarTableModel.WINNER_COLUMN)).booleanValue();
-            
-            List<String>persons = (List<String>)value;
-            String text = persons != null && !persons.isEmpty()? persons.get(0) : "name unknown";
+
+            List<String> persons = (List<String>) value;
+            String text = persons != null && !persons.isEmpty() ? persons.get(0) : "name unknown";
             int personCount = persons.size();
             if (personCount > 1) {
                 setText(text + " + more...");
                 StringBuffer winners = new StringBuffer("");
-                for(int i = 0; i < personCount ; i++) {
+                for (int i = 0; i < personCount; i++) {
                     String person = persons.get(i);
-                    winners.append(" "+person+ (i < personCount-1? ", " : ""));
+                    winners.append(" " + person + (i < personCount - 1 ? ", " : ""));
                 }
-                setToolTipText((isWinner? "Winners:" : "Nominees:") + winners);
+                setToolTipText((winner ? "Winners:" : "Nominees:") + winners);
             } else {
                 setText(text);
-                setToolTipText(isWinner? "Winner!" : "Nominee");
-            }           
+                setToolTipText(winner ? "Winner!" : "Nominee");
+            }
 
-            setIcon(isWinner? winnerIcon : nomineeIcon);
-            
+            setIcon(winner ? winnerIcon : nomineeIcon);
+
             return this;
-        }        
+        }
     }
     //</snip>
-    
+
     public static class MovieRenderer extends HyperlinkCellRenderer {
         public MovieRenderer(Action action, boolean underlineOnRollover, Color rowColors[]) {
             super(action, underlineOnRollover);
             setRowColors(rowColors);
         }
+
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
@@ -199,5 +199,5 @@ public class OscarCellRenderers {
             return this;
         }
     }
-    
+
 }

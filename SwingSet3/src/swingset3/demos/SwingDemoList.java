@@ -54,12 +54,12 @@ public class SwingDemoList implements DemoList {
                 "com.sun.swingset3.demos.splitpane.SplitPaneDemo",
                 "com.sun.swingset3.demos.gridbaglayout.GridBagLayoutDemo",
 
-                "swingset3.demos.data.TableDemo",
+                "com.sun.swingset3.demos.table.TableDemo",
                 "swingset3.demos.data.TreeDemo",
                 "com.sun.swingset3.demos.list.ListDemo",
 
                 "com.sun.swingset3.demos.togglebutton.ToggleButtonDemo",
-                "swingset3.demos.controls.JButtonDemo",
+                "com.sun.swingset3.demos.button.ButtonDemo",
                 "com.sun.swingset3.demos.combobox.ComboBoxDemo",
                 "com.sun.swingset3.demos.progressbar.ProgressBarDemo",
                 "com.sun.swingset3.demos.slider.SliderDemo",

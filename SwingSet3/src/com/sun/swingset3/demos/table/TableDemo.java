@@ -29,12 +29,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.data;
+package com.sun.swingset3.demos.table;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -53,7 +52,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -79,7 +77,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
-import javax.swing.text.Utilities;
+
 import swingset3.DemoProperties;
 import swingset3.hyperlink.HyperlinkCellRenderer;
 
@@ -88,23 +86,23 @@ import swingset3.hyperlink.HyperlinkCellRenderer;
  * @author aim
  */
 @DemoProperties(
-      value = "JTable Demo", 
-      category = "Data",
-      description = "Demonstrates use of Swing's data grid component, JTable, including asynchronous loading and sorting/filtering.",
-      sourceFiles = {
-        "swingset3/demos/data/TableDemo.java",
-        "swingset3/demos/data/OscarCandidate.java",
-        "swingset3/demos/data/OscarCellRenderers.java",
-        "swingset3/demos/data/OscarTableModel.java",
-        "swingset3/demos/data/OscarDataParser.java",
-        "swingset3/demos/data/IMDBLink.java"
-      }
+        value = "JTable Demo",
+        category = "Data",
+        description = "Demonstrates use of Swing's data grid component, JTable, including asynchronous loading and sorting/filtering.",
+        sourceFiles = {
+                "swingset3/demos/data/TableDemo.java",
+                "swingset3/demos/data/OscarCandidate.java",
+                "swingset3/demos/data/OscarCellRenderers.java",
+                "swingset3/demos/data/OscarTableModel.java",
+                "swingset3/demos/data/OscarDataParser.java",
+                "swingset3/demos/data/IMDBLink.java"
+                }
 )
 public class TableDemo extends JPanel {
     static final Logger logger = Logger.getLogger(TableDemo.class.getName());
-    
+
     private OscarTableModel oscarModel;
-    
+
     private JPanel controlPanel;
     private JTable oscarTable;
     private JCheckBox winnersCheckbox;
@@ -112,97 +110,97 @@ public class TableDemo extends JPanel {
     private Box statusBarLeft;
     private JLabel actionStatus;
     private JLabel tableStatus;
-    
+
     private Color[] rowColors;
     private String statusLabelString;
     private String searchLabelString;
-    
+
     private boolean showOnlyWinners = false;
     private String filterString = null;
-    
+
     private TableRowSorter sorter;
-    private RowFilter<OscarTableModel,Integer> winnerFilter;
-    private RowFilter<OscarTableModel,Integer> searchFilter;
-    
+    private RowFilter<OscarTableModel, Integer> winnerFilter;
+    private RowFilter<OscarTableModel, Integer> searchFilter;
+
     // Resource bundle for internationalized and accessible text
     private ResourceBundle bundle = null;
-    
-    public TableDemo() { 
+
+    public TableDemo() {
         initModel();
         initComponents();
         initSortingFiltering();
-    } 
-    
-    protected void initModel() {
-         oscarModel = new OscarTableModel();       
     }
-                
-    protected void initComponents() {   
+
+    protected void initModel() {
+        oscarModel = new OscarTableModel();
+    }
+
+    protected void initComponents() {
         setLayout(new BorderLayout());
-        
+
         controlPanel = createControlPanel();
-        add(controlPanel, BorderLayout.NORTH);       
-        
+        add(controlPanel, BorderLayout.NORTH);
+
         //<snip>Create JTable
-        oscarTable = new JTable(oscarModel); 
+        oscarTable = new JTable(oscarModel);
         //</snip>
-        
+
         //</snip>Set JTable display properties
         oscarTable.setColumnModel(createColumnModel());
         oscarTable.setAutoCreateRowSorter(true);
         oscarTable.setRowHeight(26);
         oscarTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
         oscarTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        oscarTable.setIntercellSpacing(new Dimension(0,0));
+        oscarTable.setIntercellSpacing(new Dimension(0, 0));
         //</snip>
-        
+
         //<snip>Initialize preferred size for table's viewable area
         Dimension viewSize = new Dimension();
         viewSize.width = oscarTable.getColumnModel().getTotalColumnWidth();
         viewSize.height = 10 * oscarTable.getRowHeight();
         oscarTable.setPreferredScrollableViewportSize(viewSize);
         //</snip>
-        
+
         //<snip>Customize height and alignment of table header
         JTableHeader header = oscarTable.getTableHeader();
-        header.setPreferredSize(new Dimension(30,26));
+        header.setPreferredSize(new Dimension(30, 26));
         TableCellRenderer headerRenderer = header.getDefaultRenderer();
         if (headerRenderer instanceof JLabel) {
-            ((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
+            ((JLabel) headerRenderer).setHorizontalAlignment(JLabel.CENTER);
         }
         //</snip>
-        
+
         JScrollPane scrollpane = new JScrollPane(oscarTable);
         add(BorderLayout.CENTER, scrollpane);
-        
+
         add(BorderLayout.SOUTH, createStatusBar());
-        
+
     }
-    
+
     protected JPanel createControlPanel() {
         JPanel controlPanel = new JPanel();
         GridBagLayout gridbag = new GridBagLayout();
-        GridBagConstraints c  = new GridBagConstraints();
+        GridBagConstraints c = new GridBagConstraints();
         controlPanel.setLayout(gridbag);
-        
+
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
         c.gridheight = 1;
-        c.insets = new Insets(0,10,0,10);
+        c.insets = new Insets(0, 10, 0, 10);
         c.anchor = GridBagConstraints.CENTER;
         JLabel title = new JLabel(getString("TableDemo.title", "Academy Award Results"));
-        controlPanel.add(title, c);                
-        
+        controlPanel.add(title, c);
+
         c.gridx = 0;
         c.gridy = 1;
         c.gridheight = 1;
-        c.insets = new Insets(20,10,0,10);
+        c.insets = new Insets(20, 10, 0, 10);
         c.anchor = GridBagConstraints.SOUTHWEST;
         JLabel searchLabel = new JLabel(getString("TableDemo.searchLabel",
-                                                  "Search Titles and Recipients"));
+                "Search Titles and Recipients"));
         controlPanel.add(searchLabel, c);
-        
+
         c.gridx = 0;
         c.gridy = 2;
         c.weightx = 1.0;
@@ -210,10 +208,10 @@ public class TableDemo extends JPanel {
         c.insets.bottom = 12;
         c.anchor = GridBagConstraints.SOUTHWEST;
         //c.fill = GridBagConstraints.HORIZONTAL;
-        filterField = new JTextField(24);        
+        filterField = new JTextField(24);
         filterField.getDocument().addDocumentListener(new SearchFilterListener());
         controlPanel.add(filterField, c);
-        
+
         c.gridx = 1;
         c.gridy = 2;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -223,119 +221,118 @@ public class TableDemo extends JPanel {
         c.anchor = GridBagConstraints.EAST;
         c.fill = GridBagConstraints.NONE;
         winnersCheckbox = new JCheckBox(getString("TableDemo.winnersLabel",
-                                                  "Show Only Winners"));
+                "Show Only Winners"));
         winnersCheckbox.addChangeListener(new ShowWinnersListener());
         controlPanel.add(winnersCheckbox, c);
-        
+
         return controlPanel;
     }
-    
+
     protected Container createStatusBar() {
         statusLabelString = getString("TableDemo.rowCountLabel",
-                                      "Showing ");
+                "Showing ");
         searchLabelString = getString("TableDemo.searchCountLabel",
-                                      "Search found ");
-        
+                "Search found ");
+
         Box statusBar = Box.createHorizontalBox();
-        
+
         // Left status area
-        statusBar.add(Box.createRigidArea(new Dimension(10,22)));
+        statusBar.add(Box.createRigidArea(new Dimension(10, 22)));
         statusBarLeft = Box.createHorizontalBox();
         statusBar.add(statusBarLeft);
         actionStatus = new JLabel(getString("TableDemo.noDataStatusLabel",
-                                            "No data loaded"));
-        actionStatus.setHorizontalAlignment(JLabel.LEADING);        
+                "No data loaded"));
+        actionStatus.setHorizontalAlignment(JLabel.LEADING);
         statusBarLeft.add(actionStatus);
-        
+
         // Middle (should stretch)
         statusBar.add(Box.createHorizontalGlue());
         statusBar.add(Box.createHorizontalGlue());
         statusBar.add(Box.createVerticalGlue());
-        
+
         // Right status area
         tableStatus = new JLabel(statusLabelString + "0");
         statusBar.add(tableStatus);
         statusBar.add(Box.createHorizontalStrut(12));
-        
+
         //<snip>Track number of rows currently displayed
         oscarModel.addTableModelListener(new TableModelListener() {
             public void tableChanged(TableModelEvent e) {
                 // Get rowCount from *table*, not model, as the view row count
                 // may be different from the model row count due to filtering
-                tableStatus.setText((hasFilterString()? searchLabelString : statusLabelString) + 
+                tableStatus.setText((hasFilterString() ? searchLabelString : statusLabelString) +
                         oscarTable.getRowCount());
             }
-        }); 
+        });
         //</snip>
-        
-        return (Container)statusBar;
+
+        return statusBar;
     }
 
     public Color[] getTableRowColors() {
         if (rowColors == null) {
             rowColors = new Color[2];
             rowColors[0] = UIManager.getColor("Table.background");
-            rowColors[1] = new Color((int)(rowColors[0].getRed()*.9),
-                    (int)(rowColors[0].getGreen()*.9),
-                    (int)(rowColors[0].getBlue()*.9));
+            rowColors[1] = new Color((int) (rowColors[0].getRed() * .9),
+                    (int) (rowColors[0].getGreen() * .9),
+                    (int) (rowColors[0].getBlue() * .9));
         }
         return rowColors;
     }
-    
+
     // returns appropriate string from resource bundle
     protected String getString(String key, String fallback) {
         String value = fallback;
         if (bundle == null) {
-            String bundleName = getClass().getPackage().getName()+".resources."+getClass().getSimpleName();
+            String bundleName = getClass().getPackage().getName() + ".resources." + getClass().getSimpleName();
             bundle = ResourceBundle.getBundle(bundleName);
         }
         try {
-            value = bundle != null? bundle.getString(key) : key;
-            
+            value = bundle != null ? bundle.getString(key) : key;
+
         } catch (MissingResourceException ex) {
             logger.log(Level.WARNING, "couldn't find resource value for: " + key, ex);
         }
         return value;
     }
-    
+
     public void start() {
         if (oscarModel.getRowCount() == 0) {
             loadData("resources/oscars.xml");
         }
     }
-    
+
     //<snip>Initialize table columns
     protected TableColumnModel createColumnModel() {
         DefaultTableColumnModel columnModel = new DefaultTableColumnModel();
-        
+
         TableCellRenderer cellRenderer = new OscarCellRenderers.RowRenderer(getTableRowColors());
-        
+
         TableColumn column = new TableColumn();
-        column = new TableColumn();
         column.setModelIndex(OscarTableModel.YEAR_COLUMN);
         column.setHeaderValue(getString("TableDemo.yearColumnTitle", "Year"));
         column.setPreferredWidth(26);
         column.setCellRenderer(new OscarCellRenderers.YearRenderer(getTableRowColors()));
         columnModel.addColumn(column);
-        
+
         column = new TableColumn();
         column.setModelIndex(OscarTableModel.CATEGORY_COLUMN);
         column.setHeaderValue(getString("TableDemo.categoryColumnTitle", "Award Category"));
         column.setPreferredWidth(100);
         column.setCellRenderer(cellRenderer);
         columnModel.addColumn(column);
-        
+
         column = new TableColumn();
         column.setModelIndex(OscarTableModel.MOVIE_COLUMN);
         column.setHeaderValue(getString("TableDemo.movieTitleColumnTitle", "Movie Title"));
         column.setPreferredWidth(180);
-        HyperlinkCellRenderer hyperlinkRenderer = 
-                new OscarCellRenderers.MovieRenderer(new IMDBLinkAction(), 
-                true, getTableRowColors());
+        HyperlinkCellRenderer hyperlinkRenderer =
+                new OscarCellRenderers.MovieRenderer(new IMDBLinkAction(),
+                        true, getTableRowColors());
         hyperlinkRenderer.setRowColors(getTableRowColors());
         column.setCellRenderer(hyperlinkRenderer);
         columnModel.addColumn(column);
-        
+
         column = new TableColumn();
         column.setModelIndex(OscarTableModel.PERSONS_COLUMN);
         column.setHeaderValue(getString("TableDemo.nomineesColumnTitle", "Nominees"));
@@ -343,15 +340,15 @@ public class TableDemo extends JPanel {
         column.setCellRenderer(new OscarCellRenderers.NomineeRenderer(getTableRowColors()));
         columnModel.addColumn(column);
 
-        return columnModel;        
+        return columnModel;
     }
     //</snip>
-    
+
     protected void initSortingFiltering() {
         //<snip>Setup filtering for winners
         sorter = new TableRowSorter(oscarModel);
         oscarTable.setRowSorter(sorter);
-        winnerFilter = new RowFilter<OscarTableModel,Integer>() {
+        winnerFilter = new RowFilter<OscarTableModel, Integer>() {
             public boolean include(Entry<? extends OscarTableModel, ? extends Integer> entry) {
                 OscarTableModel oscarModel = entry.getModel();
                 OscarCandidate candidate = oscarModel.getCandidate(entry.getIdentifier().intValue());
@@ -364,15 +361,15 @@ public class TableDemo extends JPanel {
             }
         };
         //</snip>
-        
+
         //<snip>Setup search filter
-        searchFilter = new RowFilter<OscarTableModel,Integer>() {
+        searchFilter = new RowFilter<OscarTableModel, Integer>() {
             public boolean include(Entry<? extends OscarTableModel, ? extends Integer> entry) {
                 OscarTableModel oscarModel = entry.getModel();
                 OscarCandidate candidate = oscarModel.getCandidate(entry.getIdentifier().intValue());
-                boolean matches = false;                
-                Pattern p = Pattern.compile(filterString+".*", Pattern.CASE_INSENSITIVE);
-                
+                boolean matches = false;
+                Pattern p = Pattern.compile(filterString + ".*", Pattern.CASE_INSENSITIVE);
+
                 String movie = candidate.getMovieTitle();
                 if (movie != null) {
                     if (movie.startsWith("The ")) {
@@ -384,7 +381,7 @@ public class TableDemo extends JPanel {
                     matches = p.matcher(movie).matches();
                 }
                 List<String> persons = candidate.getPersons();
-                for(String person: persons) {
+                for (String person : persons) {
                     if (p.matcher(person).matches()) {
                         matches = true;
                     }
@@ -394,7 +391,7 @@ public class TableDemo extends JPanel {
         };
         //</snip>
     }
-    
+
     public void setShowOnlyWinners(boolean showOnlyWinners) {
         boolean oldShowOnlyWinners = this.showOnlyWinners;
         this.showOnlyWinners = showOnlyWinners;
@@ -402,29 +399,29 @@ public class TableDemo extends JPanel {
         tableStatus.setText(statusLabelString + oscarTable.getRowCount());
         firePropertyChange("showOnlyWinners", oldShowOnlyWinners, showOnlyWinners);
     }
-    
+
     public boolean getShowOnlyWinners() {
         return showOnlyWinners;
     }
-    
+
     public void setFilterString(String filterString) {
         String oldFilterString = this.filterString;
         this.filterString = filterString;
         configureFilters();
         firePropertyChange("filterString", oldFilterString, filterString);
     }
-    
+
     protected boolean hasFilterString() {
         return filterString != null && !filterString.equals("");
     }
-    
+
     protected void configureFilters() {
         if (showOnlyWinners && hasFilterString()) {
-            List<RowFilter<OscarTableModel,Integer>> filters = 
-                    new ArrayList<RowFilter<OscarTableModel,Integer>>(2);
+            List<RowFilter<OscarTableModel, Integer>> filters =
+                    new ArrayList<RowFilter<OscarTableModel, Integer>>(2);
             filters.add(winnerFilter);
             filters.add(searchFilter);
-            RowFilter<Object,Object> comboFilter = RowFilter.andFilter(filters);
+            RowFilter<Object, Object> comboFilter = RowFilter.andFilter(filters);
             sorter.setRowFilter(comboFilter);
         } else if (showOnlyWinners) {
             sorter.setRowFilter(winnerFilter);
@@ -433,102 +430,109 @@ public class TableDemo extends JPanel {
         } else {
             sorter.setRowFilter(null);
         }
-        tableStatus.setText((hasFilterString()? searchLabelString : statusLabelString) 
-               + oscarTable.getRowCount());
+        tableStatus.setText((hasFilterString() ? searchLabelString : statusLabelString)
+                + oscarTable.getRowCount());
 
     }
-    
+
     protected class ShowWinnersListener implements ChangeListener {
         public void stateChanged(ChangeEvent event) {
-            setShowOnlyWinners(winnersCheckbox.isSelected());            
+            setShowOnlyWinners(winnersCheckbox.isSelected());
         }
     }
- 
+
     //<snip>Setup search filter
-    protected class SearchFilterListener implements DocumentListener  {
+    protected class SearchFilterListener implements DocumentListener {
         protected void changeFilter(DocumentEvent event) {
             Document document = event.getDocument();
             try {
                 setFilterString(document.getText(0, document.getLength()));
-                
+
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.err.println(ex);
             }
         }
+
         public void changedUpdate(DocumentEvent e) {
             changeFilter(e);
         }
+
         public void insertUpdate(DocumentEvent e) {
             changeFilter(e);
         }
+
         public void removeUpdate(DocumentEvent e) {
             changeFilter(e);
         }
     }
     //</snip>
-    
+
     //<snip>Use SwingWorker to asynchronously load the data    
+
     public void loadData(String dataPath) {
         // create SwingWorker which will load the data on a separate thread
         OscarDataLoader loader = new OscarDataLoader(
                 TableDemo.class.getResource(dataPath), oscarModel);
-        
+
         actionStatus.setText(getString("TableDemo.loadingStatusLabel",
-                                       "Loading data: "));
+                "Loading data: "));
         // display progress bar while data loads
         final JProgressBar progressBar = new JProgressBar();
         statusBarLeft.add(progressBar);
         loader.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getPropertyName().equals("progress")) {
-                    int progress = ((Integer)event.getNewValue()).intValue();
+                    int progress = ((Integer) event.getNewValue()).intValue();
                     progressBar.setValue(progress);
-                         
+
                     if (progress == 100) {
                         statusBarLeft.remove(progressBar);
                         actionStatus.setText("");
                         revalidate();
                     }
-                }                    
+                }
             }
         });
         loader.execute();
-            
+
     }
     //</snip>
-    
+
     protected void showMessage(String title, String message) {
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
-    
+
     //<snip>Use SwingWorker to asynchronously load the data
-    class OscarDataLoader extends javax.swing.SwingWorker<List<OscarCandidate>, OscarCandidate> {
+    private static class OscarDataLoader extends javax.swing.SwingWorker<List<OscarCandidate>, OscarCandidate> {
         private URL oscarData;
         private OscarTableModel oscarModel;
         private ArrayList candidates;
-        
+
         OscarDataLoader(URL oscarURL, OscarTableModel oscarTableModel) {
             this.oscarData = oscarURL;
             this.oscarModel = oscarTableModel;
             this.candidates = new ArrayList<OscarCandidate>();
         }
-        
+
         @Override
         public List<OscarCandidate> doInBackground() {
             OscarDataParser parser = new OscarDataParser() {
                 @Override
                 protected void addCandidate(OscarCandidate candidate) {
-                    candidates.add(candidate); 
-                    try{ Thread.currentThread().sleep(1); } catch (Exception ex) {}
+                    candidates.add(candidate);
+                    try {
+                        Thread.sleep(1);
+                    } catch (Exception ex) {
+                    }
                     publish(candidate);
-                    setProgress(100 * candidates.size() / /*8430 remind:parser hangs?!*/ 8430);                    
+                    setProgress(100 * candidates.size() / /*8430 remind:parser hangs?!*/ 8430);
                 }
             };
             parser.parseDocument(oscarData);
-            return candidates;            
+            return candidates;
         }
-        
+
         // for OS X older Java 6
         /*
         protected void process(List<OscarCandidate>... moreCandidates) {
@@ -536,37 +540,38 @@ public class TableDemo extends JPanel {
                 oscarModel.add(newCandidates);
             }
         }*/
-        
+
         //@Override
+
         protected void process(List<OscarCandidate> moreCandidates) {
             oscarModel.add(moreCandidates);
         }
-        
+
         // For older Java 6 on OS X
         protected void process(OscarCandidate... moreCandidates) {
-            for(OscarCandidate candidate: moreCandidates) {
+            for (OscarCandidate candidate : moreCandidates) {
                 oscarModel.add(candidate);
             }
         }
-        
+
         @Override
-        protected void done() { 
+        protected void done() {
             setProgress(100);
         }
-        
+
     }
     //</snip>
 
     public class IMDBLinkAction extends AbstractAction {
 
         public void actionPerformed(ActionEvent event) {
-            int row = ((Integer)event.getSource()).intValue();
+            int row = ((Integer) event.getSource()).intValue();
             OscarCandidate candidate = oscarModel.getCandidate(oscarTable.convertRowIndexToModel(row));
 
             try {
                 URI imdbURI = candidate.getIMDBMovieURI();
                 if (imdbURI == null) {
-                    String imdbString = IMDBLink.getMovieURIString(candidate.getMovieTitle(), 
+                    String imdbString = IMDBLink.getMovieURIString(candidate.getMovieTitle(),
                             candidate.getYear());
                     if (imdbString != null) {
                         imdbURI = new URI(imdbString);
@@ -574,30 +579,29 @@ public class TableDemo extends JPanel {
                     }
                 }
                 if (imdbURI != null) {
-                    boolean browsed = swingset3.utilities.Utilities.browse(imdbURI);
-                    
-                } else {                    
+                    swingset3.utilities.Utilities.browse(imdbURI);
+                } else {
                     showMessage("IMDB Link",
                             getString("AdvancedTableDemo.imdbLinkNotFound",
-                                      "Unable to locate IMDB URL for") + "\n" + 
-                            candidate.getMovieTitle());
+                                    "Unable to locate IMDB URL for") + "\n" +
+                                    candidate.getMovieTitle());
                 }
-                        
+
             } catch (Exception ex) {
                 ex.printStackTrace();
-            }            
+            }
         }
     }
-    
+
     public static void main(String args[]) {
-        
+
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JFrame frame = new JFrame("JTable Demo");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 TableDemo demo = new TableDemo();
                 frame.add(demo);
-                frame.setSize(700,400);
+                frame.setSize(700, 400);
                 frame.setVisible(true);
                 demo.start();
             }

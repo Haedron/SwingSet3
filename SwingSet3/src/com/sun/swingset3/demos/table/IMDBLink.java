@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.data;
+package com.sun.swingset3.demos.table;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,44 +47,45 @@ import java.util.ArrayList;
  *
  * @author aim
  */
-public class IMDBLink  {
+public class IMDBLink {
 
-    private IMDBLink() {}
-    
+    private IMDBLink() {
+    }
+
     /**
      * @param movieTitle the title of the movie
-     * @param year the year the movie was nominated for the oscar
-     * @returns String containing URI for movie's IMDB entry or null if URI could not be found
+     * @param year       the year the movie was nominated for the oscar
+     * @return String containing URI for movie's IMDB entry or null if URI could not be found
      */
     public static String getMovieURIString(String movieTitle, int year) throws IOException {
-        ArrayList<String> matches = new ArrayList();
+        ArrayList<String> matches = new ArrayList<String>();
         URL url = null;
-        BufferedReader reader = null;
-        
+        BufferedReader reader;
+
         // btw, google rejects the request with a 403 return code!
         // URL url = new URL("http://www.google.com/search?q=Dazed+and+confused");
         // Thank you, yahoo, for granting our search request :-)
         try {
             String urlKey = URLEncoder.encode(movieTitle, "UTF-8");
-            url = new URL("http://search.yahoo.com/search?ei=utf-8&fr=sfp&p=imdb+" + 
-                          urlKey + "&iscqry=");
+            url = new URL("http://search.yahoo.com/search?ei=utf-8&fr=sfp&p=imdb+" +
+                    urlKey + "&iscqry=");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         URLConnection conn = url.openConnection();
         conn.connect();
-        
+
         // Get the response from Yahoo search query
         reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        
+
         // Parse response a find each imdb/titleString result
         String line;
         String imdbString = ".imdb.com";
-        String titleStrings[] = {"/title", "/Title" };
+        String titleStrings[] = {"/title", "/Title"};
 
         while ((line = reader.readLine()) != null) {
-            for(String titleString: titleStrings) {
+            for (String titleString : titleStrings) {
                 String scrapeKey = imdbString + titleString;
                 int index = line.indexOf(scrapeKey);
                 if (index != -1) {
@@ -94,8 +95,8 @@ public class IMDBLink  {
                     // e.g. http://www.imdb.com/title/tt0032138
                     int len = scrapeKey.length();
                     String imdbURL = "http://www" +
-                            line.substring(index, index+len) +                           
-                            line.substring(index+len, index+len+10);
+                            line.substring(index, index + len) +
+                            line.substring(index + len, index + len + 10);
 
                     if (!matches.contains(imdbURL)) {
                         matches.add(imdbURL);
@@ -104,39 +105,39 @@ public class IMDBLink  {
             }
         }
         reader.close();
-        
+
         // Since imdb contains entries for multiple movies of the same titleString,
         // use the year to find the right entry
         if (matches.size() > 1) {
-            for(String matchURL: matches) {
-                if (verifyYear(matchURL, movieTitle, year)) {
+            for (String matchURL : matches) {
+                if (verifyYear(matchURL, year)) {
                     return matchURL;
                 }
             }
-        }  
+        }
         // Couldn't locate IMDB uri for movie title        
         return null;
     }
 
-    
-    protected static boolean verifyYear(String imdbURL, String movieTitle, int movieYear) throws IOException {
+
+    protected static boolean verifyYear(String imdbURL, int movieYear) throws IOException {
         boolean yearMatches = false;
-        
+
         URLConnection conn = new URL(imdbURL).openConnection();
         conn.connect();
-        
+
         // Get the response
         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        
+
         String line;
         while ((line = reader.readLine()) != null) {
             int index = line.indexOf("</title>");
             if (index != -1) {
                 // looking for "<title>movie title (YEAR)</title>"                
                 try {
-                    int year = Integer.parseInt(line.substring(index-5, index-1));
+                    int year = Integer.parseInt(line.substring(index - 5, index - 1));
                     // Movie may have been made the year prior to oscar award
-                    yearMatches = year == movieYear || year == movieYear-1;
+                    yearMatches = year == movieYear || year == movieYear - 1;
 
                 } catch (NumberFormatException ex) {
                     // ignore title lines that have other formatting
@@ -145,7 +146,7 @@ public class IMDBLink  {
             }
         }
         reader.close();
-               
+
         return yearMatches;
     }
 }

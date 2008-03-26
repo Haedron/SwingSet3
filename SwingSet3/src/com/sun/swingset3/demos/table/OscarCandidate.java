@@ -29,30 +29,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package swingset3.demos.data;
+package com.sun.swingset3.demos.table;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import swingset3.hyperlink.Link;
 
 /**
  *
  * @author aim
  */
 public class OscarCandidate {
-    
+
     private String category;
     private Integer year;
     private boolean winner = false;
     private String movie;
     private URI imdbURI;
-    private ArrayList<String> persons;
-    
-    /** Creates a new instance of OscarCandidate */
+    private final ArrayList<String> persons = new ArrayList<String>();
+
+    /**
+     * Creates a new instance of OscarCandidate
+     */
     public OscarCandidate(String category) {
         this.category = category;
-        persons = new ArrayList();
     }
 
     public String getCategory() {
@@ -86,11 +86,11 @@ public class OscarCandidate {
     public void setMovieTitle(String movie) {
         this.movie = movie;
     }
-    
+
     public URI getIMDBMovieURI() {
         return imdbURI;
     }
-    
+
     public void setIMDBMovieURI(URI uri) {
         this.imdbURI = uri;
     }
@@ -98,6 +98,6 @@ public class OscarCandidate {
     public List<String> getPersons() {
         return persons;
     }
-    
-    
+
+
 }
