@@ -54,6 +54,7 @@ import com.sun.swingset3.demos.ResourceManager;
                 "com/sun/swingset3/demos/spinner/CosinePalette.java",
                 "com/sun/swingset3/demos/spinner/CosinePaletteChooser.java",
                 "com/sun/swingset3/demos/spinner/JMandelbrot.java",
+                "com/sun/swingset3/demos/spinner/JSpinnerPanel.java",
                 "com/sun/swingset3/demos/spinner/MandelbrotControl.java",
                 "com/sun/swingset3/demos/spinner/Palette.java",
                 "com/sun/swingset3/demos/spinner/JPaletteShower.java"

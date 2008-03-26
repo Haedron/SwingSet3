@@ -84,7 +84,7 @@ public class MandelbrotControl extends JPanel {
                 mandelbrot.calculatePicture();
             }
         });
-        xSpinner.setPreferredSize(new Dimension(170, xSpinner.getPreferredSize().height));
+        xSpinner.setPreferredSize(new Dimension(180, xSpinner.getPreferredSize().height));
         spinnerPanel.addSpinner(resourceManager.getString("SpinnerDemo.x"), xSpinner);
 
         final double height = mandelbrot.getYHighLimit() - mandelbrot.getYLowLimit();
@@ -92,14 +92,14 @@ public class MandelbrotControl extends JPanel {
         ySpinner = new CoordSpinner(
                 new SpinnerNumberModel(yValue, null, null, height * COORD_SPINNER_STEP));
         ySpinner.addChangeListener(new ChangeListener() {
-                    public void stateChanged(ChangeEvent e) {
-                        Double newY = (Double) ySpinner.getValue();
-                        mandelbrot.setCenter(
-                                new Coords(mandelbrot.getCenter().getX(), newY));
-                        mandelbrot.calculatePicture();
-                    }
-                });
-        ySpinner.setPreferredSize(new Dimension(170, ySpinner.getPreferredSize().height));
+            public void stateChanged(ChangeEvent e) {
+                Double newY = (Double) ySpinner.getValue();
+                mandelbrot.setCenter(
+                        new Coords(mandelbrot.getCenter().getX(), newY));
+                mandelbrot.calculatePicture();
+            }
+        });
+        ySpinner.setPreferredSize(new Dimension(180, ySpinner.getPreferredSize().height));
         spinnerPanel.addSpinner(
                 resourceManager.getString("SpinnerDemo.y"), ySpinner);
 
@@ -123,46 +123,8 @@ public class MandelbrotControl extends JPanel {
         });
     }
 
-    private static class JSpinnerPanel extends JPanel {
-        private JPanel labelPanel;
-        private JPanel spinnerPanel;
-        private boolean firstTime = true;
-
-        public JSpinnerPanel() {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-
-            labelPanel = new JPanel();
-            labelPanel.setLayout(new GridLayout(1, 1));
-
-            spinnerPanel = new JPanel();
-            spinnerPanel.setLayout(new GridLayout(1, 1));
-
-            add(labelPanel);
-            add(Box.createHorizontalStrut(10));
-            add(spinnerPanel);
-        }
-
-        public void addSpinner(String labelText, JSpinner spinner) {
-            if (firstTime) {
-                firstTime = false;
-            } else {
-                GridLayout gl = (GridLayout)labelPanel.getLayout();
-                gl.setRows(gl.getRows() + 1);
-                gl = (GridLayout)spinnerPanel.getLayout();
-                gl.setRows(gl.getRows() + 1);
-            }
-
-            JLabel label = new JLabel(labelText);
-            label.setHorizontalAlignment(SwingConstants.TRAILING);
-            labelPanel.add(label);
-
-            JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 1));
-            flowPanel.add(spinner);
-            spinnerPanel.add(flowPanel);
-        }
-    }
-
     private static class CoordSpinner extends JSpinner {
+        @Override
         protected JComponent createEditor(SpinnerModel model) {
             return new NumberEditor(this, "#.####################");
         }
@@ -172,4 +134,5 @@ public class MandelbrotControl extends JPanel {
         }
     }
 }
+
 

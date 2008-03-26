@@ -31,7 +31,6 @@
 package com.sun.swingset3.demos.spinner;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicPanelUI;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
@@ -50,10 +49,10 @@ public class CosinePaletteChooser extends JPanel {
     private static final int R_ANGLE = 270;
     private static final int G_ANGLE = 90;
     private static final int B_ANGLE = 0;
-    
-    private final ResourceManager resourceManager;
+
     public static final String PALETTE_PROPERTY_NAME = "palette";
 
+    private final ResourceManager resourceManager;
     private CosinePalette palette;
     private JPaletteShower shower;
     private ChangeListener changeListener;
@@ -78,82 +77,75 @@ public class CosinePaletteChooser extends JPanel {
                 repaint();
             }
         };
-
         setBorder(BorderFactory.createTitledBorder(resourceManager.getString("SpinnerDemo.colorPalette")));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(shower);
         add(getControlPanel());
     }
-    
+
     private CosinePalette createPalette() {
         return new CosinePalette(getWidth(), MIN_COLOR, MAX_COLOR,
                 getRadianValue(raSpinner), getRadianValue(gaSpinner), getRadianValue(baSpinner),
                 getIntValue(rsSpinner), getIntValue(gsSpinner), getIntValue(bsSpinner));
     }
 
-    private static int getIntValue(JSpinner spinner) {
+    private int getIntValue(JSpinner spinner) {
         return (Integer) spinner.getValue();
     }
 
-    private static double getRadianValue(JSpinner spinner) {
+    private double getRadianValue(JSpinner spinner) {
         return getIntValue(spinner) * Math.PI / 180;
     }
 
     private JPanel getControlPanel() {
-        JPanel controlPanel = new JPanel();
-        controlPanel.setLayout(new BorderLayout());
-        controlPanel.add(getPaletteControlPanel(), BorderLayout.CENTER);
-        return controlPanel;
-    }
-
-    private JPanel getPaletteControlPanel() {
         JPanel paletteControlPanel = new JPanel();
-        paletteControlPanel.setLayout(new BorderLayout());
-        paletteControlPanel.add(getStepPanel(), BorderLayout.WEST);
-        paletteControlPanel.add(getStartAnglePanel(), BorderLayout.CENTER);
+        paletteControlPanel.setLayout(new GridLayout(1, 2));
+        paletteControlPanel.add(getStepPanel());
+        paletteControlPanel.add(getStartAnglePanel());
         return paletteControlPanel;
     }
 
     private JPanel getStartAnglePanel() {
-        JPanel startAnglePanel = new JPanel();
+        JSpinnerPanel startAnglePanel = new JSpinnerPanel();
         startAnglePanel.setBorder(BorderFactory.createTitledBorder(
                 resourceManager.getString("SpinnerDemo.startAngles")));
-        startAnglePanel.setLayout(new BoxLayout(startAnglePanel, BoxLayout.Y_AXIS));
 
-        raSpinner = createSpinner(resourceManager.getString("SpinnerDemo.r"), 
-                startAnglePanel, new SpinnerNumberModel(R_ANGLE, 0, 360, 10));
-        gaSpinner = createSpinner(resourceManager.getString("SpinnerDemo.g"), 
-                startAnglePanel, new SpinnerNumberModel(G_ANGLE, 0, 360, 10));
-        baSpinner = createSpinner(resourceManager.getString("SpinnerDemo.b"), 
-                startAnglePanel, new SpinnerNumberModel(B_ANGLE, 0, 360, 10));
+        raSpinner = createAngleSpinner(R_ANGLE, "SpinnerDemo.r", startAnglePanel);
+        gaSpinner = createAngleSpinner(G_ANGLE, "SpinnerDemo.g", startAnglePanel);
+        baSpinner = createAngleSpinner(B_ANGLE, "SpinnerDemo.b", startAnglePanel);
 
         return startAnglePanel;
     }
 
     private JPanel getStepPanel() {
-        JPanel stepPanel = new JPanel();
+        JSpinnerPanel stepPanel = new JSpinnerPanel();
         stepPanel.setBorder(BorderFactory.createTitledBorder(
                 resourceManager.getString("SpinnerDemo.steps")));
-        stepPanel.setLayout(new BoxLayout(stepPanel, BoxLayout.Y_AXIS));
 
-        rsSpinner = createSpinner(resourceManager.getString("SpinnerDemo.r"), 
-                stepPanel, new SpinnerNumberModel(R_STEPS, 1, 1000, 1));
-        gsSpinner = createSpinner(resourceManager.getString("SpinnerDemo.g"), 
-                stepPanel, new SpinnerNumberModel(G_STEPS, 1, 1000, 1));
-        bsSpinner = createSpinner(resourceManager.getString("SpinnerDemo.b"), 
-                stepPanel, new SpinnerNumberModel(B_STEPS, 1, 1000, 1));
+        rsSpinner = createStepSpinner(R_STEPS, "SpinnerDemo.r", stepPanel);
+        gsSpinner = createStepSpinner(G_STEPS, "SpinnerDemo.g", stepPanel);
+        bsSpinner = createStepSpinner(B_STEPS, "SpinnerDemo.b", stepPanel);
 
         return stepPanel;
     }
 
-    private JSpinner createSpinner(String labelText, JComponent parent, SpinnerModel model) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 1));
-        panel.add(new JLabel(labelText));
+    private JSpinner createAngleSpinner(int startAngle, String resourceName,
+                                        JSpinnerPanel parent) {
+        SpinnerModel model = new SpinnerNumberModel(startAngle, 0, 360, 10);
+        return createSpinner(model, resourceName, parent);
+    }
+
+    private JSpinner createStepSpinner(int startSteps, String resourceName,
+                                       JSpinnerPanel parent) {
+        SpinnerModel model = new SpinnerNumberModel(startSteps, 1, 1000, 1);
+        return createSpinner(model, resourceName, parent);
+    }
+
+    private JSpinner createSpinner(SpinnerModel model, String resourceName,
+                                   JSpinnerPanel parent) {
         JSpinner spinner = new JSpinner(model);
         spinner.addChangeListener(changeListener);
-        panel.add(spinner);
-        parent.add(panel);
+        parent.addSpinner(resourceManager.getString(resourceName), spinner);
         return spinner;
     }
 

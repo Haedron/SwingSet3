@@ -36,26 +36,23 @@ package com.sun.swingset3.demos.spinner;
 import java.awt.*;
 
 public class CosinePalette implements Palette {
-    int minColor;
-    int maxColor;
-    int colorRange;
-    Color[] colors;
-    int rSteps;
-    int gSteps;
-    int bSteps;
-    int totalRange;
-    int rRange;
-    int gRange;
-    int bRange;
-    double rStart;
-    double gStart;
-    double bStart;
-
+    private int minColor;
+    private int colorRange;
+    private Color[] colors;
+    private int rSteps;
+    private int gSteps;
+    private int bSteps;
+    private int totalRange;
+    private int rRange;
+    private int gRange;
+    private int bRange;
+    private double rStart;
+    private double gStart;
+    private double bStart;
 
     public CosinePalette(int totalRange, int minColor, int maxColor, double rStart, 
                          double gStart, double bStart, int rSteps, int gSteps, int bSteps) {
         this.minColor = minColor;
-        this.maxColor = maxColor;
         colorRange = maxColor - minColor;
         this.rStart = rStart;
         this.gStart = gStart;
