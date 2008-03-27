@@ -55,12 +55,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -155,7 +150,7 @@ public class CodeViewer extends JPanel {
         }
     }
     // Cache all processed code files in case they are reloaded later
-    private HashMap <URL,CodeFileInfo>codeCache = new HashMap<URL,CodeFileInfo>();
+    private Map<URL,CodeFileInfo> codeCache = new HashMap<URL,CodeFileInfo>();
     
     private JComponent codeHighlightBar;
     private JComboBox snippetComboBox;
@@ -169,8 +164,7 @@ public class CodeViewer extends JPanel {
     private ResourceBundle bundle;
 
     // Current code file set
-    private URL currentCodeFiles[] = null;
-    private CodeFileInfo currentCodeFilesInfo[] = null;
+    private Map<URL, CodeFileInfo> currentCodeFilesInfo; 
     
     // Map of all snippets in current code file set    
     private SnippetMap snippetMap = new SnippetMap();
@@ -324,12 +318,13 @@ public class CodeViewer extends JPanel {
     }
     
     public void setSourceFiles(URL sourceFiles[]) {
-        if (currentCodeFiles != null && currentCodeFiles.equals(sourceFiles)) {
+        if (currentCodeFilesInfo != null &&
+                currentCodeFilesInfo.size() == sourceFiles.length &&
+                currentCodeFilesInfo.keySet().containsAll(Arrays.asList(sourceFiles))) {
             // already loaded
             return;
-        }        
-        currentCodeFiles = sourceFiles;
-        
+        }
+
         // clear everything
         clearAllSnippetHighlights();
         snippetMap.clear();
@@ -341,63 +336,52 @@ public class CodeViewer extends JPanel {
             configureSnippetSetsComboBox();
  
         } else {
-            currentCodeFilesInfo = new CodeFileInfo[sourceFiles.length];
-            int i = 0;
+            currentCodeFilesInfo = new HashMap<URL, CodeFileInfo>();
             boolean needProcessing = false;
-            boolean filesExist = false;
-            for(URL sourceFile: sourceFiles) {
-                if (sourceFile != null) {
-                    filesExist = true;
-                    // look in cache first to avoid unnecessary processing
-                    currentCodeFilesInfo[i] = codeCache.get(sourceFile);
-                    if (currentCodeFilesInfo[i++] == null) {
-                        needProcessing = true;
-                    }
-                } else {
-                    currentCodeFilesInfo[i++] = null;
+            for (URL sourceFile : sourceFiles) {
+                // look in cache first to avoid unnecessary processing
+                CodeFileInfo cachedFilesInfo = codeCache.get(sourceFile);
+                
+                currentCodeFilesInfo.put(sourceFile, cachedFilesInfo);
+                
+                if (cachedFilesInfo == null) {
+                    needProcessing = true;
                 }
             }
-            if (!filesExist) {
-                currentCodeFilesInfo = null;
-                configureCodePane(false);
-                configureSnippetSetsComboBox();
-                
+            configureCodePane(true);
+
+            if (needProcessing) {
+                // Do it on a separate thread
+                new SourceProcessor(currentCodeFilesInfo).execute();
             } else {
-                configureCodePane(true);
-                
-                if (needProcessing) {
-                    // Do it on a separate thread
-                    new SourceProcessor(sourceFiles, currentCodeFilesInfo).execute();
-                } else {
-                    for (CodeFileInfo codeFileInfo : currentCodeFilesInfo) {
-                        registerSnippets(codeFileInfo);
-                        createCodeFileTab(codeFileInfo);
-                    }
-                    configureSnippetSetsComboBox();
+                for (CodeFileInfo codeFileInfo : currentCodeFilesInfo.values()) {
+                    registerSnippets(codeFileInfo);
+                    createCodeFileTab(codeFileInfo);
                 }
+                configureSnippetSetsComboBox();
             }
         }       
     }
     
-    private class SourceProcessor extends SwingWorker<CodeFileInfo[], CodeFileInfo> {
-        URL[] sourceFiles;
-        CodeFileInfo[] codeFileInfos;
+    private class SourceProcessor extends SwingWorker<Void, CodeFileInfo> {
+        private final Map<URL, CodeFileInfo> codeFilesInfo;
 
-        public SourceProcessor(URL sourceFiles[], CodeFileInfo[] codeFileInfos) {
-            this.sourceFiles = sourceFiles;
-            this.codeFileInfos = codeFileInfos;
+        public SourceProcessor(Map<URL, CodeFileInfo> codeFilesInfo) {
+            this.codeFilesInfo = codeFilesInfo;
         }
 
-        public CodeFileInfo[] doInBackground() {
-            for (int i = 0; i < sourceFiles.length; i++) {
+        public Void doInBackground() {
+            for (Map.Entry<URL, CodeFileInfo> entry : codeFilesInfo.entrySet()) {
                 // if not already fetched from cache, then process source code
-                if (codeFileInfos[i] == null) {
-                    codeFileInfos[i] = initializeCodeFileInfo(sourceFiles[i]);
+                if (entry.getValue() == null) {
+                    entry.setValue(initializeCodeFileInfo(entry.getKey()));
                 }
-                publish(codeFileInfos[i]);
+                publish(entry.getValue());
             }
-            return codeFileInfos;
+            
+            return null;
         }
+        
         // old signature, needed until OS X migrates to newer process() signature
         protected void process(CodeFileInfo... codeFileInfoSet) {
             for (CodeFileInfo codeFileInfo : codeFileInfoSet) {
@@ -417,7 +401,7 @@ public class CodeViewer extends JPanel {
 
             // It's possible that by now another set of source files has been loaded.
             // so check first before adding the source tab;'
-            if (currentCodeFilesInfo == codeFileInfos) {
+            if (currentCodeFilesInfo == codeFilesInfo) {
                 registerSnippets(codeFileInfo);
                 createCodeFileTab(codeFileInfo);
             } else {
@@ -550,7 +534,7 @@ public class CodeViewer extends JPanel {
     public void clearAllSnippetHighlights() {
         if (currentCodeFilesInfo != null) {
             snippetMap.setCurrentSet(null);
-            for(CodeFileInfo code : currentCodeFilesInfo) {
+            for(CodeFileInfo code : currentCodeFilesInfo.values()) {
                 if (code != null && code.textPane != null) {
                     Highlighter highlighter = code.textPane.getHighlighter();
                     highlighter.removeAllHighlights();
