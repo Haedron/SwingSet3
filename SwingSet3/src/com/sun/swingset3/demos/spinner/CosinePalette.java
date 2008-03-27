@@ -53,7 +53,7 @@ public class CosinePalette implements Palette {
     public CosinePalette(int totalRange, int minColor, int maxColor, double rStart, 
                          double gStart, double bStart, int rSteps, int gSteps, int bSteps) {
         this.minColor = minColor;
-        colorRange = maxColor - minColor;
+        this.colorRange = maxColor - minColor;
         this.rStart = rStart;
         this.gStart = gStart;
         this.bStart = bStart;
@@ -64,10 +64,10 @@ public class CosinePalette implements Palette {
     }
 
     public void setSize(int newSize) {
-        this.totalRange = newSize;
-        this.rRange = totalRange / rSteps;
-        this.gRange = totalRange / gSteps;
-        this.bRange = totalRange / bSteps;
+        totalRange = newSize;
+        rRange = totalRange / rSteps;
+        gRange = totalRange / gSteps;
+        bRange = totalRange / bSteps;
         fillColorTable();
     }
 
@@ -77,10 +77,10 @@ public class CosinePalette implements Palette {
             double cosR = Math.cos(i * 2 * Math.PI / rRange + rStart);
             double cosG = Math.cos(i * 2 * Math.PI / gRange + gStart);
             double cosB = Math.cos(i * 2 * Math.PI / bRange + bStart);
-            Color color = new Color((int) ((cosR * colorRange) + colorRange) / 2 + minColor,
+            Color color = new Color(
+                    (int) ((cosR * colorRange) + colorRange) / 2 + minColor,
                     (int) ((cosG * colorRange) + colorRange) / 2 + minColor,
                     (int) ((cosB * colorRange) + colorRange) / 2 + minColor);
-
             colors[i] = color;
         }
     }

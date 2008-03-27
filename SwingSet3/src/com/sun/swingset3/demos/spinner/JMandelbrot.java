@@ -42,51 +42,46 @@ import com.sun.swingset3.demos.ResourceManager;
  * @author Mikhail Lapshin
  */
 public class JMandelbrot extends JComponent {
-    private double xLowLimit = -2;
-    private double xHighLimit = 2;
-    private double yLowLimit = -2;
-    private double yHighLimit = 2;
+    private static final double EPSILON = 1E-16;
+    private static final int MIN_WIDTH = 50;
+    private static final int MIN_HEIGHT = 50;
 
     private Coords center;
     public static final String CENTER_PROPERTY_NAME = "center";
 
-    private double xScale;
-    private double yScale;
     private double zoomRate = 3;
     public static final String ZOOM_RATE_PROPERTY_NAME = "zoomRate";
 
-    private int maxIteration = 300; //10 - 100000
+    private int maxIteration = 300;
     public static final String MAX_ITERATION_PROPERTY_NAME = "maxIteration";
-
-    private Palette palette;
-    public static final String PALETTE_PROPERTY_NAME = "palette";
 
     private int numOfThreads = 4;
     public static final String NUM_OF_THREADS_PROPERTY_NAME = "numOfThreads";
 
-    private static final double EPSILON = 1E-16;
-    private static final int MIN_WIDTH = 50;
-    private static final int MIN_HEIGHT = 50;
+    private Palette palette;
+    public static final String PALETTE_PROPERTY_NAME = "palette";
 
     private Image buffer;
     private MandelbrotCalculator[] calculators =
             new MandelbrotCalculator[numOfThreads];
 
-    private int oldComponentWidth;
-    private int oldComponentHeight;
-    
-    public JMandelbrot(int width, int height, Palette palette, 
-            ResourceManager resourceManager) {
-        oldComponentWidth = width;
-        oldComponentHeight = height;
+    private double xLowLimit = -2;
+    private double xHighLimit = 2;
+    private double yLowLimit = -2;
+    private double yHighLimit = 2;
+    private double xScale = 100;
+    private double yScale = 100;
+    private int oldComponentWidth = (int) (xScale * (xHighLimit - xLowLimit));
+    private int oldComponentHeight = (int) (yScale * (yHighLimit - yLowLimit));
+
+    public JMandelbrot(int width, int height, Palette palette,
+                       ResourceManager resourceManager) {
         setPreferredSize(new Dimension(width, height));
         setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
-        xScale = width / (xHighLimit - xLowLimit);
-        yScale = height / (yHighLimit - yLowLimit);
         calcConstants(width, height);
         setPalette(palette);
+        setToolTipText(resourceManager.getString("SpinnerDemo.toolTip"));
         installListeners();
-        setToolTipText(resourceManager.getString("SpinnerDemo.toolTip")); 
     }
 
     private void calcConstants() {
@@ -97,8 +92,10 @@ public class JMandelbrot extends JComponent {
         if ((width >= MIN_WIDTH) && (height >= MIN_HEIGHT)) {
             double oldIntervalWidth = xHighLimit - xLowLimit;
             double oldIntervalHeight = yHighLimit - yLowLimit;
-            double newIntervalWidth = width * oldIntervalWidth / oldComponentWidth;
-            double newIntervalHeight = height * oldIntervalHeight / oldComponentHeight;
+            double newIntervalWidth =
+                    width * oldIntervalWidth / oldComponentWidth;
+            double newIntervalHeight =
+                    height * oldIntervalHeight / oldComponentHeight;
             double xDiff = newIntervalWidth - oldIntervalWidth;
             double yDiff = newIntervalHeight - oldIntervalHeight;
             xLowLimit -= xDiff / 2;
@@ -146,7 +143,6 @@ public class JMandelbrot extends JComponent {
                     newIntervalHeight = intervalHeight * zoomRate;
                     xLowLimit = x - (x - xLowLimit) * zoomRate;
                     yLowLimit = y - (y - yLowLimit) * zoomRate;
-
                 }
 
                 xHighLimit = xLowLimit + newIntervalWidth;
@@ -191,9 +187,9 @@ public class JMandelbrot extends JComponent {
                 yEnd = getHeight();
             } else {
                 yEnd = yStart + yStep;
-
             }
-            calculators[i] = new MandelbrotCalculator(0, getWidth(), yStart, yEnd);
+            calculators[i] =
+                    new MandelbrotCalculator(0, getWidth(), yStart, yEnd);
             calculators[i].execute();
             yStart = yEnd;
         }

@@ -49,7 +49,7 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates JSpinner and SwingWorker",
         sourceFiles = {
-                "com/sun/swingset3/demos/SpinnerDemo.java",
+                "com/sun/swingset3/demos/spinner/SpinnerDemo.java",
                 "com/sun/swingset3/demos/spinner/Coords.java",
                 "com/sun/swingset3/demos/spinner/CosinePalette.java",
                 "com/sun/swingset3/demos/spinner/CosinePaletteChooser.java",
@@ -60,15 +60,12 @@ import com.sun.swingset3.demos.ResourceManager;
                 "com/sun/swingset3/demos/spinner/JPaletteShower.java"
                 }
 )
-
 public class SpinnerDemo extends JPanel {
-    private final ResourceManager resourceManager = new ResourceManager(this.getClass());
+    private final ResourceManager resourceManager = new ResourceManager(getClass());
 
-    /**
-     * main method allows us to run as a standalone demo.
-     */
     public static void main(String[] args) {
-        JFrame frame = new JFrame(SpinnerDemo.class.getAnnotation(DemoProperties.class).value());
+        JFrame frame = new JFrame(
+                SpinnerDemo.class.getAnnotation(DemoProperties.class).value());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new SpinnerDemo());
         frame.setPreferredSize(new Dimension(800, 600));
@@ -80,6 +77,7 @@ public class SpinnerDemo extends JPanel {
     public SpinnerDemo() {
         setLayout(new BorderLayout());
 
+        // Create main components
         CosinePaletteChooser chooser =
                 new CosinePaletteChooser(resourceManager);
         final JMandelbrot mandelbrot =
@@ -87,19 +85,19 @@ public class SpinnerDemo extends JPanel {
         MandelbrotControl mandelbrotControl =
                 new MandelbrotControl(mandelbrot, resourceManager);
 
+        // Connect palette chooser and mandelbrot component 
         chooser.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(CosinePaletteChooser.PALETTE_PROPERTY_NAME)) {
+                if (evt.getPropertyName()
+                        .equals(CosinePaletteChooser.PALETTE_PROPERTY_NAME)) {
                     mandelbrot.setPalette((Palette) evt.getNewValue());
                     mandelbrot.calculatePicture();
                 }
             }
         });
 
-        JPanel mPanel = new JPanel();
-        mPanel.setLayout(new GridLayout());
-        mPanel.add(mandelbrot, BorderLayout.WEST);
-        add(mPanel);
+        // Layout components
+        add(mandelbrot);
 
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());

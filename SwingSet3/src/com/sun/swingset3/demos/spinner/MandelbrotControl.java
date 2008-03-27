@@ -47,10 +47,11 @@ public class MandelbrotControl extends JPanel {
     private JSpinner iterSpinner;
     private JSpinner xSpinner;
     private JSpinner ySpinner;
-    private double COORD_SPINNER_STEP = 1d / 10;
+    private double COORD_SPINNER_STEP = 0.1; // part of width or height
     private final ResourceManager resourceManager;
 
-    public MandelbrotControl(JMandelbrot mandelbrot, ResourceManager resourceManager) {
+    public MandelbrotControl(JMandelbrot mandelbrot,
+                             ResourceManager resourceManager) {
         this.mandelbrot = mandelbrot;
         this.resourceManager = resourceManager;
         createUI();
@@ -62,8 +63,8 @@ public class MandelbrotControl extends JPanel {
                 resourceManager.getString("SpinnerDemo.fractalControls")));
         JSpinnerPanel spinnerPanel = new JSpinnerPanel();
 
-        iterSpinner = new JSpinner(
-                new SpinnerNumberModel(mandelbrot.getMaxIteration(), 10, 100000, 50));
+        iterSpinner = new JSpinner(new SpinnerNumberModel(
+                        mandelbrot.getMaxIteration(), 10, 100000, 50));
         iterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 mandelbrot.setMaxIteration((Integer) iterSpinner.getValue());
@@ -73,24 +74,29 @@ public class MandelbrotControl extends JPanel {
         spinnerPanel.addSpinner(
                 resourceManager.getString("SpinnerDemo.iterations"), iterSpinner);
 
-        final double width = mandelbrot.getXHighLimit() - mandelbrot.getXLowLimit();
+        final double width =
+                mandelbrot.getXHighLimit() - mandelbrot.getXLowLimit();
         final double xValue = mandelbrot.getCenter().getX();
-        xSpinner = new CoordSpinner(
-                new SpinnerNumberModel(xValue, null, null, width * COORD_SPINNER_STEP));
+        xSpinner = new CoordSpinner(new SpinnerNumberModel(
+                xValue, null, null, width * COORD_SPINNER_STEP));
         xSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 Double newX = (Double) xSpinner.getValue();
-                mandelbrot.setCenter(new Coords(newX, mandelbrot.getCenter().getY()));
+                mandelbrot.setCenter(
+                        new Coords(newX, mandelbrot.getCenter().getY()));
                 mandelbrot.calculatePicture();
             }
         });
-        xSpinner.setPreferredSize(new Dimension(180, xSpinner.getPreferredSize().height));
-        spinnerPanel.addSpinner(resourceManager.getString("SpinnerDemo.x"), xSpinner);
+        xSpinner.setPreferredSize(
+                new Dimension(180, xSpinner.getPreferredSize().height));
+        spinnerPanel.addSpinner(
+                resourceManager.getString("SpinnerDemo.x"), xSpinner);
 
-        final double height = mandelbrot.getYHighLimit() - mandelbrot.getYLowLimit();
+        final double height =
+                mandelbrot.getYHighLimit() - mandelbrot.getYLowLimit();
         final double yValue = mandelbrot.getCenter().getY();
-        ySpinner = new CoordSpinner(
-                new SpinnerNumberModel(yValue, null, null, height * COORD_SPINNER_STEP));
+        ySpinner = new CoordSpinner(new SpinnerNumberModel(
+                yValue, null, null, height * COORD_SPINNER_STEP));
         ySpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 Double newY = (Double) ySpinner.getValue();
@@ -99,7 +105,8 @@ public class MandelbrotControl extends JPanel {
                 mandelbrot.calculatePicture();
             }
         });
-        ySpinner.setPreferredSize(new Dimension(180, ySpinner.getPreferredSize().height));
+        ySpinner.setPreferredSize(
+                new Dimension(180, ySpinner.getPreferredSize().height));
         spinnerPanel.addSpinner(
                 resourceManager.getString("SpinnerDemo.y"), ySpinner);
 
@@ -109,12 +116,15 @@ public class MandelbrotControl extends JPanel {
     private void installListeners() {
         mandelbrot.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(JMandelbrot.CENTER_PROPERTY_NAME)) {
-                    double width = mandelbrot.getXHighLimit() - mandelbrot.getXLowLimit();
+                if (evt.getPropertyName().equals(
+                        JMandelbrot.CENTER_PROPERTY_NAME)) {
+                    double width = mandelbrot.getXHighLimit()
+                            - mandelbrot.getXLowLimit();
                     double newX = mandelbrot.getCenter().getX();
                     xSpinner.setModel(new SpinnerNumberModel(newX, null, null,
                             width * COORD_SPINNER_STEP));
-                    double height = mandelbrot.getYHighLimit() - mandelbrot.getYLowLimit();
+                    double height = mandelbrot.getYHighLimit()
+                            - mandelbrot.getYLowLimit();
                     double newY = mandelbrot.getCenter().getY();
                     ySpinner.setModel(new SpinnerNumberModel(newY, null, null,
                             height * COORD_SPINNER_STEP));
