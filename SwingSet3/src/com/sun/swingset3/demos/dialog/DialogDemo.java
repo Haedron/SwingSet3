@@ -44,9 +44,12 @@ import com.sun.swingset3.demos.DemoUtilities;
  * @author aim
  */
 @DemoProperties(
-      value = "JDialog Demo", 
-      category = "Toplevel Containers",
-      description = "Demonstrates JDialog, Swing's top-level dialog container."
+        value = "JDialog Demo",
+        category = "Toplevel Containers",
+        description = "Demonstrates JDialog, Swing's top-level dialog container.",
+        sourceFiles = {
+                "com/sun/swingset3/demos/DemoUtilities.java"
+                }
 )
 public class DialogDemo extends JPanel { 
     

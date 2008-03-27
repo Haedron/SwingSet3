@@ -50,7 +50,7 @@ import swingset3.DemoProperties;
         category = "Choosers",
         description = "Demonstrates JOptionPane, a component which displays standard message dialogs (question, warning, error, etc).",
         sourceFiles = {
-                "swingset3/demos/choosers/OptionPaneDemo.java"
+                "com/sun/swingset3/demos/ResourceManager.java"
                 }
 )
 public class OptionPaneDemo extends JPanel {

@@ -53,9 +53,8 @@ import swingset3.DemoProperties;
         category = "Choosers",
         description = "Demonstrates JColorChooser, a component which allows the user to pick a color.",
         sourceFiles = {
-                "swingset3/demos/choosers/ColorChooserDemo.java",
-                "swingset3/utilities/JGridPanel.java",
-                "swingset3/demos/choosers/BezierAnimationPanel.java"
+                "com/sun/swingset3/demos/JGridPanel.java",
+                "com/sun/swingset3/demos/ResourceManager.java"
                 }
 )
 public class ColorChooserDemo extends JPanel {

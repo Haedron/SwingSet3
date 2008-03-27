@@ -47,7 +47,10 @@ import com.sun.swingset3.demos.DemoUtilities;
 @DemoProperties(
         value = "JWindow Demo",
         category = "Toplevel Containers",
-        description = "Demonstrates JWindow, a toplevel container with no system border."
+        description = "Demonstrates JWindow, a toplevel container with no system border.",
+        sourceFiles = {
+                "com/sun/swingset3/demos/DemoUtilities.java"
+                }
 )
 public class WindowDemo extends JPanel {
 

@@ -55,9 +55,7 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates JCheckBox & JRadioButton",
         sourceFiles = {
-                "swingset3/demos/controls/ToggleButtonDemo.java",
-                "swingset3/demos/controls/LayoutControlPanel.java",
-                "swingset3/demos/controls/DirectionPanel.java"
+                "com/sun/swingset3/demos/ResourceManager.java"
                 }
 )
 public class ToggleButtonDemo extends JPanel implements ChangeListener {

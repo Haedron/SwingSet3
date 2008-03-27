@@ -52,10 +52,7 @@ import swingset3.DemoProperties;
 @DemoProperties(
         value = "JEditorPane Demo",
         category = "Text",
-        description = "Demonstrates JEditorPane, a text component which supports display and editing of rich text formats (such as HTML)",
-        sourceFiles = {
-                "swingset3/demos/text/EditorPaneDemo.java"
-                }
+        description = "Demonstrates JEditorPane, a text component which supports display and editing of rich text formats (such as HTML)"
 )
 public class EditorPaneDemo extends JPanel {
 

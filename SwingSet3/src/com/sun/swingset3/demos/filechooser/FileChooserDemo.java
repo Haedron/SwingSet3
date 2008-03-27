@@ -61,9 +61,7 @@ import swingset3.DemoProperties;
         category = "Choosers",
         description = "Demonstrates JFileChooser, a component which allows the user to open and save files.",
         sourceFiles = {
-                "swingset3/demos/choosers/FileChooserDemo.java",
-                "swingset3/demos/choosers/ExampleFileView.java",
-                "swingset3/utilities/JGridPanel.java"
+                "com/sun/swingset3/demos/DemoUtilities.java"
                 }
 )
 public class FileChooserDemo extends JPanel {

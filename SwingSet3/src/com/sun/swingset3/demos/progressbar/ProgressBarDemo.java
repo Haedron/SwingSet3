@@ -53,7 +53,7 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates the JProgressBar, a control which displays progress to the user",
         sourceFiles = {
-                "swingset3/demos/controls/ProgressBarDemo.java"
+                "com/sun/swingset3/demos/ResourceManager.java"
                 }
 )
 public class ProgressBarDemo extends JPanel {

@@ -52,9 +52,8 @@ import swingset3.DemoProperties;
         category = "Controls",
         description = "Demonstrates the JTextField, a control which allows to input text",
         sourceFiles = {
-                "swingset3/demos/controls/TextFieldDemo.java",
-                "swingset3/demos/controls/JHistoryTextField.java",
-                "swingset3/utilities/JGridPanel.java"
+                "com/sun/swingset3/demos/JGridPanel.java",
+                "com/sun/swingset3/demos/ResourceManager.java"
                 }
 )
 public class TextFieldDemo extends JPanel {

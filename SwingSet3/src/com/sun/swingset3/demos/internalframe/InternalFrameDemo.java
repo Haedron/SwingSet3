@@ -56,7 +56,7 @@ import com.sun.swingset3.demos.ResourceManager;
         description = "Demonstrates JInternalFrame, a frame which can be embedded within another container to" +
                 "implement an MDI style interface.",
         sourceFiles = {
-                "swingset3/demos/containers/InternalFrameDemo.java"
+                "com/sun/swingset3/demos/ResourceManager.java"
                 }
 )
 public class InternalFrameDemo extends JPanel {

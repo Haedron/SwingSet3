@@ -114,7 +114,7 @@ public class DemoUtilities {
             desktop.browse(uri);
 
             return true;
-        } catch (SecurityException sex) {
+        } catch (SecurityException e) {
             // Running in sandbox, try using WebStart service
             BasicService basicService =
                     (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");

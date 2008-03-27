@@ -36,8 +36,11 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
 import java.util.logging.Level;
+import java.io.IOException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -50,8 +53,9 @@ public class Demo {
     
     public enum State { UNINITIALIZED, INITIALIZING, INITIALIZED, RUNNING, STOPPED, FAILED }
 
+    private static final String SOURCES = ".+\\.java";  
     
-    private static final String imageExtensions[] = {".gif", ".png", ".jpg"};
+    private static final String IMAGE_EXTENSIONS[] = {".gif", ".png", ".jpg"};
     
     public static String deriveCategoryFromPackageName(String className) {
         String parts[] = className.split("\\.");
@@ -93,20 +97,20 @@ public class Demo {
         return nameBuffer.toString();
     }
     
-    protected Class<?> demoClass;
-    protected String name;
-    protected String category;
-    protected String shortDescription; // used for tooltips
-    protected String iconPath;
-    protected Icon icon;
-    protected String[] sourceFilePaths;
-    protected URL[] sourceFiles;
+    private Class<?> demoClass;
+    private String name;
+    private String category;
+    private String shortDescription; // used for tooltips
+    private String iconPath;
+    private Icon icon;
+    private String[] sourceFilePaths;
+    private URL[] sourceFiles;
     
-    protected Component component;
+    private Component component;
     
-    protected State state;
+    private State state;
     
-    protected Exception failException;
+    private Exception failException;
     
     private PropertyChangeSupport pcs;
     
@@ -154,7 +158,7 @@ public class Demo {
                 icon = getIconFromPath(iconPath);
             } else {
                 // Look for icon with same name as demo class
-                for(String ext : imageExtensions) {
+                for(String ext : IMAGE_EXTENSIONS) {
                     icon = getIconFromPath(getIconImagePath(ext));
                     if (icon != null) {
                         break;
@@ -189,36 +193,48 @@ public class Demo {
         return demoClass.getResource("resources/" + 
                 demoClass.getSimpleName() + ".html");    
     }
-    
+
     public URL[] getSourceFiles() {
         if (sourceFiles == null) {
-            if (sourceFilePaths != null && !sourceFilePaths[0].equals("")) {
-                initSourceFiles(sourceFilePaths);
-                
-            } else {
-                // by default return just the demo class's source file url
-                sourceFilePaths = new String[1];
-                sourceFilePaths[0] = demoClass.getName().replace(".", "/") + ".java";
+            ArrayList<URL> sourceURLs = new ArrayList<URL>();
 
-                initSourceFiles(sourceFilePaths);               
+            // Add all sources from demo package
+            String path = demoClass.getPackage().getName().replace(".", "/");
+
+            try {
+                ZipFile zipFile = new ZipFile("SwingSet3.jar");
+
+                Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+
+                while (enumeration.hasMoreElements()) {
+                    String name = enumeration.nextElement().getName();
+
+                    if (name.startsWith(path) && name.matches(SOURCES)) {
+                        sourceURLs.add(getClass().getClassLoader().getResource(name));
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println("warning: SwingSet3.jar not found. Can't load demo sources.");
             }
+
+            // Add all additional sources
+            for (String sourceFilePath : sourceFilePaths) {
+                URL url = getClass().getClassLoader().getResource(sourceFilePath);
+
+                if (url == null) {
+                    System.err.println("warning: unable to load source file '" +
+                            sourceFilePath + "'");
+                } else {
+                    sourceURLs.add(url);
+                }
+            }
+
+            sourceFiles = sourceURLs.toArray(new URL[sourceURLs.size()]);
         }
+
         return sourceFiles;
     }
-    
-    protected void initSourceFiles(String sourceFilePaths[]) {
-        ArrayList<URL> sourceURLs = new ArrayList();
-        for(String sourceFilePath : sourceFilePaths) {
-            URL url = getClass().getClassLoader().getResource(sourceFilePath);
-            if (url == null) {
-                System.err.println("warning: unable to load source file: " + sourceFilePath);
-            } else {
-                sourceURLs.add(url);
-            }
-        }
-        sourceFiles = sourceURLs.toArray(new URL[0]);
-    }
-    
+
     void startInitializing() {
         setState(Demo.State.INITIALIZING);
     }
@@ -327,7 +343,7 @@ public class Demo {
             failException = npe;
             setState(State.FAILED);
         }
-    };
+    }
     
     public void stop() {
         setState(State.STOPPED);
@@ -350,5 +366,5 @@ public class Demo {
             SwingSet3.logger.log(Level.SEVERE, "stop method called before demo was instantiated: "
                     +demoClass.getName(), npe);
         }
-    };
+    }
 }

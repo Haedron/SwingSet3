@@ -90,12 +90,8 @@ import com.sun.swingset3.demos.DemoUtilities;
         category = "Data",
         description = "Demonstrates use of Swing's data grid component, JTable, including asynchronous loading and sorting/filtering.",
         sourceFiles = {
-                "swingset3/demos/data/TableDemo.java",
-                "swingset3/demos/data/OscarCandidate.java",
-                "swingset3/demos/data/OscarCellRenderers.java",
-                "swingset3/demos/data/OscarTableModel.java",
-                "swingset3/demos/data/OscarDataParser.java",
-                "swingset3/demos/data/IMDBLink.java"
+                "com/sun/swingset3/demos/DemoUtilities.java",
+                "com/sun/swingset3/demos/JHyperlink.java"
                 }
 )
 public class TableDemo extends JPanel {

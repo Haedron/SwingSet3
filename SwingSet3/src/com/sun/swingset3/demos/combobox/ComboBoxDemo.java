@@ -54,7 +54,7 @@ import swingset3.DemoProperties;
         category = "Controls",
         description = "Demonstrates JComboBox, a control which allows the user to make a selection from a popup list",
         sourceFiles = {
-                "swingset3/demos/controls/ComboBoxDemo.java"
+                "com/sun/swingset3/demos/ResourceManager.java"
                 }
 )
 public class ComboBoxDemo extends JPanel implements ActionListener {
