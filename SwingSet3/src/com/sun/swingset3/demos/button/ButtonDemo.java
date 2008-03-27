@@ -38,7 +38,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URISyntaxException;
-import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -66,18 +65,6 @@ public class ButtonDemo extends JPanel {
     // remind: replace with annotation?
     public static String getShortDescription() {
         return "Demonstrates JButton, Swing's push button component.";
-    }
-
-    public static URL[] getSourceFiles() {
-        URL sourceFiles[] = new URL[2];
-        String className = ButtonDemo.class.getName();
-
-        ClassLoader cl = ButtonDemo.class.getClassLoader();
-        sourceFiles[0] = cl.getResource("sources/" +
-                className.replace(".", "/") + ".java");
-        sourceFiles[1] = cl.getResource("sources/" +
-                "swingset3/demos/controls/Hyperlink.java");
-        return sourceFiles;
     }
 
     public ButtonDemo() {

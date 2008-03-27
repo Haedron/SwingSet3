@@ -58,9 +58,7 @@ import com.sun.swingset3.demos.DemoUtilities;
         category = "Toplevel Containers",
         description = "Demonstrates JFrame, Swing's top-level primary window container.",
         sourceFiles = {
-                "swingset3/demos/toplevels/FrameDemo.java",
-                "swingset3/demos/toplevels/BusyGlass.java",
-                "swingset3/utilities/Utilities.java"
+                "com/sun/swingset3/demos/DemoUtilities.java"
                 }
 )
 public class FrameDemo extends JPanel {

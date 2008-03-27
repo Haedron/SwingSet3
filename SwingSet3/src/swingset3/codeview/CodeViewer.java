@@ -144,22 +144,18 @@ public class CodeViewer extends JPanel {
     
     private static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(255,255,176); 
     private static BufferedImage SNIPPET_GLYPH;
-    private static Insets CODE_INSETS;
     private static String NO_SNIPPET_SELECTED;
-    
-    private static final Rectangle scrollRect = new Rectangle(5,5,50,50);
     
     static {
         try {
             URL imageURL = CodeViewer.class.getResource("resources/images/SnippetArrow.png");
             SNIPPET_GLYPH = ImageIO.read(imageURL);
-            CODE_INSETS = new Insets(0, 0, 0, 0);
         } catch (Exception e) {
             System.err.println(e);
         }
     }
     // Cache all processed code files in case they are reloaded later
-    private HashMap <URL,CodeFileInfo>codeCache = new HashMap();
+    private HashMap <URL,CodeFileInfo>codeCache = new HashMap<URL,CodeFileInfo>();
     
     private JComponent codeHighlightBar;
     private JComboBox snippetComboBox;
@@ -528,7 +524,7 @@ public class CodeViewer extends JPanel {
         InputStream is;
         InputStreamReader isr;
         CodeStyler cv = new CodeStyler();        
-        String styledCode = new String("<html><body bgcolor=\"#ffffff\"><pre>");
+        String styledCode = "<html><body bgcolor=\"#ffffff\"><pre>";
         
         try {
             is = sourceUrl.openStream();
@@ -542,7 +538,7 @@ public class CodeViewer extends JPanel {
                 styledCode += cv.syntaxHighlight(line) + " \n ";
                 line = reader.readLine();
             }
-            styledCode += new String("</pre></body></html>");
+            styledCode += "</pre></body></html>";
             
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -838,7 +834,7 @@ public class CodeViewer extends JPanel {
         }
         
         public Dimension getPreferredSize() {
-            Dimension prefSize = null;
+            Dimension prefSize;
             Insets insets = getInsets();
 
             Dimension labelSize = statusLabel.getPreferredSize();
@@ -934,10 +930,10 @@ public class CodeViewer extends JPanel {
     }
     
  
-    private class CodeFileInfo {
+    private static class CodeFileInfo {
         public URL url;
         public String styled;
-        public HashMap<String,ArrayList<Snippet>> snippets = new HashMap();
+        public HashMap<String,ArrayList<Snippet>> snippets = new HashMap<String,ArrayList<Snippet>>();
         public JEditorPane textPane;
         public JPanel veneer;
     }
@@ -966,9 +962,7 @@ public class CodeViewer extends JPanel {
     }
     
     private class CodeVeneer extends JPanel {        
-        CodeFileInfo codeFileInfo;
-        
-        private Rectangle rect = new Rectangle();
+        private CodeFileInfo codeFileInfo;
         
         public CodeVeneer(CodeFileInfo codeFileInfo) {
             this.codeFileInfo = codeFileInfo;
@@ -1000,8 +994,6 @@ public class CodeViewer extends JPanel {
                     CodeFileInfo currentSnippetCodeFileInfo = codeCache.get(
                             snippetMap.getFileForSnippet(currentSnippet));
                     
-                    Rectangle clipRect = g.getClipBounds();
-                    
                     Font font = g.getFont();
                     g.setFont(font.deriveFont(9f));
                     FontMetrics metrics = g.getFontMetrics();
@@ -1031,7 +1023,7 @@ public class CodeViewer extends JPanel {
       
                             g2.drawImage(SNIPPET_GLYPH, 0, snipRect.y, this);
                             g2.drawString(glyphLabel,
-                                    0 + (SNIPPET_GLYPH.getWidth(this) - labelRect.width)/2,
+                                    (SNIPPET_GLYPH.getWidth(this) - labelRect.width)/2,
                                     snipRect.y +
                                     (SNIPPET_GLYPH.getHeight(this) - labelRect.height)/2 +
                                     metrics.getAscent());
