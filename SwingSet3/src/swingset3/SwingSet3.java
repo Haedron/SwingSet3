@@ -116,6 +116,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     public static final String titleGradientColor1Key = "titleGradientColor1";
     public static final String titleGradientColor2Key = "titleGradientColor2";
     public static final String titleForegroundKey = "titleForegroundColor";
+    public static final String codeHighlightKey = "codeHighlightColor";
     public static final String titleFontKey = "titleFont";
     public static final String subPanelBackgroundKey = "subPanelBackgroundColor";
 
@@ -322,13 +323,15 @@ public class SwingSet3 extends SingleFrameApplication  {
         view.setComponent(createMainPanel());
         view.setMenuBar(createMenuBar());
         
+        applyDefaults();
+        
         // application framework should handle this
         getMainFrame().setIconImage(resourceMap.getImageIcon("Application.icon").getImage());
         
         show(view);     
     } 
     
-    private static void configureDefaults() {
+    private void configureDefaults() {
         
         // Color palette algorithm courtesy of Jasper Potts
         Color controlColor = UIManager.getColor("control");
@@ -354,6 +357,8 @@ public class SwingSet3 extends SingleFrameApplication  {
                 Color.getHSBColor(hsb[0]-.005f, .24f, .80f));
         UIManager.put(titleForegroundKey, 
                 Color.getHSBColor(hsb[0], .54f, .40f));
+        UIManager.put(codeHighlightKey,
+                Color.getHSBColor(hsb[0]-.005f, .24f, .95f));
        
         Font labelFont = UIManager.getFont("Label.font");
         UIManager.put(titleFontKey, labelFont.deriveFont(Font.BOLD, labelFont.getSize()+4f));        
@@ -362,7 +367,15 @@ public class SwingSet3 extends SingleFrameApplication  {
         UIManager.put(subPanelBackgroundKey, 
                 Utilities.deriveColorHSB(panelColor, 0, 0, -.06f));
         
-    }  
+        applyDefaults();
+        
+    } 
+    
+    protected void applyDefaults() {
+        if (codeViewer != null) {
+            codeViewer.setHighlightColor(UIManager.getColor(codeHighlightKey));
+        }        
+    }
     
     protected JComponent createMainPanel() {
         

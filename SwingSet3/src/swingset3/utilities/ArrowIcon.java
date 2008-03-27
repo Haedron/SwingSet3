@@ -109,7 +109,8 @@ public class ArrowIcon implements Icon, SwingConstants {
             int xx = (size - width)/2;
             int yy = (size - height + 1)/2;
 
-            Color base = color != null? color : UIManager.getColor("controlDkShadow").darker();                   
+            Color base = color != null? color : UIManager.getColor("controlDkShadow").darker(); 
+
             paintArrow(ig, base, xx, yy);
             paintArrowBevel(ig, base, xx, yy);
             paintArrowBevel(ig, Utilities.deriveColorHSB(base, 0f, 0f, .20f), xx, yy + 1);

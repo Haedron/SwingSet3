@@ -431,7 +431,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
 		    if ((p0.y + p0.height) != p1.y) {
 			g.fillRect(alloc.x, p0.y + p0.height, alloc.width, 
 				   p1.y - (p0.y + p0.height));
-		    }  
+		    } 
 		    g.fillRect(alloc.x, p1.y, (p1.x - alloc.x), p1.height);
 		}
 	    } catch (BadLocationException e) {
@@ -454,7 +454,11 @@ public class SnippetHighlighter extends LayeredHighlighter {
          */
 	public Shape paintLayer(Graphics g, int offs0, int offs1,
 				Shape bounds, JTextComponent c, View view) {
-	    Color color = getColor();
+	    Color base = getColor();
+            // use transparency so selection isn't clobbered
+            Color color = base != null? 
+                          new Color(base.getRed(), base.getGreen(), base.getBlue(),
+                                    150) : null;
 
 	    if (color == null) {
 		g.setColor(c.getSelectionColor());
@@ -473,11 +477,10 @@ public class SnippetHighlighter extends LayeredHighlighter {
 		    alloc = bounds.getBounds();
 		}
                 // For CodeViewer Snippet painting, this is the paint block that is called.
-                // We need to reset x to the left edge of the text pane to ensure the highlight
-                // paints underneath the snippet glyph;  we also adjust the width to paint the
-                // full width of the text pane, rather than just to the end of line.
-                g.fillRect(alloc.x, alloc.y, c.getWidth() - alloc.x, alloc.height);
-		return alloc;
+                // We want to paint the highlight on the full width of the text pane,
+                // so we only need to do this when the region is the beginning of a new
+                // line.
+                g.fillRect(alloc.x, alloc.y, alloc.width, alloc.height);
 	    }
 	    else {
 		// Should only render part of View.
@@ -489,7 +492,6 @@ public class SnippetHighlighter extends LayeredHighlighter {
                     Rectangle r = (shape instanceof Rectangle) ?
                                   (Rectangle)shape : shape.getBounds();
 
-                    //g.fillRect(r.x, r.y, r.width, r.height);
                     g.fillRect(0, r.y, c.getWidth(), r.height);
                     return r;
 		} catch (BadLocationException e) {
@@ -572,6 +574,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
 	    p1 = Math.min(end, p1);
 	    // Paint the appropriate region using the painter and union
 	    // the effected region with our bounds.
+            System.out.println("paintLayeredHighlights "+p0+" "+p1);
 	    union(((LayeredHighlighter.LayerPainter)painter).paintLayer
 		  (g, p0, p1, viewBounds, editor, view));
 	}

@@ -44,8 +44,8 @@ import javax.swing.UIManager;
  * @author Aim
  */
 public class GradientPanel extends JPanel {
-    private Color colors[] = new Color[2];
-    private Image gradientImage; 
+    protected Color colors[] = new Color[2];
+    protected Image image; 
     
     public GradientPanel(Color color1, Color color2) {
         super();
@@ -63,26 +63,32 @@ public class GradientPanel extends JPanel {
         changeGradientColor(1, color);
     }
     
-    private void changeGradientColor(int colorIndex, Color newColor) {
+    protected void changeGradientColor(int colorIndex, Color newColor) {
         Color oldColor = colors[colorIndex];
         colors[colorIndex] = newColor;
         if (!oldColor.equals(newColor)) {
-            gradientImage = null;
+            image = null;
             firePropertyChange("gradientColor"+colorIndex, oldColor, newColor);
         }
+    }
+    
+    protected Image getGradientImage() {
+        Dimension size = getSize();
+        if (image == null ||
+                image.getWidth(null) != size.width ||
+                image.getHeight(null) != size.height) {
+
+            image = Utilities.createGradientImage(size.width, size.height, 
+                    colors[0], colors[1]);
+        
+        }
+        return image;
     }
    
     @Override
     protected void paintComponent(Graphics g) {
         Dimension size = getSize();
-        if (gradientImage == null ||
-                gradientImage.getWidth(null) != size.width ||
-                gradientImage.getHeight(null) != size.height) {
-
-            gradientImage = Utilities.createGradientImage(size.width, size.height, 
-                    colors[0], colors[1]);
-        
-        }
+        Image gradientImage = getGradientImage();
         g.drawImage(gradientImage, 0, 0, null);
         super.paintComponent(g);
     }

@@ -81,22 +81,14 @@ public class RoundedPanel extends JXPanel {
     public boolean isContentAreaFilled() {
         return contentAreaFilled;
     }
-    
-    @Override
-    public void paint(Graphics g) {
-        Graphics2D g2 = (Graphics2D)g.create();
-        Dimension size = getSize();
-        roundBounds.width = size.width;
-        roundBounds.height = size.height;
-        g2.clip(roundBounds);
-        super.paint(g2);
-        g2.dispose();
-    }
-    
+       
     @Override
     protected void paintComponent(Graphics g) {
         if (isContentAreaFilled()) {
             Graphics2D g2 = (Graphics2D) g;
+            Dimension size = getSize();
+            roundBounds.width = size.width;
+            roundBounds.height = size.height;
             g2.setColor(getBackground());
             g2.fill(roundBounds);
         }

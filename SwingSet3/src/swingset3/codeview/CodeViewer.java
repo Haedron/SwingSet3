@@ -41,17 +41,17 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -67,10 +67,8 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -86,9 +84,11 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
+import swingset3.utilities.ArrowIcon;
 import swingset3.utilities.RoundedBorder;
 import swingset3.utilities.RoundedPanel;
 import swingset3.utilities.Utilities;
@@ -153,7 +153,7 @@ public class CodeViewer extends JPanel {
         try {
             URL imageURL = CodeViewer.class.getResource("resources/images/SnippetArrow.png");
             SNIPPET_GLYPH = ImageIO.read(imageURL);
-            CODE_INSETS = new Insets(0, SNIPPET_GLYPH.getWidth(), 0, 0);
+            CODE_INSETS = new Insets(0, 0, 0, 0);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -203,36 +203,44 @@ public class CodeViewer extends JPanel {
     }
                 
     protected JComponent createCodeHighlightBar() {
+        GridBagLayout gridbag = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
+        JPanel bar = new JPanel(gridbag);
         
-        Box box = Box.createHorizontalBox();
-        box.setBorder(new EmptyBorder(10, 0, 10, 0));
-        
-        box.add(Box.createHorizontalStrut(2));        
+        bar.setBorder(new EmptyBorder(10, 0, 10, 0));
         
         NO_SNIPPET_SELECTED = getString("CodeViewer.snippets.selectOne", 
                                         "Select One");
        
         JLabel snippetSetsLabel = new JLabel(getString("CodeViewer.snippets.highlightCode",
                                                        "Highlight code to: "));
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.WEST;
+        c.weightx = 0;
+        gridbag.addLayoutComponent(snippetSetsLabel, c);
+        bar.add(snippetSetsLabel);
+        
         snippetComboBox = new JComboBox();
-        snippetComboBox.setAlignmentY(.51f);
         snippetComboBox.setMaximumRowCount(20);
         snippetComboBox.setRenderer(new SnippetCellRenderer(snippetComboBox.getRenderer()));
         snippetComboBox.addActionListener(new SnippetActivator());
         snippetSetsLabel.setLabelFor(snippetComboBox);
-        box.add(snippetSetsLabel);
-        box.add(snippetComboBox);
-       
-        box.add(Box.createHorizontalGlue());
+        c.gridx++;
+        c.weightx = 1;
+        gridbag.addLayoutComponent(snippetComboBox, c);
+        bar.add(snippetComboBox);
             
         SnippetNavigator snippetNavigator = new SnippetNavigator(snippetMap);
         snippetNavigator.setNavigateNextAction(nextSnippetAction);
         snippetNavigator.setNavigatePreviousAction(previousSnippetAction);
-        box.add(snippetNavigator);
+        c.gridx++;
+        c.anchor = GridBagConstraints.EAST;
+        c.weightx = 0;
+        gridbag.addLayoutComponent(snippetNavigator, c);
+        bar.add(snippetNavigator);
         
-        box.add(Box.createHorizontalStrut(2));
-        
-        return box;              
+        return bar;              
     }
     
     protected JComponent createCodePanel() {
@@ -309,6 +317,9 @@ public class CodeViewer extends JPanel {
         if (!highlight.equals(highlightColor)) {
             highlightColor = highlight;
             snippetPainter = new SnippetHighlighter.SnippetHighlightPainter(highlightColor);
+            if (getCurrentSnippetKey() != null) {
+                repaint();
+            }
         }
     }
     
@@ -425,7 +436,7 @@ public class CodeViewer extends JPanel {
             CodeFileInfo.url = sourceFile;
             CodeFileInfo.styled = loadSourceCode(sourceFile);
             CodeFileInfo.textPane = new JEditorPane();
-            CodeFileInfo.textPane.setMargin(CODE_INSETS);
+            //CodeFileInfo.textPane.setMargin(CODE_INSETS);
             CodeFileInfo.veneer = new CodeVeneer(CodeFileInfo);
             Stacker layers = new Stacker(CodeFileInfo.textPane);
             layers.add(CodeFileInfo.veneer, JLayeredPane.POPUP_LAYER);
@@ -749,9 +760,8 @@ public class CodeViewer extends JPanel {
         }
     }
     
-    private class SnippetNavigator extends JComponent {
+    private class SnippetNavigator extends JPanel {
         private String NO_SNIPPET;
-        private String SHOWING_SNIPPET;
         
         private SnippetMap snippetMap;
         
@@ -759,29 +769,117 @@ public class CodeViewer extends JPanel {
         private JButton prevButton;
         private JButton nextButton;
         
+        private Insets statusInsets = new Insets(1,0,1,0);
+        private int arrowSize = 6;
+        private int overlap = 6;
+        
         public SnippetNavigator(SnippetMap snippetMap) {
             this.snippetMap = snippetMap;
             snippetMap.addPropertyChangeListener(new SnippetHighlightListener());
             
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            setLayout(null);
             
             NO_SNIPPET = getString("CodeViewer.snippets.noCodeHighlighted",
                                    "No Code highlight selected");
             
-            SHOWING_SNIPPET = getString("CodeViewer.snippets.showing",
-                                        " Showing ");
-            
-            prevButton = (JButton)add(new JButton(
-                    new ImageIcon(getClass().getResource("resources/images/previous.png"))));
-            prevButton.setVisible(false);
-            
             statusLabel = new JLabel(NO_SNIPPET);
+            statusLabel.setHorizontalAlignment(JLabel.CENTER);
+            statusLabel.setBorder(new Border() {
+                public boolean isBorderOpaque() {
+                    return true;
+                }
+                public Insets getBorderInsets(Component c) {
+                    return statusInsets;
+                }
+                public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
+                    if (prevButton.isVisible()) {
+                        g.setColor(UIManager.getColor("controlDkShadow"));
+                        g.drawLine(x, y, x + w, y);
+                        g.drawLine(x, y + h - 1, x + w - 1, y + h - 1);
+                    }
+                }
+            });
             add(statusLabel);
             
-            nextButton = (JButton)add(new JButton(
-                    new ImageIcon(getClass().getResource("resources/images/next.png"))));
+            prevButton = (JButton)add(new JButton());
+            prevButton.setVisible(false);
+                       
+            nextButton = (JButton)add(new JButton());
             nextButton.setVisible(false);
             
+            applyDefaults();
+            
+        }
+        
+        public void doLayout() {
+            Dimension size = getSize();
+            Insets insets = getInsets();
+            Dimension labelSize = statusLabel.getPreferredSize();
+            
+            if (prevButton.isVisible()) {
+                Dimension buttonSize = prevButton.getPreferredSize();
+
+                prevButton.setBounds(insets.left, insets.top,
+                        buttonSize.width, size.height - insets.top - insets.bottom);
+
+                statusLabel.setBounds(insets.left + buttonSize.width - overlap,
+                        insets.top,
+                        labelSize.width + (2 * overlap), size.height - insets.top - insets.bottom);
+                
+                nextButton.setBounds(size.width - buttonSize.width,
+                        insets.top,
+                        buttonSize.width, size.height - insets.top - insets.bottom);
+            } else {
+                
+                statusLabel.setBounds(insets.left, insets.top,
+                        size.width - insets.left - insets.right,
+                        size.height - insets.top - insets.bottom);
+            }
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension prefSize = null;
+            Insets insets = getInsets();
+
+            Dimension labelSize = statusLabel.getPreferredSize();
+           
+            if (prevButton.isVisible()) {
+                Dimension buttonSize = prevButton.getPreferredSize();
+            
+                prefSize = new Dimension(buttonSize.width*2 + labelSize.width  +       
+                    insets.left + insets.right,
+                    Math.max(buttonSize.height, 
+                    labelSize.height) + insets.top + insets.bottom);
+            } else {
+                prefSize = new Dimension(labelSize.width + insets.left + insets.right,
+                    labelSize.height + insets.top + insets.bottom);
+            }
+            return prefSize;
+            
+        }
+        
+        public void updateUI() {
+            super.updateUI();
+            applyDefaults();
+        }
+        
+        protected void applyDefaults() {
+            if (prevButton != null) {
+                Color arrowColor = UIManager.getColor("Label.foreground");
+                Color inactiveColor = UIManager.getColor("Label.disabledText");
+                Dimension buttonSize = new Dimension(arrowSize + 12 + overlap, 
+                                                     arrowSize + 12 + overlap);
+                
+                prevButton.setIcon(new ArrowIcon(ArrowIcon.WEST, arrowSize, arrowColor));
+                prevButton.setDisabledIcon(new ArrowIcon(ArrowIcon.WEST, arrowSize, inactiveColor));
+                prevButton.setPreferredSize(buttonSize);
+                nextButton.setIcon(new ArrowIcon(ArrowIcon.EAST, arrowSize, arrowColor));
+                nextButton.setDisabledIcon(new ArrowIcon(ArrowIcon.EAST, arrowSize, inactiveColor));
+                nextButton.setPreferredSize(buttonSize);
+                
+                statusLabel.setOpaque(true);
+                statusLabel.setFont(UIManager.getFont("Label.font").deriveFont(12f));
+            }
         }
         
         public void setNavigatePreviousAction(Action action) {
@@ -818,9 +916,11 @@ public class CodeViewer extends JPanel {
                     
                 } else {
                     
-                    String place = snippetMap.getIndexForSnippet(snippetMap.getCurrentSnippet()) +
-                            " of " + snippetMap.getSnippetCountForSet(currentKey) + " ";
-                    statusLabel.setText(SHOWING_SNIPPET + place);
+                    String place = "<html><b>"+
+                            snippetMap.getIndexForSnippet(snippetMap.getCurrentSnippet()) + 
+                            "</b>" +
+                            " of " + snippetMap.getSnippetCountForSet(currentKey) + "</html>";
+                    statusLabel.setText(place);
                     
                 }
                 boolean moreThanOne = snippetMap.getSnippetCountForSet(currentKey) > 1;
