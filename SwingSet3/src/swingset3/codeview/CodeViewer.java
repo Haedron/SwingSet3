@@ -143,7 +143,7 @@ public class CodeViewer extends JPanel {
     
     static {
         try {
-            URL imageURL = CodeViewer.class.getResource("resources/images/SnippetArrow.png");
+            URL imageURL = CodeViewer.class.getResource("resources/images/snippetglyph.png");
             SNIPPET_GLYPH = ImageIO.read(imageURL);
         } catch (Exception e) {
             System.err.println(e);
@@ -267,6 +267,18 @@ public class CodeViewer extends JPanel {
             snippetComboBox.setRenderer(new SnippetCellRenderer(
                     new JComboBox().getRenderer()));
         }
+        if (currentCodeFilesInfo != null) {
+            Collection<CodeFileInfo> codeFiles = currentCodeFilesInfo.values();
+            for(CodeFileInfo cfi : codeFiles) {
+                makeSelectionTransparent(cfi.textPane, 180);
+            }
+        }
+    }
+    
+    private void makeSelectionTransparent(JEditorPane textPane, int alpha) {
+        Color c = textPane.getSelectionColor();
+        textPane.setSelectionColor(
+                new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha));
     }
     
     protected String getString(String key, String fallback) {
@@ -412,23 +424,24 @@ public class CodeViewer extends JPanel {
         } // processOneFile
         
         private CodeFileInfo initializeCodeFileInfo(URL sourceFile) {
-            CodeFileInfo CodeFileInfo = new CodeFileInfo();
-            CodeFileInfo.url = sourceFile;
-            CodeFileInfo.styled = loadSourceCode(sourceFile);
-            CodeFileInfo.textPane = new JEditorPane();
-            //CodeFileInfo.textPane.setMargin(CODE_INSETS);
-            CodeFileInfo.veneer = new CodeVeneer(CodeFileInfo);
-            Stacker layers = new Stacker(CodeFileInfo.textPane);
-            layers.add(CodeFileInfo.veneer, JLayeredPane.POPUP_LAYER);
-            CodeFileInfo.textPane.setContentType("text/html");
-            CodeFileInfo.textPane.setEditable(false); // HTML won't display correctly without this!
-            CodeFileInfo.textPane.setText(CodeFileInfo.styled);
-            CodeFileInfo.textPane.setCaretPosition(0);
+            CodeFileInfo codeFileInfo = new CodeFileInfo();
+            codeFileInfo.url = sourceFile;
+            codeFileInfo.styled = loadSourceCode(sourceFile);
+            codeFileInfo.textPane = new JEditorPane();
+            codeFileInfo.textPane.setHighlighter(new SnippetHighlighter());
+            makeSelectionTransparent(codeFileInfo.textPane, 180);
+            codeFileInfo.veneer = new CodeVeneer(codeFileInfo);
+            Stacker layers = new Stacker(codeFileInfo.textPane);
+            layers.add(codeFileInfo.veneer, JLayeredPane.POPUP_LAYER);
+            codeFileInfo.textPane.setContentType("text/html");
+            codeFileInfo.textPane.setEditable(false); // HTML won't display correctly without this!
+            codeFileInfo.textPane.setText(codeFileInfo.styled);
+            codeFileInfo.textPane.setCaretPosition(0);
 
             // MUST parse AFTER textPane Document has been created to ensure
             // snippet offsets are relative to the editor pane's Document model
-            CodeFileInfo.snippets = SnippetParser.parse(CodeFileInfo.textPane.getDocument());
-            return CodeFileInfo;
+            codeFileInfo.snippets = SnippetParser.parse(codeFileInfo.textPane.getDocument());
+            return codeFileInfo;
         }
 
         protected void done() {
@@ -979,7 +992,7 @@ public class CodeViewer extends JPanel {
                             snippetMap.getFileForSnippet(currentSnippet));
                     
                     Font font = g.getFont();
-                    g.setFont(font.deriveFont(9f));
+                    g.setFont(font.deriveFont(10f));
                     FontMetrics metrics = g.getFontMetrics();
                     
                     g.setColor(getHighlightColor());
@@ -1002,10 +1015,12 @@ public class CodeViewer extends JPanel {
                             }
                             Rectangle snipRect = codeFileInfo.textPane.modelToView(snippet.startLine);
                             
-                            String glyphLabel = snippetIndex++ + "/" + snippetTotal;
+                            //String glyphLabel = snippetIndex++ + "/" + snippetTotal;
+                            String glyphLabel = "" + snippetIndex++;
                             Rectangle labelRect = metrics.getStringBounds(glyphLabel, g2).getBounds();
       
                             g2.drawImage(SNIPPET_GLYPH, 0, snipRect.y, this);
+                            g2.setColor(Color.black);
                             g2.drawString(glyphLabel,
                                     (SNIPPET_GLYPH.getWidth(this) - labelRect.width)/2,
                                     snipRect.y +

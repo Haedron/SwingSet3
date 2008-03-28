@@ -51,8 +51,6 @@ import javax.swing.text.View;
  * Implements the Highlighter interfaces.  Implements a simple highlight
  * painter that renders in a solid color.
  * 
- * @author  Timothy Prinzing
- * @version 1.40 11/17/05
  * @see     Highlighter
  */
 public class SnippetHighlighter extends LayeredHighlighter {
@@ -139,7 +137,10 @@ public class SnippetHighlighter extends LayeredHighlighter {
 	i.painter = p;
 	i.p0 = doc.createPosition(p0);
 	i.p1 = doc.createPosition(p1);
-	highlights.addElement(i);
+        // For snippets, we want to make sure selection is layered ON TOP
+        // since we add transparency to the selection color;  so rather
+        // than append the highlight, we insert it in the front.
+	highlights.insertElementAt(i, 0);
         safeDamageRange(p0, p1);
         return i;
     }
@@ -458,7 +459,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
             // use transparency so selection isn't clobbered
             Color color = base != null? 
                           new Color(base.getRed(), base.getGreen(), base.getBlue(),
-                                    150) : null;
+                                    255) : null;
 
 	    if (color == null) {
 		g.setColor(c.getSelectionColor());
@@ -480,7 +481,9 @@ public class SnippetHighlighter extends LayeredHighlighter {
                 // We want to paint the highlight on the full width of the text pane,
                 // so we only need to do this when the region is the beginning of a new
                 // line.
-                g.fillRect(alloc.x, alloc.y, alloc.width, alloc.height);
+                //g.fillRect(alloc.x, alloc.y, alloc.width, alloc.height);
+                g.fillRect(alloc.x, alloc.y, c.getWidth() - alloc.x, alloc.height);
+
 	    }
 	    else {
 		// Should only render part of View.
@@ -574,7 +577,6 @@ public class SnippetHighlighter extends LayeredHighlighter {
 	    p1 = Math.min(end, p1);
 	    // Paint the appropriate region using the painter and union
 	    // the effected region with our bounds.
-            System.out.println("paintLayeredHighlights "+p0+" "+p1);
 	    union(((LayeredHighlighter.LayerPainter)painter).paintLayer
 		  (g, p0, p1, viewBounds, editor, view));
 	}

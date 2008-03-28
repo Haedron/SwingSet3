@@ -357,8 +357,10 @@ public class SwingSet3 extends SingleFrameApplication  {
                 Color.getHSBColor(hsb[0]-.005f, .24f, .80f));
         UIManager.put(titleForegroundKey, 
                 Color.getHSBColor(hsb[0], .54f, .40f));
+        
+        // Calculate highlight color for code pane
         UIManager.put(codeHighlightKey,
-                Color.getHSBColor(hsb[0]-.005f, .24f, .95f));
+                Color.getHSBColor(hsb[0]-.005f, .20f, .95f));
        
         Font labelFont = UIManager.getFont("Label.font");
         UIManager.put(titleFontKey, labelFont.deriveFont(Font.BOLD, labelFont.getSize()+4f));        
