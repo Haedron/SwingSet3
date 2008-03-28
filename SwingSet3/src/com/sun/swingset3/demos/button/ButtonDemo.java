@@ -45,7 +45,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.JHyperlink;
 
 /**

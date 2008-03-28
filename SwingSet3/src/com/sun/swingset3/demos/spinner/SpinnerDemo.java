@@ -35,7 +35,7 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
 
 /**

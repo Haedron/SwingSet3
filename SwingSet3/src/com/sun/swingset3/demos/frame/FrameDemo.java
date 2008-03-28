@@ -45,7 +45,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.DemoUtilities;
 
 /**

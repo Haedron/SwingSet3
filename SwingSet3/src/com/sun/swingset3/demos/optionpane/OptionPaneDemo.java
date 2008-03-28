@@ -37,7 +37,7 @@ import java.net.URL;
 import javax.swing.*;
 
 import com.sun.swingset3.demos.ResourceManager;
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 
 /**
  * JOptionPaneDemo

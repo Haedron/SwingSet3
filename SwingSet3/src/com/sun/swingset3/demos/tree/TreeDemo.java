@@ -40,7 +40,7 @@ import java.net.URL;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
 
 /**

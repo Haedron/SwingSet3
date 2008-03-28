@@ -78,7 +78,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
 
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.DemoUtilities;
 
 /**

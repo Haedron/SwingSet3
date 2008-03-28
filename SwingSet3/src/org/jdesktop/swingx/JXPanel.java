@@ -26,7 +26,6 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 
@@ -37,7 +36,6 @@ import javax.swing.Scrollable;
 import org.jdesktop.swingx.RepaintManagerX;
 import org.jdesktop.swingx.TranslucentRepaintManager;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
-import org.jdesktop.swingx.painter.Painter;
 
 /**
  * A simple JPanel extension that adds translucency support.
@@ -50,6 +48,9 @@ import org.jdesktop.swingx.painter.Painter;
  * <PRE> <CODE>JXPanel panel = new JXPanel();
  * panel.setBackgroundPainter(new CheckerboardPainter());</CODE></PRE>
  * @author rbair
+ * 
+ * Note: This has been imported directly into the SwingSet3 source in order
+ * to make a critical bugfix which was needed for SwingSet3.
  */
 public class JXPanel extends JPanel implements Scrollable {
     private boolean scrollableTracksViewportHeight;

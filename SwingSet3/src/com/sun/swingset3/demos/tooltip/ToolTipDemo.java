@@ -34,7 +34,7 @@ package com.sun.swingset3.demos.tooltip;
 import java.awt.*;
 import javax.swing.*;
 
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
 
 /**

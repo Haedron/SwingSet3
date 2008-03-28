@@ -39,7 +39,7 @@ import java.awt.event.FocusListener;
 import java.util.Vector;
 import javax.swing.*;
 
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
 
 /**

@@ -41,7 +41,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 
 /**
  * EditorPane Demo (was HTMLDemo in SwingSet2)

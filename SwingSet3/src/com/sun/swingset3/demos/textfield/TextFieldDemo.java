@@ -40,7 +40,7 @@ import javax.swing.event.DocumentListener;
 
 import com.sun.swingset3.demos.JGridPanel;
 import com.sun.swingset3.demos.ResourceManager;
-import swingset3.DemoProperties;
+import com.sun.swingset3.DemoProperties;
 
 /**
  * JTextField Demo
