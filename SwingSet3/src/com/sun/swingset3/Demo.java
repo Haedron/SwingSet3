@@ -154,7 +154,7 @@ public class Demo {
     public Icon getIcon() {
         if (icon == null) {
             if (iconPath != null && !iconPath.equals("")) {
-                // icon path was specified in DemoProperties annotation
+                // icon packageName was specified in DemoProperties annotation
                 icon = getIconFromPath(iconPath);
             } else {
                 // Look for icon with same name as demo class
@@ -194,13 +194,14 @@ public class Demo {
                 demoClass.getSimpleName() + ".html");    
     }
 
-    public URL[] getSourceFiles() {
+    public URL[] getSourceFiles() {      
+        // If not already cached, then look them up
         if (sourceFiles == null) {
-            ArrayList<URL> sourceURLs = new ArrayList<URL>();
-
-            // Add all sources from demo package
-            String path = demoClass.getPackage().getName().replace(".", "/");
-
+            ArrayList<String> pathNames = new ArrayList<String>();
+            ArrayList<URL> pathURLs = new ArrayList<URL>();
+            
+            // Now try to automagically determine files by looking in package
+            String packageName = demoClass.getPackage().getName().replace(".", "/");
             try {
                 ZipFile zipFile = new ZipFile("SwingSet3.jar");
 
@@ -209,33 +210,43 @@ public class Demo {
                 while (enumeration.hasMoreElements()) {
                     String name = enumeration.nextElement().getName();
 
-                    if (name.startsWith(path) && (name.matches(CodeViewer.SOURCES_JAVA) ||
+                    if (name.startsWith(packageName) && (name.matches(CodeViewer.SOURCES_JAVA) ||
                             name.matches(CodeViewer.SOURCES_IMAGES) ||
                             name.matches(CodeViewer.SOURCES_TEXT))) {
-                        sourceURLs.add(getClass().getClassLoader().getResource(name));
+                        pathNames.add(name);
                     }
                 }
+            } catch (SecurityException se) {
+                SwingSet3.logger.log(Level.INFO, 
+                        "cannot read from jar file when running from sandbox");
             } catch (IOException e) {
-                System.err.println("warning: SwingSet3.jar not found. Can't load demo sources.");
+                SwingSet3.logger.log(Level.WARNING,
+                        "unable to load sources from SwingSet.jar because jar file could not be found.");
+            }
+            
+            // If package inference didn't work, then at least infer the demo class itself
+            if (pathNames.isEmpty()) {
+                pathNames.add(demoClass.getName().replace(".", "/") + ".java");
+            }
+            
+            // Now get any names registered in DemoProperties meta-data
+            for (String path : sourceFilePaths) {
+                pathNames.add(path);
             }
 
-            // Add all additional sources
-            if (!(sourceFilePaths.length == 1 && sourceFilePaths[0].length() == 0)) {
-                for (String sourceFilePath : sourceFilePaths) {
-                    URL url = getClass().getClassLoader().getResource(sourceFilePath);
-
-                    if (url == null) {
-                        System.err.println("warning: unable to load source file '" +
-                                sourceFilePath + "'");
-                    } else {
-                        sourceURLs.add(url);
-                    }
+            // Now find all the files
+            for (String path : pathNames) {
+                URL url = getClass().getClassLoader().getResource(path);
+                if (url == null) {
+                    SwingSet3.logger.log(Level.WARNING,
+                            "unable to load source file '" + path + "'");
+                } else {
+                    pathURLs.add(url);
                 }
             }
-
-            sourceFiles = sourceURLs.toArray(new URL[sourceURLs.size()]);
+            this.sourceFiles = pathURLs.toArray(new URL[pathURLs.size()]);
         }
-
+        
         return sourceFiles;
     }
 
