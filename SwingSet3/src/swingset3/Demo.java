@@ -220,14 +220,16 @@ public class Demo {
             }
 
             // Add all additional sources
-            for (String sourceFilePath : sourceFilePaths) {
-                URL url = getClass().getClassLoader().getResource(sourceFilePath);
+            if (!(sourceFilePaths.length == 1 && sourceFilePaths[0].length() == 0)) {
+                for (String sourceFilePath : sourceFilePaths) {
+                    URL url = getClass().getClassLoader().getResource(sourceFilePath);
 
-                if (url == null) {
-                    System.err.println("warning: unable to load source file '" +
-                            sourceFilePath + "'");
-                } else {
-                    sourceURLs.add(url);
+                    if (url == null) {
+                        System.err.println("warning: unable to load source file '" +
+                                sourceFilePath + "'");
+                    } else {
+                        sourceURLs.add(url);
+                    }
                 }
             }
 
