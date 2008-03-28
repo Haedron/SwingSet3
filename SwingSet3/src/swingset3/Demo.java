@@ -44,6 +44,8 @@ import java.io.IOException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import swingset3.codeview.CodeViewer;
+
 /**
  * Wrapper class which encapsulates a GUI component to be displayed
  * as a SwingSet3 demo.
@@ -53,8 +55,6 @@ public class Demo {
     
     public enum State { UNINITIALIZED, INITIALIZING, INITIALIZED, RUNNING, STOPPED, FAILED }
 
-    private static final String SOURCES = ".+\\.java";  
-    
     private static final String IMAGE_EXTENSIONS[] = {".gif", ".png", ".jpg"};
     
     public static String deriveCategoryFromPackageName(String className) {
@@ -209,7 +209,9 @@ public class Demo {
                 while (enumeration.hasMoreElements()) {
                     String name = enumeration.nextElement().getName();
 
-                    if (name.startsWith(path) && name.matches(SOURCES)) {
+                    if (name.startsWith(path) && (name.matches(CodeViewer.SOURCES_JAVA) ||
+                            name.matches(CodeViewer.SOURCES_IMAGES) ||
+                            name.matches(CodeViewer.SOURCES_TEXT))) {
                         sourceURLs.add(getClass().getClassLoader().getResource(name));
                     }
                 }

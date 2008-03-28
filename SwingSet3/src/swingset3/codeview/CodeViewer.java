@@ -51,34 +51,13 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
@@ -135,7 +114,13 @@ import swingset3.utilities.Utilities;
  * @author aim
  */
 public class CodeViewer extends JPanel {
-    static final Logger logger = Logger.getLogger(CodeViewer.class.getName());
+    public static final String SOURCES_JAVA = ".+\\.java";
+
+    public static final String SOURCES_TEXT = ".+\\.properties|.+\\.txt|.+\\.html";
+
+    public static final String SOURCES_IMAGES = ".+\\.jpg|.+\\.gif|.+\\.png";
+    
+    private static final Logger logger = Logger.getLogger(CodeViewer.class.getName());
     
     private static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(255,255,176); 
     private static BufferedImage SNIPPET_GLYPH;
@@ -165,6 +150,7 @@ public class CodeViewer extends JPanel {
 
     // Current code file set
     private Map<URL, CodeFileInfo> currentCodeFilesInfo; 
+    private List<URL> additionalSourceFiles; 
     
     // Map of all snippets in current code file set    
     private SnippetMap snippetMap = new SnippetMap();
@@ -330,11 +316,14 @@ public class CodeViewer extends JPanel {
     }
     
     public void setSourceFiles(URL sourceFiles[]) {
-        if (currentCodeFilesInfo != null &&
-                currentCodeFilesInfo.size() == sourceFiles.length &&
-                currentCodeFilesInfo.keySet().containsAll(Arrays.asList(sourceFiles))) {
-            // already loaded
-            return;
+        if (currentCodeFilesInfo != null && additionalSourceFiles != null && sourceFiles != null &&
+                currentCodeFilesInfo.size() + additionalSourceFiles.size() == sourceFiles.length) {
+            List<URL> list = Arrays.asList(sourceFiles);
+
+            if (list.containsAll(currentCodeFilesInfo.keySet()) && list.containsAll(additionalSourceFiles)) {
+                // already loaded
+                return;
+            }
         }
 
         // clear everything
@@ -344,20 +333,27 @@ public class CodeViewer extends JPanel {
         if (sourceFiles == null) {
             // being reset to having no source files; need to clear everything
             currentCodeFilesInfo = null;
+            additionalSourceFiles = null;
             configureCodePane(false);
             configureSnippetSetsComboBox();
  
         } else {
             currentCodeFilesInfo = new HashMap<URL, CodeFileInfo>();
+            additionalSourceFiles = new ArrayList<URL>();
+
             boolean needProcessing = false;
             for (URL sourceFile : sourceFiles) {
-                // look in cache first to avoid unnecessary processing
-                CodeFileInfo cachedFilesInfo = codeCache.get(sourceFile);
-                
-                currentCodeFilesInfo.put(sourceFile, cachedFilesInfo);
-                
-                if (cachedFilesInfo == null) {
-                    needProcessing = true;
+                if (sourceFile.getFile().matches(SOURCES_JAVA)) {
+                    // look in cache first to avoid unnecessary processing
+                    CodeFileInfo cachedFilesInfo = codeCache.get(sourceFile);
+
+                    currentCodeFilesInfo.put(sourceFile, cachedFilesInfo);
+
+                    if (cachedFilesInfo == null) {
+                        needProcessing = true;
+                    }
+                } else {
+                    additionalSourceFiles.add(sourceFile);
                 }
             }
             configureCodePane(true);
@@ -371,6 +367,78 @@ public class CodeViewer extends JPanel {
                     createCodeFileTab(codeFileInfo);
                 }
                 configureSnippetSetsComboBox();
+            }
+
+            JPanel pnImages = null;
+
+            for (URL sourceFile : additionalSourceFiles) {
+                String sourcePath = sourceFile.getPath();
+                
+                int i = sourcePath.indexOf('!');
+                
+                if (i >= 0) {
+                    sourcePath = sourcePath.substring(i + 1);
+                }
+
+                if (sourceFile.getFile().matches(SOURCES_IMAGES)) {
+                    if (pnImages == null) {
+                        pnImages = new JPanel();
+
+                        pnImages.setLayout(new BoxLayout(pnImages, BoxLayout.Y_AXIS));
+                    }
+                    
+                    JLabel label = new JLabel();
+                    
+                    label.setIcon(new ImageIcon(sourceFile));
+                    label.setBorder(new EmptyBorder(10, 0, 40, 0));
+                    
+                    pnImages.add(new JLabel(sourcePath));
+                    pnImages.add(label);
+                }
+                
+                if (sourceFile.getFile().matches(SOURCES_TEXT)) {
+                    BufferedReader reader = null;
+                    
+                    try {
+                        reader = new BufferedReader(new InputStreamReader(sourceFile.openStream()));
+
+                        StringBuilder content = new StringBuilder();
+
+                        String line;
+                        
+                        while ((line = reader.readLine()) != null) {
+                            content.append(line).append('\n');
+                            
+                        }
+
+                        JTextArea textArea = new JTextArea(content.toString());
+                        Font font = textArea.getFont();
+                        textArea.setEditable(false);
+                        textArea.setFont(new Font("Monospaced", font.getStyle(), font.getSize()));
+                        
+                        JScrollPane scrollPane = new JScrollPane(textArea);
+                        scrollPane.setBorder(null);
+                
+                        codeTabbedPane.addTab(Utilities.getURLFileName(sourceFile), scrollPane);
+                    } catch (IOException e) {
+                        System.err.println(e);
+                    } finally {
+                        if (reader != null) {
+                            try {
+                                reader.close();
+                            } catch (IOException e) {
+                                System.err.println(e);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (pnImages != null) {
+                JScrollPane scrollPane = new JScrollPane(pnImages);
+                scrollPane.setBorder(null);
+                
+                codeTabbedPane.addTab(getString("CodeViewer.images", "Images"), scrollPane);
             }
         }       
     }
@@ -518,14 +586,12 @@ public class CodeViewer extends JPanel {
      * HTML version stylized for display
      */
     protected String loadSourceCode(URL sourceUrl) {
-        InputStream is;
-        InputStreamReader isr;
+        InputStreamReader isr = null;
         CodeStyler cv = new CodeStyler();        
         String styledCode = "<html><body bgcolor=\"#ffffff\"><pre>";
         
         try {
-            is = sourceUrl.openStream();
-            isr = new InputStreamReader(is, "UTF-8");
+            isr = new InputStreamReader(sourceUrl.openStream(), "UTF-8");
             BufferedReader reader = new BufferedReader(isr);
             
             // Read one line at a time, htmlizing using super-spiffy
@@ -540,6 +606,14 @@ public class CodeViewer extends JPanel {
         } catch (Exception ex) {
             ex.printStackTrace();
             return "Could not load file from: " + sourceUrl;
+        } finally {
+            if (isr != null) {
+                try {
+                    isr.close();
+                } catch (IOException e) {
+                    System.err.println(e);
+                }
+            }
         }
         return styledCode;
     }

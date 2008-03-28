@@ -42,7 +42,6 @@
  */
 package swingset3.codeview;
 
-import java.io.*;
 import java.util.*;
 
 /**
@@ -78,10 +77,8 @@ import java.util.*;
  */
 public class CodeStyler {
 
-    private static HashMap reservedWords = new HashMap(); // >= Java2 only (also, not thread-safe)
-    //private static Hashtable reservedWords = new Hashtable(); // < Java2 (thread-safe)
+    private final static Map<String, String> RESERVED_WORDS = new HashMap<String, String>(); // >= Java2 only (also, not thread-safe)
     private boolean inMultiLineComment = false;
-    private String backgroundColor = "#ffffff";
     private String commentStart = "</font><font size=4 color=\"#0000aa\"><i>";
     private String commentEnd = "</font></i><font size=4 color=black>";    
     private String stringStart = "</font><font size=4 color=\"#00bb00\">";
@@ -249,7 +246,7 @@ public class CodeStyler {
         }
         int start = 0;
         int startStringIndex = -1;
-        int endStringIndex = -1;
+        int endStringIndex;
         int tempIndex;
         //Keep moving through String characters until we want to stop...
         while ((tempIndex = line.indexOf("\"")) > -1) {
@@ -283,15 +280,14 @@ public class CodeStyler {
             return "";
         }
         StringBuffer buf = new StringBuffer();
-        HashMap usedReservedWords = new HashMap(); // >= Java2 only (not thread-safe)
+        Map<String, String> usedReservedWords = new HashMap<String, String>(); // >= Java2 only (not thread-safe)
         //Hashtable usedReservedWords = new Hashtable(); // < Java2 (thread-safe)
-        int i=0, startAt=0;
+        int i=0;
         char ch;
         StringBuffer temp = new StringBuffer();
         while( i < line.length() ) {
             temp.setLength(0);
             ch = line.charAt(i);
-            startAt = i;
             // 65-90, uppercase letters
             // 97-122, lowercase letters
             while( i<line.length() && ( ( ch >= 65 && ch <= 90 )
@@ -303,7 +299,7 @@ public class CodeStyler {
                 }
             }
             String tempString = temp.toString();
-            if( reservedWords.containsKey(tempString) && !usedReservedWords.containsKey(tempString)) {
+            if( RESERVED_WORDS.containsKey(tempString) && !usedReservedWords.containsKey(tempString)) {
                 usedReservedWords.put(tempString,tempString);
                 line = replace( line, tempString, (reservedWordStart+tempString+reservedWordEnd) );
                 i += (reservedWordStart.length() + reservedWordEnd.length());
@@ -320,7 +316,7 @@ public class CodeStyler {
      * All important replace method. Replaces all occurences of oldString in
      * line with newString.
      */
-    private String replace( String line, String oldString, String newString ) {
+    private static String replace( String line, String oldString, String newString ) {
         int i=0;
         while( ( i=line.indexOf( oldString, i ) ) >= 0 ) {
             line = (new StringBuffer().append(line.substring(0,i)).append(newString).append(line.substring(i+oldString.length()))).toString();
@@ -333,7 +329,7 @@ public class CodeStyler {
      * Checks to see if some position in a line is between String start and
      * ending characters. Not yet used in code or fully working :)
      */
-    private boolean isInsideString(String line, int position) {
+    private static boolean isInsideString(String line, int position) {
         if (line.indexOf("\"") < 0) {
             return false;
         }
@@ -350,70 +346,65 @@ public class CodeStyler {
             rightCount ++;
             right = right.substring(index+1); 
         }
-        if (rightCount % 2 != 0 && leftCount % 2 != 0) {
-            return true;
-        }
-        else {
-            return false;
-        }        
+        return rightCount % 2 != 0 && leftCount % 2 != 0;
     }
 
     /*
      * Load Hashtable (or HashMap) with Java reserved words.
      */
     private static void loadHash() {
-        reservedWords.put( "abstract", "abstract" );
-        reservedWords.put( "do", "do" );
-        reservedWords.put( "inner", "inner" );
-        reservedWords.put( "public", "public" );
-        reservedWords.put( "var", "var" );
-        reservedWords.put( "boolean", "boolean" );
-        reservedWords.put( "continue", "continue" );
-        reservedWords.put( "int", "int" );
-        reservedWords.put( "return", "return" );
-        reservedWords.put( "void", "void" );
-        reservedWords.put( "break", "break" );
-        reservedWords.put( "else", "else" );
-        reservedWords.put( "interface", "interface" );
-        reservedWords.put( "short", "short" );
-        reservedWords.put( "volatile", "volatile" );
-        reservedWords.put( "byvalue", "byvalue" );
-        reservedWords.put( "extends", "extends" );
-        reservedWords.put( "long", "long" );
-        reservedWords.put( "static", "static" );
-        reservedWords.put( "while", "while" );
-        reservedWords.put( "case", "case" );
-        reservedWords.put( "final", "final" );
-        reservedWords.put( "naive", "naive" );
-        reservedWords.put( "super", "super" );
-        reservedWords.put( "transient", "transient" );
-        reservedWords.put( "cast", "cast" );
-        reservedWords.put( "float", "float" );
-        reservedWords.put( "new", "new" );
-        reservedWords.put( "rest", "rest" );
-        reservedWords.put( "catch", "catch" );
-        reservedWords.put( "for", "for" );
-        reservedWords.put( "null", "null" );
-        reservedWords.put( "synchronized", "synchronized" );
-        reservedWords.put( "char", "char" );
-        reservedWords.put( "finally", "finally" );
-        reservedWords.put( "operator", "operator" );
-        reservedWords.put( "this", "this" );
-        reservedWords.put( "class", "class" );
-        reservedWords.put( "generic", "generic" );
-        reservedWords.put( "outer", "outer" );
-        reservedWords.put( "switch", "switch" );
-        reservedWords.put( "const", "const" );
-        reservedWords.put( "goto", "goto" );
-        reservedWords.put( "package", "package" );
-        reservedWords.put( "throw", "throw" );
-        reservedWords.put( "double", "double" );
-        reservedWords.put( "if", "if" );
-        reservedWords.put( "private", "private" );
-        reservedWords.put( "true", "true" );
-        reservedWords.put( "default", "default" );
-        reservedWords.put( "import", "import" );
-        reservedWords.put( "protected", "protected" );
-        reservedWords.put( "try", "try" );
+        RESERVED_WORDS.put("abstract", "abstract");
+        RESERVED_WORDS.put("do", "do");
+        RESERVED_WORDS.put("inner", "inner");
+        RESERVED_WORDS.put("public", "public");
+        RESERVED_WORDS.put("var", "var");
+        RESERVED_WORDS.put("boolean", "boolean");
+        RESERVED_WORDS.put("continue", "continue");
+        RESERVED_WORDS.put("int", "int");
+        RESERVED_WORDS.put("return", "return");
+        RESERVED_WORDS.put("void", "void");
+        RESERVED_WORDS.put("break", "break");
+        RESERVED_WORDS.put("else", "else");
+        RESERVED_WORDS.put("interface", "interface");
+        RESERVED_WORDS.put("short", "short");
+        RESERVED_WORDS.put("volatile", "volatile");
+        RESERVED_WORDS.put("byvalue", "byvalue");
+        RESERVED_WORDS.put("extends", "extends");
+        RESERVED_WORDS.put("long", "long");
+        RESERVED_WORDS.put("static", "static");
+        RESERVED_WORDS.put("while", "while");
+        RESERVED_WORDS.put("case", "case");
+        RESERVED_WORDS.put("final", "final");
+        RESERVED_WORDS.put("naive", "naive");
+        RESERVED_WORDS.put("super", "super");
+        RESERVED_WORDS.put("transient", "transient");
+        RESERVED_WORDS.put("cast", "cast");
+        RESERVED_WORDS.put("float", "float");
+        RESERVED_WORDS.put("new", "new");
+        RESERVED_WORDS.put("rest", "rest");
+        RESERVED_WORDS.put("catch", "catch");
+        RESERVED_WORDS.put("for", "for");
+        RESERVED_WORDS.put("null", "null");
+        RESERVED_WORDS.put("synchronized", "synchronized");
+        RESERVED_WORDS.put("char", "char");
+        RESERVED_WORDS.put("finally", "finally");
+        RESERVED_WORDS.put("operator", "operator");
+        RESERVED_WORDS.put("this", "this");
+        RESERVED_WORDS.put("class", "class");
+        RESERVED_WORDS.put("generic", "generic");
+        RESERVED_WORDS.put("outer", "outer");
+        RESERVED_WORDS.put("switch", "switch");
+        RESERVED_WORDS.put("const", "const");
+        RESERVED_WORDS.put("goto", "goto");
+        RESERVED_WORDS.put("package", "package");
+        RESERVED_WORDS.put("throw", "throw");
+        RESERVED_WORDS.put("double", "double");
+        RESERVED_WORDS.put("if", "if");
+        RESERVED_WORDS.put("private", "private");
+        RESERVED_WORDS.put("true", "true");
+        RESERVED_WORDS.put("default", "default");
+        RESERVED_WORDS.put("import", "import");
+        RESERVED_WORDS.put("protected", "protected");
+        RESERVED_WORDS.put("try", "try");
     }
 }
