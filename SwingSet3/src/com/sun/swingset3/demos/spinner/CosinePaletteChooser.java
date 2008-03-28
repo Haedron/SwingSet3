@@ -102,11 +102,11 @@ public class CosinePaletteChooser extends JPanel {
     }
 
     private JPanel createControlPanel() {
-        JPanel paletteControlPanel = new JPanel();
-        paletteControlPanel.setLayout(new GridLayout(1, 2));
-        paletteControlPanel.add(createStepPanel());
-        paletteControlPanel.add(createStartAnglePanel());
-        return paletteControlPanel;
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new GridLayout(1, 2));
+        controlPanel.add(createStepPanel());
+        controlPanel.add(createStartAnglePanel());
+        return controlPanel;
     }
 
     private JPanel createStartAnglePanel() {

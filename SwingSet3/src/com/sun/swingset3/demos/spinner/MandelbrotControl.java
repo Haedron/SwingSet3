@@ -59,6 +59,7 @@ public class MandelbrotControl extends JPanel {
     }
 
     private void createUI() {
+        setLayout(new FlowLayout(FlowLayout.LEADING, 5, 0));
         setBorder(BorderFactory.createTitledBorder(
                 resourceManager.getString("SpinnerDemo.fractalControls")));
         JSpinnerPanel spinnerPanel = new JSpinnerPanel();
@@ -131,13 +132,19 @@ public class MandelbrotControl extends JPanel {
 
         public CoordSpinner(double value, double stepSize) {
             super(new SpinnerNumberModel(value, null, null, stepSize));
-            setPreferredSize(new Dimension(180, getPreferredSize().height));
         }
 
         public void updateModel(double value, double stepSize) {
             SpinnerNumberModel model = (SpinnerNumberModel) getModel();
             model.setValue(value);
             model.setStepSize(stepSize);
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension prefSize = super.getPreferredSize();
+            prefSize.setSize(180, prefSize.getHeight());
+            return prefSize;
         }
     }
 }
