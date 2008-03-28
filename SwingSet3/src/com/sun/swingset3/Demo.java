@@ -217,11 +217,11 @@ public class Demo {
                     }
                 }
             } catch (SecurityException se) {
-                SwingSet3.logger.log(Level.INFO, 
-                        "cannot read from jar file when running from sandbox");
+                //SwingSet3.logger.log(Level.INFO, 
+                //       "cannot read from jar file when running from sandbox");
             } catch (IOException e) {
-                SwingSet3.logger.log(Level.WARNING,
-                        "unable to load sources from SwingSet.jar because jar file could not be found.");
+                //SwingSet3.logger.log(Level.INFO,
+                //      "unable to load sources from SwingSet.jar because jar file could not be found.");
             }
             
             // If package inference didn't work, then at least infer the demo class itself

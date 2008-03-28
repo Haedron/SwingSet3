@@ -59,6 +59,7 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Data",
         description = "Demonstrates JList, a component which supports display/editing of a data list",
         sourceFiles = {
+                "com/sun/swingset3/demos/list/Permuter.java",
                 "com/sun/swingset3/demos/ResourceManager.java"
                 }
 )

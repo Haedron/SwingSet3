@@ -55,6 +55,8 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates JCheckBox & JRadioButton",
         sourceFiles = {
+                "com/sun/swingset3/demos/togglebutton/DirectionPanel.java",
+                "com/sun/swingset3/demos/togglebutton/LayoutControlPanel.java",
                 "com/sun/swingset3/demos/ResourceManager.java"
                 }
 )
