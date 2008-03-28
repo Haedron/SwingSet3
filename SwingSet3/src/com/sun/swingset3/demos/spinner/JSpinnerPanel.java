@@ -39,16 +39,15 @@ import java.awt.*;
 public class JSpinnerPanel extends JPanel {
     private JPanel labelPanel;
     private JPanel spinnerPanel;
-    private boolean firstTime = true;
 
     public JSpinnerPanel() {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         labelPanel = new JPanel();
-        labelPanel.setLayout(new GridLayout(1, 1));
+        labelPanel.setLayout(new GridLayout(0, 1));
 
         spinnerPanel = new JPanel();
-        spinnerPanel.setLayout(new GridLayout(1, 1));
+        spinnerPanel.setLayout(new GridLayout(0, 1));
 
         add(labelPanel);
         add(Box.createHorizontalStrut(5));
@@ -56,20 +55,16 @@ public class JSpinnerPanel extends JPanel {
     }
 
     public void addSpinner(String labelText, JSpinner spinner) {
-        if (firstTime) {
-            firstTime = false;
-        } else {
-            GridLayout gl = (GridLayout) labelPanel.getLayout();
-            gl.setRows(gl.getRows() + 1);
-            gl = (GridLayout) spinnerPanel.getLayout();
-            gl.setRows(gl.getRows() + 1);
-        }
+        addSpinner(labelText, spinner, false);
+    }
 
+    public void addSpinner(String labelText, JSpinner spinner, boolean stretch) {
         JLabel label = new JLabel(labelText);
         label.setHorizontalAlignment(SwingConstants.TRAILING);
         labelPanel.add(label);
 
-        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 1));
+        JPanel flowPanel = new JPanel();
+        flowPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 1));
         flowPanel.add(spinner);
         spinnerPanel.add(flowPanel);
     }
