@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -128,29 +128,6 @@ public class Utilities {
         hsb[0] += dH;
         hsb[1] += dS;
         hsb[2] += dB;
-        return Color.getHSBColor(
-                hsb[0] < 0? 0 : (hsb[0] > 1? 1 : hsb[0]),
-                hsb[1] < 0? 0 : (hsb[1] > 1? 1 : hsb[1]),
-                hsb[2] < 0? 0 : (hsb[2] > 1? 1 : hsb[2]));
-                                               
-    }
-    
-    /**
-     * Derives a color by multiplying to the base color's 
-     * hue, saturation, and brightness values by the specified multipliers.   
-     * @param base the color to which the HSV offsets will be added
-     * @param xH the multiplier for hue
-     * @param xS the multiplier for saturation
-     * @param xB the multiplier for brightness
-     * @return Color with modified HSV values
-     */
-    public static Color deriveColorPercentHSB(Color base, float xH, float xS, float xB) {
-        float hsb[] = Color.RGBtoHSB(
-                base.getRed(), base.getGreen(), base.getBlue(), null);
-
-        hsb[0] *= xH;
-        hsb[1] *= xS;
-        hsb[2] *= xB;
         return Color.getHSBColor(
                 hsb[0] < 0? 0 : (hsb[0] > 1? 1 : hsb[0]),
                 hsb[1] < 0? 0 : (hsb[1] > 1? 1 : hsb[1]),

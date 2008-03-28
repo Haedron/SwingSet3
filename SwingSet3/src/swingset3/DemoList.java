@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,7 +35,7 @@ import java.util.List;
 
 /**
  * Service Provider for defining class names for demos
- * @author aim
+ * @author Amy Fowler
  */
 public interface DemoList {
     

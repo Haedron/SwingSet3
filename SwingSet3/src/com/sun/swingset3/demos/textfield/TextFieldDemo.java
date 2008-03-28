@@ -1,5 +1,5 @@
 /*
- * Copyright %YEARS% Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,7 +49,7 @@ import swingset3.DemoProperties;
  */
 @DemoProperties(
         value = "TextField Demo",
-        category = "Controls",
+        category = "Text",
         description = "Demonstrates the JTextField, a control which allows to input text",
         sourceFiles = {
                 "com/sun/swingset3/demos/JGridPanel.java",

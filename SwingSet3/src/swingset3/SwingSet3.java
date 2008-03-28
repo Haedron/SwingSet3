@@ -98,7 +98,7 @@ import swingset3.utilities.RoundedPanel;
 
 /**
  *
- * @author  aim
+ * @author Amy Fowler
  */
 public class SwingSet3 extends SingleFrameApplication  {
     static final Logger logger = Logger.getLogger(SwingSet3.class.getName());

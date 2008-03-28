@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,7 +49,7 @@ import swingset3.codeview.CodeViewer;
 /**
  * Wrapper class which encapsulates a GUI component to be displayed
  * as a SwingSet3 demo.
- * @author aim
+ * @author Amy Fowler
  */
 public class Demo {
     
