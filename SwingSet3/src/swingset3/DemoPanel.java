@@ -32,9 +32,9 @@
 package swingset3;
 
 import swingset3.utilities.HTMLPanel;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -46,14 +46,13 @@ import java.io.IOException;
 import java.net.URL;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
-import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.jdesktop.animation.timing.triggers.TimingTrigger;
 import org.jdesktop.animation.timing.triggers.TimingTriggerEvent;
-import org.jdesktop.application.ResourceMap;
 import org.jdesktop.swingx.JXPanel;
 import swingset3.utilities.RoundedBorder;
 import swingset3.utilities.RoundedPanel;
@@ -66,69 +65,56 @@ import swingset3.utilities.Utilities;
  */
 public class DemoPanel extends JXPanel {
     private static final Border roundedBorder = new RoundedBorder(10);
-    private static final Insets margin = new Insets(8,10,8,8);
-    
-    protected Demo demo;
-    protected ResourceMap resourceMap;
-    
-    protected LoadAnimationPanel loadAnimationPanel;   
-    
+    private static final Insets margin = new Insets(8, 10, 8, 8);
+
+    private Demo demo;
+
     public DemoPanel(Demo demo) {
         this.demo = demo;
         setLayout(new BorderLayout());
         // remind(aim): how to access resourceMap?
         //resourceMap = getContext().getResourceMap();
-        
-        loadAnimationPanel = new LoadAnimationPanel(demo);
+
+        LoadAnimationPanel loadAnimationPanel = new LoadAnimationPanel();
+
         add(loadAnimationPanel);
         loadAnimationPanel.setAnimating(true);
-        
-        new DemoLoader().execute();        
+
+        LoadedDemoPanel demoPanel = new LoadedDemoPanel(demo);
+
+        try {
+            loadAnimationPanel.setAnimating(false);
+            Animator fadeOutAnimator = new Animator(400,
+                    new FadeOut(DemoPanel.this,
+                            loadAnimationPanel, demoPanel));
+            fadeOutAnimator.setAcceleration(.2f);
+            fadeOutAnimator.setDeceleration(.3f);
+            Animator fadeInAnimator = new Animator(400,
+                    new PropertySetter(DemoPanel.this, "alpha", 0.3f, 1.0f));
+            TimingTrigger.addTrigger(fadeOutAnimator, fadeInAnimator, TimingTriggerEvent.STOP);
+            fadeOutAnimator.start();
+        } catch (Exception ignore) {
+            System.err.println(ignore);
+            ignore.printStackTrace();
+        }
     }
-    
+
     public Demo getDemo() {
         return demo;
     }
-    
-    protected class DemoLoader extends SwingWorker<Component, Object> {
-        private Animator fadeAnimator;
-        public DemoLoader() {            
-        }
-        @Override
-        public Component doInBackground() {          
-            return new LoadedDemoPanel(DemoPanel.this.demo);
-        }
-        protected void done() {
-            try {
-                DemoPanel.this.loadAnimationPanel.setAnimating(false);
-                Animator fadeOutAnimator = new Animator(400, 
-                        new FadeOut(DemoPanel.this, 
-                        DemoPanel.this.loadAnimationPanel, (JComponent)get()));
-                fadeOutAnimator.setAcceleration(.2f);
-                fadeOutAnimator.setDeceleration(.3f);
-                Animator fadeInAnimator = new Animator(400,
-                        new PropertySetter(DemoPanel.this, "alpha", 0.3f, 1.0f));
-                TimingTrigger trigger =
-                        TimingTrigger.addTrigger(fadeOutAnimator, fadeInAnimator, TimingTriggerEvent.STOP);
-                fadeOutAnimator.start();
-                                
-            } catch (Exception ignore) {
-                System.err.println(ignore);
-                ignore.printStackTrace();
-            }
-        }        
-    } // DemoLoader
-    
-   private static class FadeOut extends PropertySetter {
-        JXPanel parent;
-        JComponent out;
-        JComponent in;
+
+    private static class FadeOut extends PropertySetter {
+        private JXPanel parent;
+        private JComponent out;
+        private JComponent in;
+
         public FadeOut(JXPanel parent, JComponent out, JComponent in) {
             super(out, "alpha", 1.0f, 0.3f);
             this.parent = parent;
             this.out = out;
             this.in = in;
         }
+
         public void end() {
             parent.setAlpha(0.3f);
             parent.remove(out);
@@ -136,29 +122,29 @@ public class DemoPanel extends JXPanel {
             parent.revalidate();
         }
     } // Fader
-    
-    protected static class LoadAnimationPanel extends RoundedPanel {
+
+    private static class LoadAnimationPanel extends RoundedPanel {
         private String message;
         private int triState = 0;
         private boolean animating = false;
         private Animator animator;
-        
-        public LoadAnimationPanel(Demo demo) {
+
+        public LoadAnimationPanel() {
             super(10);
             setBorder(roundedBorder);
             setBackground(Utilities.deriveColorHSB(
                     UIManager.getColor("Panel.background"), 0, 0, -.06f));
-            
+
             // remind(aim): get from resource map
             message = "demo loading";
-            
+
             PropertySetter rotator = new PropertySetter(this, "triState", 0, 3);
             animator = new Animator(500, Animator.INFINITE,
                     Animator.RepeatBehavior.LOOP, rotator);
             // Don't animate gears if loading is quick
             animator.setStartDelay(200);
         }
-        
+
         public void setAnimating(boolean animating) {
             this.animating = animating;
             if (animating) {
@@ -167,25 +153,25 @@ public class DemoPanel extends JXPanel {
                 animator.stop();
             }
         }
-        
+
         public boolean isAnimating() {
             return animating;
         }
-        
+
         public void setTriState(int triState) {
             this.triState = triState;
             repaint();
         }
-        
+
         public int getTriState() {
             return triState;
         }
-        
+
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D)g.create();            
+            Graphics2D g2 = (Graphics2D) g.create();
             Dimension size = getSize();
-            
+
             Color textColor = Utilities.deriveColorHSB(getBackground(), 0, 0, -.3f);
             Color dotColor = Utilities.deriveColorHSB(textColor, 0, .2f, -.08f);
             g2.setColor(textColor);
@@ -193,36 +179,36 @@ public class DemoPanel extends JXPanel {
             FontMetrics metrics = g2.getFontMetrics();
             Rectangle2D rect = metrics.getStringBounds(message, g2);
             Rectangle2D dotRect = metrics.getStringBounds(".", g2);
-            float x = (float)(size.width - (rect.getWidth() + 3*dotRect.getWidth()))/2;
-            float y = (float)(size.height - rect.getHeight())/2;
+            float x = (float) (size.width - (rect.getWidth() + 3 * dotRect.getWidth())) / 2;
+            float y = (float) (size.height - rect.getHeight()) / 2;
             g2.drawString(message, x, y);
             int tri = getTriState();
             float dx = 0;
-            for(int i = 0; i < 3; i++) {
-                g2.setColor(animator.isRunning() && i == tri? 
-                    dotColor : 
-                    textColor);
-                g2.drawString(".", x + (float)(rect.getWidth() + dx), y);
+            for (int i = 0; i < 3; i++) {
+                g2.setColor(animator.isRunning() && i == tri ?
+                        dotColor :
+                        textColor);
+                g2.drawString(".", x + (float) (rect.getWidth() + dx), y);
                 dx += dotRect.getWidth();
-            }            
+            }
         }
     } // LoadAnimationPanel
-       
-    protected static class LoadedDemoPanel extends RoundedPanel {
+
+    private static class LoadedDemoPanel extends RoundedPanel {
         private String demoName;
         private JComponent descriptionArea;
         private JComponent demoPanel;
-        
+
         public LoadedDemoPanel(Demo demo) {
             super(10);
             setLayout(null);
             demoName = demo.getName();
-            
+
             URL description = demo.getHTMLDescription();
             if (description != null) {
                 descriptionArea = createDescriptionArea(description);
                 add(descriptionArea);
-                
+
                 demoPanel = new RoundedPanel(new BorderLayout());
                 demoPanel.setBorder(roundedBorder);
 
@@ -232,15 +218,15 @@ public class DemoPanel extends JXPanel {
             }
             demoPanel.add(demo.createDemoComponent());
             add(demoPanel);
-            
+
             applyDefaults();
         }
 
-        public JComponent createDescriptionArea(URL descriptionURL) {
+        private static JComponent createDescriptionArea(URL descriptionURL) {
             JEditorPane descriptionPane = new HTMLPanel();
             descriptionPane.setEditable(false);
             descriptionPane.setMargin(margin);
-            descriptionPane.setOpaque(true);   
+            descriptionPane.setOpaque(true);
             try {
                 descriptionPane.setPage(descriptionURL);
             } catch (IOException e) {
@@ -248,7 +234,7 @@ public class DemoPanel extends JXPanel {
             }
             return descriptionPane;
         }
-        
+
         @Override
         public void doLayout() {
             if (demoPanel != null) {
@@ -277,29 +263,29 @@ public class DemoPanel extends JXPanel {
                 }
             }
         }
-        
+
         @Override
         public void updateUI() {
             super.updateUI();
             applyDefaults();
         }
 
-        protected void applyDefaults() {
+        private void applyDefaults() {
             setBorder(new RoundedTitleBorder(demoName,
                     UIManager.getColor(SwingSet3.titleGradientColor1Key),
                     UIManager.getColor(SwingSet3.titleGradientColor2Key)));
-            
+
             setFont(UIManager.getFont(SwingSet3.titleFontKey));
             Color bg = Utilities.deriveColorHSB(
                     UIManager.getColor("Panel.background"), 0, 0, -.06f);
             setBackground(bg);
             setForeground(UIManager.getColor(SwingSet3.titleForegroundKey));
             if (demoPanel != null) {
-                demoPanel.setBackground(Utilities.deriveColorHSB(bg, 0, 0, .04f));               
+                demoPanel.setBackground(Utilities.deriveColorHSB(bg, 0, 0, .04f));
             }
             if (descriptionArea != null) {
                 descriptionArea.setBackground(bg);
             }
         }
-    }    
+    }
 }

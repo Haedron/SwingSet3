@@ -116,7 +116,7 @@ import swingset3.utilities.Utilities;
 public class CodeViewer extends JPanel {
     public static final String SOURCES_JAVA = ".+\\.java";
 
-    public static final String SOURCES_TEXT = ".+\\.properties|.+\\.txt|.+\\.html";
+    public static final String SOURCES_TEXT = ".+\\.properties|.+\\.txt|.+\\.html|.+\\.xml";
 
     public static final String SOURCES_IMAGES = ".+\\.jpg|.+\\.gif|.+\\.png";
     
