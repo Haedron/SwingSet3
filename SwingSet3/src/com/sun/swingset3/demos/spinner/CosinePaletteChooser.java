@@ -31,9 +31,9 @@
 package com.sun.swingset3.demos.spinner;
 
 import javax.swing.*;
+import java.awt.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
-import java.awt.*;
 
 import com.sun.swingset3.demos.ResourceManager;
 

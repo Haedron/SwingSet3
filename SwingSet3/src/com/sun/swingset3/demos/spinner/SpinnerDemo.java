@@ -30,17 +30,16 @@
  */
 package com.sun.swingset3.demos.spinner;
 
-import java.awt.BorderLayout;
+import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.*;
 
 import swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
 
 /**
- * JSpinner, SwingWorker demos
+ * Demonstrates JSpinner and SwingWorker
  *
  * @author Mikhail Lapshin
  */
@@ -78,15 +77,15 @@ public class SpinnerDemo extends JPanel {
                 new MandelbrotControl(mandelbrot, resourceManager);
 
         // Connect palette chooser and mandelbrot component 
-        chooser.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName()
-                        .equals(CosinePaletteChooser.PALETTE_PROPERTY_NAME)) {
-                    mandelbrot.setPalette((Palette) evt.getNewValue());
-                    mandelbrot.calculatePicture();
+        chooser.addPropertyChangeListener(
+                CosinePaletteChooser.PALETTE_PROPERTY_NAME,
+                new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        mandelbrot.setPalette((Palette) evt.getNewValue());
+                        mandelbrot.calculatePicture();
+                    }
                 }
-            }
-        });
+        );
 
         // Layout components
         add(mandelbrot);

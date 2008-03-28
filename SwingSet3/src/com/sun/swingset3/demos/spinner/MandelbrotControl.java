@@ -31,11 +31,11 @@
 package com.sun.swingset3.demos.spinner;
 
 import javax.swing.*;
+import java.awt.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
-import java.awt.*;
 
 import com.sun.swingset3.demos.ResourceManager;
 
@@ -107,21 +107,21 @@ public class MandelbrotControl extends JPanel {
     }
 
     private void installListeners() {
-        mandelbrot.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(
-                        JMandelbrot.CENTER_PROPERTY_NAME)) {
-                    double width = mandelbrot.getXHighLimit()
-                            - mandelbrot.getXLowLimit();
-                    double newX = mandelbrot.getCenter().getX();
-                    xSpinner.updateModel(newX, width * COORD_SPINNER_STEP);
-                    double height = mandelbrot.getYHighLimit()
-                            - mandelbrot.getYLowLimit();
-                    double newY = mandelbrot.getCenter().getY();
-                    ySpinner.updateModel(newY, height * COORD_SPINNER_STEP);
+        mandelbrot.addPropertyChangeListener(
+                JMandelbrot.CENTER_PROPERTY_NAME,
+                new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        double width = mandelbrot.getXHighLimit()
+                                - mandelbrot.getXLowLimit();
+                        double newX = mandelbrot.getCenter().getX();
+                        xSpinner.updateModel(newX, width * COORD_SPINNER_STEP);
+                        double height = mandelbrot.getYHighLimit()
+                                - mandelbrot.getYLowLimit();
+                        double newY = mandelbrot.getCenter().getY();
+                        ySpinner.updateModel(newY, height * COORD_SPINNER_STEP);
+                    }
                 }
-            }
-        });
+        );
     }
 
     private static class CoordSpinner extends JSpinner {
