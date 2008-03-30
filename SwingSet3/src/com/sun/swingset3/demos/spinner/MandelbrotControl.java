@@ -43,11 +43,11 @@ import com.sun.swingset3.demos.ResourceManager;
  * @author Mikhail Lapshin
  */
 public class MandelbrotControl extends JPanel {
-    private JMandelbrot mandelbrot;
+    private final JMandelbrot mandelbrot;
     private JSpinner iterSpinner;
     private CoordSpinner xSpinner;
     private CoordSpinner ySpinner;
-    private double COORD_SPINNER_STEP = 0.1d; // part of width or height
+    private static final double COORD_SPINNER_STEP = 0.1d; // part of width or height
     private final ResourceManager resourceManager;
 
     public MandelbrotControl(JMandelbrot mandelbrot,

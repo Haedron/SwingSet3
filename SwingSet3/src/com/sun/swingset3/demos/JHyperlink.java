@@ -55,19 +55,19 @@ import javax.swing.UIManager;
 //<snip>Create HTML hyperlink
 //<snip>Create HTML image hyperlink
 public class JHyperlink extends JButton {
-    private static BrowseAction defaultBrowseAction = new BrowseAction();
+    private static final BrowseAction defaultBrowseAction = new BrowseAction();
     
     private URI targetURI;
     private boolean visited;
 
-    private transient Rectangle viewRect = new Rectangle();
-    private transient Rectangle iconRect = new Rectangle();
-    private transient Rectangle textRect = new Rectangle();
+    private final transient Rectangle viewRect = new Rectangle();
+    private final transient Rectangle iconRect = new Rectangle();
+    private final transient Rectangle textRect = new Rectangle();
 
     //remind(aim): lookup colors instead of hardcoding them
     private Color normalForeground;
-    private Color activeForeground;
-    private Color visitedForeground;
+    private final Color activeForeground;
+    private final Color visitedForeground;
     private boolean drawUnderline = true;
     
     static {
@@ -205,7 +205,7 @@ public class JHyperlink extends JButton {
     }
 
     // This action is stateless and hence can be shared across hyperlinks
-    public static class BrowseAction extends AbstractAction {
+    private static class BrowseAction extends AbstractAction {
         public BrowseAction() {
             super();
         }

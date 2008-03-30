@@ -272,7 +272,7 @@ public class TableDemo extends JPanel {
         return statusBar;
     }
 
-    public Color[] getTableRowColors() {
+    private Color[] getTableRowColors() {
         if (rowColors == null) {
             rowColors = new Color[2];
             rowColors[0] = UIManager.getColor("Table.background");
@@ -438,7 +438,7 @@ public class TableDemo extends JPanel {
 
     }
 
-    protected class ShowWinnersListener implements ChangeListener {
+    private class ShowWinnersListener implements ChangeListener {
         public void stateChanged(ChangeEvent event) {
             setShowOnlyWinners(winnersCheckbox.isSelected());
         }
@@ -508,11 +508,11 @@ public class TableDemo extends JPanel {
 
     //<snip>Use SwingWorker to asynchronously load the data
     private static class OscarDataLoader extends javax.swing.SwingWorker<List<OscarCandidate>, OscarCandidate> {
-        private URL oscarData;
-        private OscarTableModel oscarModel;
-        private ArrayList candidates;
+        private final URL oscarData;
+        private final OscarTableModel oscarModel;
+        private final ArrayList candidates;
 
-        OscarDataLoader(URL oscarURL, OscarTableModel oscarTableModel) {
+        private OscarDataLoader(URL oscarURL, OscarTableModel oscarTableModel) {
             this.oscarData = oscarURL;
             this.oscarModel = oscarTableModel;
             this.candidates = new ArrayList<OscarCandidate>();
@@ -565,7 +565,7 @@ public class TableDemo extends JPanel {
     }
     //</snip>
 
-    public class IMDBLinkAction extends AbstractAction {
+    private class IMDBLinkAction extends AbstractAction {
 
         public void actionPerformed(ActionEvent event) {
             int row = ((Integer) event.getSource()).intValue();

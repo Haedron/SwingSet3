@@ -83,7 +83,7 @@ public class WindowDemo extends JPanel {
         return controlPanel;
     }
 
-    protected static JComponent createWindowSpaceholder(JWindow window) {
+    private static JComponent createWindowSpaceholder(JWindow window) {
         JPanel windowPlaceholder = new JPanel();
         Dimension prefSize = window.getPreferredSize();
         prefSize.width += 12;
@@ -93,7 +93,7 @@ public class WindowDemo extends JPanel {
         return windowPlaceholder;
     }
 
-    protected static JWindow createWindow() {
+    private static JWindow createWindow() {
 
         //<snip>Create window
         JWindow window = new JWindow();

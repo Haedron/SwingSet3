@@ -62,13 +62,8 @@ import com.sun.swingset3.demos.JHyperlink;
 )
 public class ButtonDemo extends JPanel {
 
-    // remind: replace with annotation?
-    public static String getShortDescription() {
-        return "Demonstrates JButton, Swing's push button component.";
-    }
-
     public ButtonDemo() {
-        setToolTipText(getShortDescription());
+        setToolTipText("Demonstrates JButton, Swing's push button component.");
         initComponents();
         setOpaque(false);
     }

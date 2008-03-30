@@ -224,8 +224,8 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
 
     private class HyperlinkMouseListener extends MouseAdapter {
         private transient Rectangle cellRect;
-        private transient Rectangle iconRect = new Rectangle();
-        private transient Rectangle textRect = new Rectangle();
+        private final transient Rectangle iconRect = new Rectangle();
+        private final transient Rectangle textRect = new Rectangle();
         private transient Cursor tableCursor;
 
         @Override
@@ -327,24 +327,6 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
             hitRowIndex = -1;
             hitColumnIndex = -1;
             return false;
-        }
-    }
-
-    public static class DefaultAction extends AbstractAction {
-
-        public void actionPerformed(ActionEvent event) {
-            Object source = event.getSource();
-            if (source instanceof Link) {
-                Link link = (Link) source;
-                try {
-                    DemoUtilities.browse(link.getUri());
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    System.err.println(ex);
-                }
-
-            }
         }
     }
 }

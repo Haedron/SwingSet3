@@ -85,10 +85,10 @@ public class ToolTipDemo extends JPanel {
         private final Rectangle htmlRect = new Rectangle(240, 134, 186, 186);
         private final Rectangle styledRect = new Rectangle(45, 327, 188, 134);
 
-        private JLabel background;
-        private JComponent plainToolTipRegion;
-        private JComponent htmlToolTipRegion;
-        private JComponent styledToolTipRegion;
+        private final JLabel background;
+        private final JComponent plainToolTipRegion;
+        private final JComponent htmlToolTipRegion;
+        private final JComponent styledToolTipRegion;
 
         public Toolbox() {
             setLayout(null);

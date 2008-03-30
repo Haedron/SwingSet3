@@ -109,7 +109,7 @@ public class FrameDemo extends JPanel {
         return controlPanel;
     }
 
-    protected static JComponent createFrameSpaceholder(JFrame frame) {
+    private static JComponent createFrameSpaceholder(JFrame frame) {
         JPanel framePlaceholder = new JPanel();
         Dimension prefSize = frame.getPreferredSize();
         prefSize.width += 12;
@@ -119,7 +119,7 @@ public class FrameDemo extends JPanel {
         return framePlaceholder;
     }
 
-    protected static JFrame createFrame() {
+    private static JFrame createFrame() {
 
         //<snip>Create frame and set simple properties
         JFrame frame = new JFrame("Demo JFrame");

@@ -105,7 +105,7 @@ public class OptionPaneDemo extends JPanel {
         add(Box.createHorizontalGlue());
     }
 
-    public JButton createWarningDialogButton() {
+    private JButton createWarningDialogButton() {
         Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.warningbutton")) {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(
@@ -119,7 +119,7 @@ public class OptionPaneDemo extends JPanel {
         return createButton(a);
     }
 
-    public JButton createMessageDialogButton() {
+    private JButton createMessageDialogButton() {
         Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.messagebutton")) {
             final URL img = getClass().getResource("resources/images/bottle.gif");
             final String imagesrc = "<img src=\"" + img + "\" width=\"284\" height=\"100\">";
@@ -135,7 +135,7 @@ public class OptionPaneDemo extends JPanel {
         return createButton(a);
     }
 
-    public JButton createConfirmDialogButton() {
+    private JButton createConfirmDialogButton() {
         Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.confirmbutton")) {
             public void actionPerformed(ActionEvent e) {
                 int result = JOptionPane.showConfirmDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.confirmquestion"));
@@ -149,7 +149,7 @@ public class OptionPaneDemo extends JPanel {
         return createButton(a);
     }
 
-    public JButton createInputDialogButton() {
+    private JButton createInputDialogButton() {
         Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.inputbutton")) {
             public void actionPerformed(ActionEvent e) {
                 String result = JOptionPane.showInputDialog(OptionPaneDemo.this, resourceManager.getString("OptionPaneDemo.inputquestion"));
@@ -163,7 +163,7 @@ public class OptionPaneDemo extends JPanel {
         return createButton(a);
     }
 
-    public JButton createComponentDialogButton() {
+    private JButton createComponentDialogButton() {
         Action a = new AbstractAction(resourceManager.getString("OptionPaneDemo.componentbutton")) {
             public void actionPerformed(ActionEvent e) {
                 // In a ComponentDialog, you can show as many message components and
@@ -222,7 +222,7 @@ public class OptionPaneDemo extends JPanel {
         return createButton(a);
     }
 
-    public JButton createButton(Action a) {
+    private JButton createButton(Action a) {
         JButton b = new JButton() {
             public Dimension getMaximumSize() {
                 int width = Short.MAX_VALUE;

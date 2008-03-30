@@ -87,7 +87,7 @@ public class SliderDemo extends JPanel {
         createSliderDemo();
     }
 
-    public void createSliderDemo() {
+    private void createSliderDemo() {
         JSlider s;
         JPanel hp;
         JPanel vp;

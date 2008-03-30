@@ -66,9 +66,9 @@ public class SplitPaneDemo extends JPanel {
 
     private static final Insets insets = new Insets(4, 8, 4, 8);
 
-    private JSplitPane splitPane;
-    private JLabel day;
-    private JLabel night;
+    private final JSplitPane splitPane;
+    private final JLabel day;
+    private final JLabel night;
 
     private JPanel controlPanel;
     private GridBagLayout gridbag;
@@ -259,7 +259,7 @@ public class SplitPaneDemo extends JPanel {
     }
 
     //<snip>Create radio box to edit splitpane orientation   
-    public class OrientationListener implements ActionListener {
+    private class OrientationListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             splitPane.setOrientation(event.getActionCommand().equals("vertical") ?
                     JSplitPane.VERTICAL_SPLIT : JSplitPane.HORIZONTAL_SPLIT);
@@ -271,7 +271,7 @@ public class SplitPaneDemo extends JPanel {
     //<snip>Create spinners to edit day & night's minimum sizes
 
     public class MinimumSizeListener implements ChangeListener {
-        private JComponent component;
+        private final JComponent component;
 
         public MinimumSizeListener(JComponent c) {
             this.component = c;

@@ -83,7 +83,7 @@ public class TreeDemo extends JPanel {
         add(new JScrollPane(createTree()), BorderLayout.CENTER);
     }
 
-    public JTree createTree() {
+    private JTree createTree() {
         DefaultMutableTreeNode top = new DefaultMutableTreeNode(resourceManager.getString("TreeDemo.music"));
         DefaultMutableTreeNode catagory = null;
         DefaultMutableTreeNode artist = null;

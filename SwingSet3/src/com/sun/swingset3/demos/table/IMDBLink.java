@@ -59,7 +59,7 @@ public class IMDBLink {
      */
     public static String getMovieURIString(String movieTitle, int year) throws IOException {
         ArrayList<String> matches = new ArrayList<String>();
-        URL url = null;
+        URL url;
         BufferedReader reader;
 
         // btw, google rejects the request with a 403 return code!
@@ -70,7 +70,9 @@ public class IMDBLink {
             url = new URL("http://search.yahoo.com/search?ei=utf-8&fr=sfp&p=imdb+" +
                     urlKey + "&iscqry=");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.err.println(ex);
+            
+            return null;
         }
 
         URLConnection conn = url.openConnection();
@@ -120,7 +122,7 @@ public class IMDBLink {
     }
 
 
-    protected static boolean verifyYear(String imdbURL, int movieYear) throws IOException {
+    private static boolean verifyYear(String imdbURL, int movieYear) throws IOException {
         boolean yearMatches = false;
 
         URLConnection conn = new URL(imdbURL).openConnection();

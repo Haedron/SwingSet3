@@ -71,7 +71,7 @@ public class ListDemo extends JPanel {
 
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());
 
-    private JList list;
+    private final JList list;
 
     private JPanel prefixList;
     private JPanel suffixList;
@@ -79,7 +79,7 @@ public class ListDemo extends JPanel {
     private Action prefixAction;
     private Action suffixAction;
 
-    private GeneratedListModel listModel;
+    private final GeneratedListModel listModel;
 
     /**
      * main method allows us to run as a standalone demo.
@@ -121,7 +121,7 @@ public class ListDemo extends JPanel {
         // Create the list
         list = new JList();
         list.setCellRenderer(new CompanyLogoListCellRenderer());
-        listModel = new GeneratedListModel(this);
+        listModel = new GeneratedListModel();
         list.setModel(listModel);
 
         // Set the preferred row count. This affects the preferredSize
@@ -190,9 +190,9 @@ public class ListDemo extends JPanel {
         addSuffix("Concepts", false);
     }
 
-    public JPanel createControlPanel() {
+    private JPanel createControlPanel() {
         JPanel controlPanel = new JPanel() {
-            Insets insets = new Insets(0, 4, 10, 10);
+            private final Insets insets = new Insets(0, 4, 10, 10);
 
             public Insets getInsets() {
                 return insets;
@@ -209,7 +209,7 @@ public class ListDemo extends JPanel {
         suffixPanel.add(new JLabel(resourceManager.getString("ListDemo.suffixes")));
 
         prefixList = new JPanel() {
-            Insets insets = new Insets(0, 4, 0, 0);
+            private final Insets insets = new Insets(0, 4, 0, 0);
 
             public Insets getInsets() {
                 return insets;
@@ -222,7 +222,7 @@ public class ListDemo extends JPanel {
         prefixPanel.add(Box.createRigidArea(HGAP10));
 
         suffixList = new JPanel() {
-            Insets insets = new Insets(0, 4, 0, 0);
+            private final Insets insets = new Insets(0, 4, 0, 0);
 
             public Insets getInsets() {
                 return insets;
@@ -240,14 +240,14 @@ public class ListDemo extends JPanel {
         return controlPanel;
     }
 
-    private FocusListener listFocusListener = new FocusAdapter() {
+    private final FocusListener listFocusListener = new FocusAdapter() {
         public void focusGained(FocusEvent e) {
             JComponent c = (JComponent) e.getComponent();
             c.scrollRectToVisible(new Rectangle(0, 0, c.getWidth(), c.getHeight()));
         }
     };
 
-    public void addPrefix(String prefix, boolean selected) {
+    private void addPrefix(String prefix, boolean selected) {
         if (prefixAction == null) {
             prefixAction = new UpdatePrefixListAction(listModel);
         }
@@ -260,7 +260,7 @@ public class ListDemo extends JPanel {
         cb.addFocusListener(listFocusListener);
     }
 
-    public void addSuffix(String suffix, boolean selected) {
+    private void addSuffix(String suffix, boolean selected) {
         if (suffixAction == null) {
             suffixAction = new UpdateSuffixListAction(listModel);
         }
@@ -274,7 +274,7 @@ public class ListDemo extends JPanel {
     }
 
     private static class UpdatePrefixListAction extends AbstractAction {
-        private GeneratedListModel listModel;
+        private final GeneratedListModel listModel;
 
         protected UpdatePrefixListAction(GeneratedListModel listModel) {
             this.listModel = listModel;
@@ -291,7 +291,7 @@ public class ListDemo extends JPanel {
     }
 
     private static class UpdateSuffixListAction extends AbstractAction {
-        GeneratedListModel listModel;
+        private final GeneratedListModel listModel;
 
         protected UpdateSuffixListAction(GeneratedListModel listModel) {
             this.listModel = listModel;
@@ -309,15 +309,10 @@ public class ListDemo extends JPanel {
 
 
     private static class GeneratedListModel extends AbstractListModel {
-        ListDemo demo;
-        Permuter permuter;
+        private Permuter permuter;
 
-        public Vector<String> prefix = new Vector<String>();
-        public Vector<String> suffix = new Vector<String>();
-
-        public GeneratedListModel(ListDemo demo) {
-            this.demo = demo;
-        }
+        private final Vector<String> prefix = new Vector<String>();
+        private final Vector<String> suffix = new Vector<String>();
 
         private void update() {
             permuter = new Permuter(getSize());
@@ -365,7 +360,7 @@ public class ListDemo extends JPanel {
         }
     }
 
-    ImageIcon images[] = new ImageIcon[7];
+    private final ImageIcon[] images = new ImageIcon[7];
 
     void loadImages() {
         images[0] = resourceManager.createImageIcon("red.gif", resourceManager.getString("ListDemo.red"));
@@ -377,7 +372,7 @@ public class ListDemo extends JPanel {
         images[6] = resourceManager.createImageIcon("magenta.gif", resourceManager.getString("ListDemo.magenta"));
     }
 
-    class CompanyLogoListCellRenderer extends DefaultListCellRenderer {
+    private class CompanyLogoListCellRenderer extends DefaultListCellRenderer {
         public Component getListCellRendererComponent(
                 JList list,
                 Object value,

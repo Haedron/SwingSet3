@@ -98,7 +98,7 @@ public class ComboBoxDemo extends JPanel implements ActionListener {
         createComboBoxDemo();
     }
 
-    public void createComboBoxDemo() {
+    private void createComboBoxDemo() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JPanel innerPanel = new JPanel();
@@ -205,7 +205,7 @@ public class ComboBoxDemo extends JPanel implements ActionListener {
         presetCB.setSelectedIndex(0);
     }
 
-    void addFace(String name, String i18n_name) {
+    private void addFace(String name, String i18n_name) {
         ImageIcon i;
         String i18n_hair = resourceManager.getString("ComboBoxDemo.hair");
         String i18n_eyes = resourceManager.getString("ComboBoxDemo.eyes");
@@ -224,35 +224,28 @@ public class ComboBoxDemo extends JPanel implements ActionListener {
         parts.put(name + "mouth", i);
     }
 
-    JComboBox createHairComboBox() {
+    private JComboBox createHairComboBox() {
         JComboBox cb = new JComboBox();
         fillComboBox(cb);
         cb.addActionListener(this);
         return cb;
     }
 
-    JComboBox createEyesComboBox() {
+    private JComboBox createEyesComboBox() {
         JComboBox cb = new JComboBox();
         fillComboBox(cb);
         cb.addActionListener(this);
         return cb;
     }
 
-    JComboBox createNoseComboBox() {
+    private JComboBox createMouthComboBox() {
         JComboBox cb = new JComboBox();
         fillComboBox(cb);
         cb.addActionListener(this);
         return cb;
     }
 
-    JComboBox createMouthComboBox() {
-        JComboBox cb = new JComboBox();
-        fillComboBox(cb);
-        cb.addActionListener(this);
-        return cb;
-    }
-
-    JComboBox createPresetComboBox() {
+    private JComboBox createPresetComboBox() {
         JComboBox cb = new JComboBox();
         cb.addItem(resourceManager.getString("ComboBoxDemo.preset1"));
         cb.addItem(resourceManager.getString("ComboBoxDemo.preset2"));
@@ -268,7 +261,7 @@ public class ComboBoxDemo extends JPanel implements ActionListener {
         return cb;
     }
 
-    void fillComboBox(JComboBox cb) {
+    private void fillComboBox(JComboBox cb) {
         cb.addItem(resourceManager.getString("ComboBoxDemo.brent"));
         cb.addItem(resourceManager.getString("ComboBoxDemo.georges"));
         cb.addItem(resourceManager.getString("ComboBoxDemo.hans"));

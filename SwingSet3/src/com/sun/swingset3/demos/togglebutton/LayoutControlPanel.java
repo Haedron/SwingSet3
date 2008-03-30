@@ -47,7 +47,7 @@ import com.sun.swingset3.demos.ResourceManager;
 public class LayoutControlPanel extends JPanel implements SwingConstants {
     private static final Dimension VGAP20 = new Dimension(1, 20);
 
-    private boolean absolutePositions;
+    private final boolean absolutePositions;
     private ToggleButtonDemo demo = null;
 
     // private ComponentOrientChanger componentOrientChanger = null;

@@ -37,8 +37,8 @@ import java.awt.*;
  * @author Mikhail Lapshin
  */
 public class JSpinnerPanel extends JPanel {
-    private JPanel labelPanel;
-    private JPanel spinnerPanel;
+    private final JPanel labelPanel;
+    private final JPanel spinnerPanel;
 
     public JSpinnerPanel() {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));

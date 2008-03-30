@@ -92,20 +92,6 @@ public class DirectionPanel extends JPanel {
         add(thirdThree);
     }
 
-    public String getSelection() {
-        return group.getSelection().getActionCommand();
-    }
-
-    public void setSelection(String selection) {
-        Enumeration e = group.getElements();
-        while (e.hasMoreElements()) {
-            JRadioButton b = (JRadioButton) e.nextElement();
-            if (b.getActionCommand().equals(selection)) {
-                b.setSelected(true);
-            }
-        }
-    }
-
     // Chester's way cool layout buttons 
     private final ImageIcon bl_dot = loadImageIcon("bl.gif", "bottom left layout button");
     private final ImageIcon bldn_dot = loadImageIcon("bldn.gif", "selected bottom left layout button");
@@ -126,7 +112,7 @@ public class DirectionPanel extends JPanel {
     private final ImageIcon tr_dot = loadImageIcon("tr.gif", "top right layout button");
     private final ImageIcon trdn_dot = loadImageIcon("trdn.gif", "selected top right layout button");
 
-    public ImageIcon loadImageIcon(String filename, String description) {
+    private ImageIcon loadImageIcon(String filename, String description) {
         String path = "resources/images/" + filename;
         return new ImageIcon(getClass().getResource(path), description);
     }

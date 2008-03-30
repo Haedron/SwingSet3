@@ -125,7 +125,7 @@ public class ToggleButtonDemo extends JPanel implements ChangeListener {
         currentControls = checkboxes;
     }
 
-    public void addButtons() {
+    private void addButtons() {
         tab.addTab(resourceManager.getString("ToggleButtonDemo.buttons"), buttonPanel);
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setBorder(border5);
@@ -202,7 +202,7 @@ public class ToggleButtonDemo extends JPanel implements ChangeListener {
         buttonPanel.add(createControls());
     }
 
-    public void addRadioButtons() {
+    private void addRadioButtons() {
         ButtonGroup group = new ButtonGroup();
 
         tab.addTab(resourceManager.getString("ToggleButtonDemo.radiobuttons"), radioButtonPanel);
@@ -296,7 +296,7 @@ public class ToggleButtonDemo extends JPanel implements ChangeListener {
     }
 
 
-    public void addCheckBoxes() {
+    private void addCheckBoxes() {
         tab.addTab(resourceManager.getString("ToggleButtonDemo.checkboxes"), checkboxPanel);
         checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.X_AXIS));
         checkboxPanel.setBorder(border5);
@@ -378,11 +378,11 @@ public class ToggleButtonDemo extends JPanel implements ChangeListener {
         checkboxPanel.add(createControls());
     }
 
-    public void addToggleButtons() {
+    private void addToggleButtons() {
         tab.addTab(resourceManager.getString("ToggleButtonDemo.togglebuttons"), toggleButtonPanel);
     }
 
-    public JPanel createControls() {
+    private JPanel createControls() {
         JPanel controls = new JPanel() {
             public Dimension getMaximumSize() {
                 return new Dimension(300, super.getMaximumSize().height);
@@ -482,7 +482,7 @@ public class ToggleButtonDemo extends JPanel implements ChangeListener {
         return controls;
     }
 
-    public void createListeners() {
+    private void createListeners() {
         buttonDisplayListener = new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 JCheckBox cb = (JCheckBox) e.getSource();

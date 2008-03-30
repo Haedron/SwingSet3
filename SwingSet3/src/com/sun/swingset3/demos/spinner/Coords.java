@@ -34,8 +34,8 @@ package com.sun.swingset3.demos.spinner;
  * @author Mikhail Lapshin
  */
 public class Coords {
-    private double x;
-    private double y;
+    private final double x;
+    private final double y;
 
     public Coords(double x, double y) {
         this.x = x;

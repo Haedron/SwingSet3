@@ -164,7 +164,7 @@ public class InternalFrameDemo extends JPanel {
     /**
      * Create an internal frame and add a scrollable imageicon to it
      */
-    public JInternalFrame createInternalFrame(Icon icon, Integer layer, int width, int height) {
+    private JInternalFrame createInternalFrame(Icon icon, Integer layer, int width, int height) {
         //<snip>Create internal frame
         JInternalFrame internalFrame = new JInternalFrame();
         //</snip>
@@ -205,7 +205,7 @@ public class InternalFrameDemo extends JPanel {
         return internalFrame;
     }
 
-    public JInternalFrame createInternalFramePalette() {
+    private void createInternalFramePalette() {
         JInternalFrame palette = new JInternalFrame(
                 resourceManager.getString("InternalFrameDemo.palette_label")
         );
@@ -305,12 +305,10 @@ public class InternalFrameDemo extends JPanel {
         palette.getContentPane().add(p, BorderLayout.SOUTH);
 
         palette.show();
-
-        return palette;
     }
 
 
-    class CreateFrameAction extends AbstractAction {
+    private class CreateFrameAction extends AbstractAction {
         final InternalFrameDemo demo;
         final Icon icon;
 
@@ -321,15 +319,11 @@ public class InternalFrameDemo extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             demo.createInternalFrame(icon,
-                    getDemoFrameLayer(),
+                    DEMO_FRAME_LAYER,
                     FRAME_WIDTH,
                     FRAME_HEIGHT
             );
         }
-    }
-
-    public Integer getDemoFrameLayer() {
-        return DEMO_FRAME_LAYER;
     }
 
     private static class ImageScroller extends JScrollPane {

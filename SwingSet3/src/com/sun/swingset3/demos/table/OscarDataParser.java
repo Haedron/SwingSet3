@@ -35,8 +35,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -48,7 +46,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public abstract class OscarDataParser extends DefaultHandler {
-    private static String categoriesIn[] = {
+    private static final String[] CATEGORIES_IN = {
             "actor", "actress", "bestPicture",
             "actorSupporting", "actressSupporting", "artDirection",
             "assistantDirector", "director", "cinematography",
@@ -61,7 +59,7 @@ public abstract class OscarDataParser extends DefaultHandler {
             "engEffects", "uniqueArtisticPicture"
     };
 
-    private static String categoriesOut[] = {
+    private static final String[] CATEGORIES_OUT = {
             "Best Actor", "Best Actress", "Best Picture",
             "Best Supporting Actor", "Best Supporting Actress", "Best Art Direction",
             "Best Assistant Director", "Best Director", "Best Cinematography",
@@ -80,9 +78,7 @@ public abstract class OscarDataParser extends DefaultHandler {
     //to maintain context
     private OscarCandidate tempOscarCandidate;
 
-    public List<OscarCandidate> parseDocument(URL oscarURL) {
-        ArrayList<OscarCandidate> candidates = new ArrayList<OscarCandidate>();
-
+    public void parseDocument(URL oscarURL) {
         //get a factory
         SAXParserFactory spf = SAXParserFactory.newInstance();
         InputStream is;
@@ -103,7 +99,6 @@ public abstract class OscarDataParser extends DefaultHandler {
         } catch (IOException ie) {
             ie.printStackTrace();
         }
-        return candidates;
     }
 
 
@@ -111,9 +106,9 @@ public abstract class OscarDataParser extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         //reset
         tempVal = "";
-        for (int i = 0; i < categoriesIn.length; i++) {
-            if (qName.equalsIgnoreCase(categoriesIn[i])) {
-                tempOscarCandidate = new OscarCandidate(categoriesOut[i]);
+        for (int i = 0; i < CATEGORIES_IN.length; i++) {
+            if (qName.equalsIgnoreCase(CATEGORIES_IN[i])) {
+                tempOscarCandidate = new OscarCandidate(CATEGORIES_OUT[i]);
                 tempOscarCandidate.setYear(Integer.parseInt(attributes.getValue("year")));
                 return;
             }
@@ -136,7 +131,7 @@ public abstract class OscarDataParser extends DefaultHandler {
             tempOscarCandidate.getPersons().add(tempVal);
         } else {
             // find category
-            for (String category : categoriesIn) {
+            for (String category : CATEGORIES_IN) {
                 if (qName.equalsIgnoreCase(category)) {
                     //add it to the list
                     addCandidate(tempOscarCandidate);

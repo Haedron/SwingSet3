@@ -62,7 +62,7 @@ public class JMandelbrot extends JComponent {
     public static final String PALETTE_PROPERTY_NAME = "palette";
 
     private Image buffer;
-    private MandelbrotCalculator[] calculators =
+    private final MandelbrotCalculator[] calculators =
             new MandelbrotCalculator[numOfThreads];
 
     private double xLowLimit = -2;
@@ -207,10 +207,10 @@ public class JMandelbrot extends JComponent {
     }
 
     private class MandelbrotCalculator extends SwingWorker<Object, Object> {
-        private int xStart;
-        private int xEnd;
-        private int yStart;
-        private int yEnd;
+        private final int xStart;
+        private final int xEnd;
+        private final int yStart;
+        private final int yEnd;
 
         public MandelbrotCalculator(int xStart, int xEnd, int yStart, int yEnd) {
             this.xStart = xStart;

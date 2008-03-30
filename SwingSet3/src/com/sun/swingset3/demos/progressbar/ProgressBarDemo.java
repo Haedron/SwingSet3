@@ -86,7 +86,7 @@ public class ProgressBarDemo extends JPanel {
     private JProgressBar progressBar;
     private JTextArea progressTextArea;
 
-    public void createProgressPanel() {
+    private void createProgressPanel() {
         setLayout(new BorderLayout());
 
         JPanel textWrapper = new JPanel(new BorderLayout());
@@ -118,7 +118,7 @@ public class ProgressBarDemo extends JPanel {
         progressPanel.add(createStopButton());
     }
 
-    public JButton createLoadButton() {
+    private JButton createLoadButton() {
         loadAction = new AbstractAction(resourceManager.getString("ProgressBarDemo.start_button")) {
             public void actionPerformed(ActionEvent e) {
                 loadAction.setEnabled(false);
@@ -134,7 +134,7 @@ public class ProgressBarDemo extends JPanel {
         return createButton(loadAction);
     }
 
-    public JButton createStopButton() {
+    private JButton createStopButton() {
         stopAction = new AbstractAction(resourceManager.getString("ProgressBarDemo.stop_button")) {
             public void actionPerformed(ActionEvent e) {
                 timer.stop();
@@ -145,7 +145,7 @@ public class ProgressBarDemo extends JPanel {
         return createButton(stopAction);
     }
 
-    public static JButton createButton(Action a) {
+    private static JButton createButton(Action a) {
         JButton b = new JButton();
         // setting the following client property informs the button to show
         // the action text as it's name. The default is to not show the
@@ -160,7 +160,7 @@ public class ProgressBarDemo extends JPanel {
 
     private final String text = resourceManager.getString("ProgressBarDemo.text");
 
-    public Action createTextLoadAction() {
+    private Action createTextLoadAction() {
         return new AbstractAction("text load action") {
             public void actionPerformed(ActionEvent e) {
                 if (progressBar.getValue() < progressBar.getMaximum()) {

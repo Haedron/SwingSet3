@@ -54,8 +54,8 @@ public class CosinePaletteChooser extends JPanel {
 
     private final ResourceManager resourceManager;
     private CosinePalette palette;
-    private JPaletteShower shower;
-    private ChangeListener changeListener;
+    private final JPaletteShower shower;
+    private final ChangeListener changeListener;
 
     private JSpinner rsSpinner;
     private JSpinner gsSpinner;
@@ -97,7 +97,7 @@ public class CosinePaletteChooser extends JPanel {
                 getIntValue(gsSpinner), getIntValue(bsSpinner));
     }
 
-    private int getIntValue(JSpinner spinner) {
+    private static int getIntValue(JSpinner spinner) {
         return (Integer) spinner.getValue();
     }
 

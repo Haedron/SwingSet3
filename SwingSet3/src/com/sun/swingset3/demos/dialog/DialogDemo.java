@@ -71,7 +71,7 @@ public class DialogDemo extends JPanel {
         add(dialogSpaceholder, BorderLayout.CENTER);
     }
                 
-    protected static JComponent createDialogSpaceholder(JDialog dialog) {
+    private static JComponent createDialogSpaceholder(JDialog dialog) {
         // Create placeholder panel to provide space in which to
         // display the toplevel dialog so that the control panel is not
         // obscured by it.
@@ -96,7 +96,7 @@ public class DialogDemo extends JPanel {
         return panel;
     }
     
-    protected static JDialog createDialog() {
+    private static JDialog createDialog() {
  
         //<snip>Create dialog
         JDialog dialog = new JDialog(new JFrame(), "Demo JDialog", false);

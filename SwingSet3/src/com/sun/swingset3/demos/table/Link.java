@@ -42,9 +42,9 @@ import java.net.URI;
  */
 public class Link {
     protected String displayText;
-    protected URI uri;
-    protected String description;
-    protected boolean visited;
+    private URI uri;
+    private String description;
+    private boolean visited;
 
     /**
      * Creates a new instance of Link

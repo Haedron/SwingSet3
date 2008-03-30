@@ -133,8 +133,8 @@ public class OscarCellRenderers {
     //<snip>Render "nominee" table column with special icon for winners
 
     public static class NomineeRenderer extends RowRenderer {
-        private ImageIcon winnerIcon;
-        private ImageIcon nomineeIcon; // nice way of saying "loser" :)
+        private final ImageIcon winnerIcon;
+        private final ImageIcon nomineeIcon; // nice way of saying "loser" :)
 
         public NomineeRenderer() {
             winnerIcon = new ImageIcon(
