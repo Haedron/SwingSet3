@@ -229,8 +229,12 @@ public class Demo {
                 pathNames.add(demoClass.getName().replace(".", "/") + ".java");
             }
             
-            // Now get any names registered in DemoProperties meta-data
-            pathNames.addAll(Arrays.asList(sourceFilePaths));
+            // Now get any names registered in DemoProperties meta-data.
+            // If meta-data is not specified then sourceFilePaths contains
+            // one empty string. In this case we skip it.
+            if (!(sourceFilePaths.length == 1 && sourceFilePaths[0].length() == 0)) {
+                pathNames.addAll(Arrays.asList(sourceFilePaths));
+            }
 
             // Now find all the files
             for (String path : pathNames) {
