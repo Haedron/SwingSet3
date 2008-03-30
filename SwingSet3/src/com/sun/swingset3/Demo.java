@@ -197,55 +197,23 @@ public class Demo {
     public URL[] getSourceFiles() {      
         // If not already cached, then look them up
         if (sourceFiles == null) {
-            ArrayList<String> pathNames = new ArrayList<String>();
             ArrayList<URL> pathURLs = new ArrayList<URL>();
-            
-            // Now try to automagically determine files by looking in package
-            String packageName = demoClass.getPackage().getName().replace(".", "/");
-            try {
-                ZipFile zipFile = new ZipFile("SwingSet3.jar");
 
-                Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
-
-                while (enumeration.hasMoreElements()) {
-                    String name = enumeration.nextElement().getName();
-
-                    if (name.startsWith(packageName) && (name.matches(CodeViewer.SOURCES_JAVA) ||
-                            name.matches(CodeViewer.SOURCES_IMAGES) ||
-                            name.matches(CodeViewer.SOURCES_TEXT))) {
-                        pathNames.add(name);
-                    }
-                }
-            } catch (SecurityException se) {
-                //SwingSet3.logger.log(Level.INFO, 
-                //       "cannot read from jar file when running from sandbox");
-            } catch (IOException e) {
-                //SwingSet3.logger.log(Level.INFO,
-                //      "unable to load sources from SwingSet.jar because jar file could not be found.");
-            }
-            
-            // If package inference didn't work, then at least infer the demo class itself
-            if (pathNames.isEmpty()) {
-                pathNames.add(demoClass.getName().replace(".", "/") + ".java");
-            }
-            
-            // Now get any names registered in DemoProperties meta-data.
+            // Get any names registered in DemoProperties meta-data.
             // If meta-data is not specified then sourceFilePaths contains
             // one empty string. In this case we skip it.
             if (!(sourceFilePaths.length == 1 && sourceFilePaths[0].length() == 0)) {
-                pathNames.addAll(Arrays.asList(sourceFilePaths));
-            }
-
-            // Now find all the files
-            for (String path : pathNames) {
-                URL url = getClass().getClassLoader().getResource(path);
-                if (url == null) {
-                    SwingSet3.logger.log(Level.WARNING,
-                            "unable to load source file '" + path + "'");
-                } else {
-                    pathURLs.add(url);
+                for (String path : sourceFilePaths) {
+                    URL url = getClass().getClassLoader().getResource(path);
+                    if (url == null) {
+                        SwingSet3.logger.log(Level.WARNING,
+                                "unable to load source file '" + path + "'");
+                    } else {
+                        pathURLs.add(url);
+                    }
                 }
             }
+
             this.sourceFiles = pathURLs.toArray(new URL[pathURLs.size()]);
         }
         

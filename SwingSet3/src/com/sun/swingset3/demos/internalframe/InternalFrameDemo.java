@@ -56,7 +56,18 @@ import com.sun.swingset3.demos.ResourceManager;
         description = "Demonstrates JInternalFrame, a frame which can be embedded within another container to" +
                 "implement an MDI style interface.",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/internalframe/InternalFrameDemo.java",
+                "com/sun/swingset3/demos/internalframe/resources/InternalFrameDemo.properties",
+                "com/sun/swingset3/demos/internalframe/resources/images/bananas.png",
+                "com/sun/swingset3/demos/internalframe/resources/images/bananas_small.png",
+                "com/sun/swingset3/demos/internalframe/resources/images/globe.png",
+                "com/sun/swingset3/demos/internalframe/resources/images/globe_small.png",
+                "com/sun/swingset3/demos/internalframe/resources/images/InternalFrameDemo.gif",
+                "com/sun/swingset3/demos/internalframe/resources/images/package.png",
+                "com/sun/swingset3/demos/internalframe/resources/images/package_small.png",
+                "com/sun/swingset3/demos/internalframe/resources/images/soccer_ball.png",
+                "com/sun/swingset3/demos/internalframe/resources/images/soccer_ball_small.png"
                 }
 )
 public class InternalFrameDemo extends JPanel {

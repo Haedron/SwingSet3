@@ -48,7 +48,11 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "General",
         description = "Demonstrates how tooltips can be easily added to Swing GUI components",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/tooltip/ToolTipDemo.java",
+                "com/sun/swingset3/demos/tooltip/resources/ToolTipDemo.properties",
+                "com/sun/swingset3/demos/tooltip/resources/images/tooltip_background.png",
+                "com/sun/swingset3/demos/tooltip/resources/images/ToolTipDemo.gif"
                 }
 )
 public class ToolTipDemo extends JPanel {

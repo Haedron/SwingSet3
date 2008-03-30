@@ -47,9 +47,12 @@ import com.sun.swingset3.DemoProperties;
         category = "Containers",
         description = "Demonstrates GridBagLayout, a layout which allows to arrange components in containers.",
         sourceFiles = {
-                "com/sun/swingset3/demos/gridbaglayout/Calculator.java",
                 "com/sun/swingset3/demos/JGridPanel.java",
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/gridbaglayout/Calculator.java",
+                "com/sun/swingset3/demos/gridbaglayout/GridBagLayoutDemo.java",
+                "com/sun/swingset3/demos/gridbaglayout/resources/GridBagLayoutDemo.properties",
+                "com/sun/swingset3/demos/gridbaglayout/resources/images/GridBagLayoutDemo.gif"
                 }
 )
 public class GridBagLayoutDemo extends JPanel {

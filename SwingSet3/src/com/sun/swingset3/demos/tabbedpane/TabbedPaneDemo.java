@@ -53,7 +53,19 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Containers",
         description = "Demonstrates JTabbedPane, a container which allows tabbed navigation of components",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/tabbedpane/TabbedPaneDemo.java",
+                "com/sun/swingset3/demos/tabbedpane/resources/TabbedPaneDemo.properties",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/blake.gif",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/brooke.gif",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/camille.jpg",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/david.gif",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/ewan.gif",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/ewan.jpg",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/hania.jpg",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/matthew.gif",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/stephen.gif",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/TabbedPaneDemo.gif"
                 }
 )
 public class TabbedPaneDemo extends JPanel implements ActionListener {

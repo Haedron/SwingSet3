@@ -52,9 +52,12 @@ import com.sun.swingset3.DemoProperties;
         category = "Text",
         description = "Demonstrates the JTextField, a control which allows to input text",
         sourceFiles = {
-                "com/sun/swingset3/demos/textfield/JHistoryTextField.java",
                 "com/sun/swingset3/demos/JGridPanel.java",
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/textfield/JHistoryTextField.java",
+                "com/sun/swingset3/demos/textfield/TextFieldDemo.java",
+                "com/sun/swingset3/demos/textfield/resources/TextFieldDemo.properties",
+                "com/sun/swingset3/demos/textfield/resources/images/TextFieldDemo.gif"
                 }
 )
 public class TextFieldDemo extends JPanel {

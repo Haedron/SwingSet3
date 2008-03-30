@@ -54,7 +54,11 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Data",
         description = "Demonstrates JTree, a component which supports display/editing of hierarchical data",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/tree/TreeDemo.java",
+                "com/sun/swingset3/demos/tree/resources/tree.txt",
+                "com/sun/swingset3/demos/tree/resources/TreeDemo.properties",
+                "com/sun/swingset3/demos/tree/resources/images/TreeDemo.gif"
                 }
 )
 public class TreeDemo extends JPanel {

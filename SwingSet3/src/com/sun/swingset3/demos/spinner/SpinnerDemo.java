@@ -48,6 +48,7 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates JSpinner and SwingWorker",
         sourceFiles = {
+                "com/sun/swingset3/demos/ResourceManager.java",
                 "com/sun/swingset3/demos/spinner/Coords.java",
                 "com/sun/swingset3/demos/spinner/CosinePalette.java",
                 "com/sun/swingset3/demos/spinner/CosinePaletteChooser.java",
@@ -56,7 +57,9 @@ import com.sun.swingset3.demos.ResourceManager;
                 "com/sun/swingset3/demos/spinner/JSpinnerPanel.java",
                 "com/sun/swingset3/demos/spinner/MandelbrotControl.java",
                 "com/sun/swingset3/demos/spinner/Palette.java",
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/spinner/SpinnerDemo.java",
+                "com/sun/swingset3/demos/spinner/resources/SpinnerDemo.properties",
+                "com/sun/swingset3/demos/spinner/resources/images/SpinnerDemo.gif"
                 }
 )
 public class SpinnerDemo extends JPanel {

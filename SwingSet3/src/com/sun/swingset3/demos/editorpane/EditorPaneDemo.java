@@ -52,7 +52,31 @@ import com.sun.swingset3.DemoProperties;
 @DemoProperties(
         value = "JEditorPane Demo",
         category = "Text",
-        description = "Demonstrates JEditorPane, a text component which supports display and editing of rich text formats (such as HTML)"
+        description = "Demonstrates JEditorPane, a text component which supports display and editing of rich text formats (such as HTML)",
+        sourceFiles = {
+                "com/sun/swingset3/demos/editorpane/EditorPaneDemo.java",
+                "com/sun/swingset3/demos/editorpane/book/ant.html",
+                "com/sun/swingset3/demos/editorpane/book/bug.html",
+                "com/sun/swingset3/demos/editorpane/book/index.html",
+                "com/sun/swingset3/demos/editorpane/book/king.html",
+                "com/sun/swingset3/demos/editorpane/book/preface.html",
+                "com/sun/swingset3/demos/editorpane/book/seaweed.html",
+                "com/sun/swingset3/demos/editorpane/book/title.html",
+                "com/sun/swingset3/demos/editorpane/book/editorpane/back.jpg",
+                "com/sun/swingset3/demos/editorpane/book/editorpane/forward.jpg",
+                "com/sun/swingset3/demos/editorpane/book/editorpane/header.jpg",
+                "com/sun/swingset3/demos/editorpane/book/Octavo/ant.jpg",
+                "com/sun/swingset3/demos/editorpane/book/Octavo/book.jpg",
+                "com/sun/swingset3/demos/editorpane/book/Octavo/bug.jpg",
+                "com/sun/swingset3/demos/editorpane/book/Octavo/bug2.jpg",
+                "com/sun/swingset3/demos/editorpane/book/Octavo/COPYRIGHT",
+                "com/sun/swingset3/demos/editorpane/book/Octavo/crest.jpg",
+                "com/sun/swingset3/demos/editorpane/book/Octavo/king.jpg",
+                "com/sun/swingset3/demos/editorpane/book/Octavo/micro.jpg",
+                "com/sun/swingset3/demos/editorpane/book/Octavo/seaweed.jpg",
+                "com/sun/swingset3/demos/editorpane/resources/EditorPaneDemo.properties",
+                "com/sun/swingset3/demos/editorpane/resources/images/EditorPaneDemo.gif"
+                }
 )
 public class EditorPaneDemo extends JPanel {
 

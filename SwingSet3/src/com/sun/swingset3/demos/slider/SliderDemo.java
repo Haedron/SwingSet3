@@ -53,7 +53,10 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates the JSlider, a control which supports linear adjustment",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/slider/SliderDemo.java",
+                "com/sun/swingset3/demos/slider/resources/SliderDemo.properties",
+                "com/sun/swingset3/demos/slider/resources/images/SliderDemo.gif"
                 }
 )
 public class SliderDemo extends JPanel {

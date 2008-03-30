@@ -48,8 +48,17 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Containers",
         description = "Demonstrates JScrollPane, a container for scrolling contents within a view port",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java"
-                }
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/scrollpane/ScrollPaneDemo.java",
+                "com/sun/swingset3/demos/scrollpane/resources/ScrollPaneDemo.properties",
+                "com/sun/swingset3/demos/scrollpane/resources/images/colheader.jpg",
+                "com/sun/swingset3/demos/scrollpane/resources/images/COPYRIGHT",
+                "com/sun/swingset3/demos/scrollpane/resources/images/crayons.jpg",
+                "com/sun/swingset3/demos/scrollpane/resources/images/lowerleft.jpg",
+                "com/sun/swingset3/demos/scrollpane/resources/images/rowheader.jpg",
+                "com/sun/swingset3/demos/scrollpane/resources/images/ScrollPaneDemo.gif",
+                "com/sun/swingset3/demos/scrollpane/resources/images/upperleft.jpg",
+                "com/sun/swingset3/demos/scrollpane/resources/images/upperright.jpg"}
 )
 public class ScrollPaneDemo extends JPanel {
     private final ResourceManager resourceManager = new ResourceManager(this.getClass());

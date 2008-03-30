@@ -58,7 +58,12 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Containers",
         description = "Demonstrates JSplitPane, a container which lays out two components in an adjustable split view (horizontal or vertical)",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/splitpane/SplitPaneDemo.java",
+                "com/sun/swingset3/demos/splitpane/resources/SplitPaneDemo.properties",
+                "com/sun/swingset3/demos/splitpane/resources/images/day.jpg",
+                "com/sun/swingset3/demos/splitpane/resources/images/night.jpg",
+                "com/sun/swingset3/demos/splitpane/resources/images/SplitPaneDemo.gif"
                 }
 )
 public class SplitPaneDemo extends JPanel {

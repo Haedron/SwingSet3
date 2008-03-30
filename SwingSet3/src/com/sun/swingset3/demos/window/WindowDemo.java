@@ -49,7 +49,10 @@ import com.sun.swingset3.demos.DemoUtilities;
         category = "Toplevel Containers",
         description = "Demonstrates JWindow, a toplevel container with no system border.",
         sourceFiles = {
-                "com/sun/swingset3/demos/DemoUtilities.java"
+                "com/sun/swingset3/demos/DemoUtilities.java",
+                "com/sun/swingset3/demos/window/WindowDemo.java",
+                "com/sun/swingset3/demos/window/resources/WindowDemo.html",
+                "com/sun/swingset3/demos/window/resources/images/WindowDemo.gif"
                 }
 )
 public class WindowDemo extends JPanel {

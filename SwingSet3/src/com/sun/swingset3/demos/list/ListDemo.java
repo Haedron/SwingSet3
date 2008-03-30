@@ -59,8 +59,18 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Data",
         description = "Demonstrates JList, a component which supports display/editing of a data list",
         sourceFiles = {
+                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/list/ListDemo.java",
                 "com/sun/swingset3/demos/list/Permuter.java",
-                "com/sun/swingset3/demos/ResourceManager.java"
+                "com/sun/swingset3/demos/list/resources/ListDemo.properties",
+                "com/sun/swingset3/demos/list/resources/images/blue.gif",
+                "com/sun/swingset3/demos/list/resources/images/cyan.gif",
+                "com/sun/swingset3/demos/list/resources/images/gray.gif",
+                "com/sun/swingset3/demos/list/resources/images/green.gif",
+                "com/sun/swingset3/demos/list/resources/images/ListDemo.gif",
+                "com/sun/swingset3/demos/list/resources/images/magenta.gif",
+                "com/sun/swingset3/demos/list/resources/images/red.gif",
+                "com/sun/swingset3/demos/list/resources/images/yellow.gif"
                 }
 )
 public class ListDemo extends JPanel {
