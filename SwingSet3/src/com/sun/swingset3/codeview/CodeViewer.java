@@ -134,7 +134,7 @@ public class CodeViewer extends JPanel {
         }
     }
     // Cache all processed code files in case they are reloaded later
-    private Map<URL,CodeFileInfo> codeCache = new HashMap<URL,CodeFileInfo>();
+    private final Map<URL,CodeFileInfo> codeCache = new HashMap<URL,CodeFileInfo>();
     
     private JComponent codeHighlightBar;
     private JComboBox snippetComboBox;
@@ -152,7 +152,7 @@ public class CodeViewer extends JPanel {
     private List<URL> additionalSourceFiles; 
     
     // Map of all snippets in current code file set    
-    private SnippetMap snippetMap = new SnippetMap();
+    private final SnippetMap snippetMap = new SnippetMap();
     
     private Action firstSnippetAction;
     private Action nextSnippetAction;
@@ -558,7 +558,7 @@ public class CodeViewer extends JPanel {
 
     private void registerSnippets(CodeFileInfo codeFileInfo) {
         for(String snippetKey: codeFileInfo.snippets.keySet()) {
-            ArrayList<Snippet> snippetCodeList = codeFileInfo.snippets.get(snippetKey);
+            List<Snippet> snippetCodeList = codeFileInfo.snippets.get(snippetKey);
             for(Snippet snippet: snippetCodeList) {
                 snippetMap.add(snippetKey, codeFileInfo.url, snippet);
             }
@@ -792,7 +792,7 @@ public class CodeViewer extends JPanel {
         }        
     }
     
-    class SnippetCellRenderer implements ListCellRenderer {
+    private class SnippetCellRenderer implements ListCellRenderer {
         private JLabel delegate;
         
         public SnippetCellRenderer(ListCellRenderer delegate) {
@@ -827,7 +827,7 @@ public class CodeViewer extends JPanel {
     }
     
     private class SnippetNavigator extends JPanel {
-        private String NO_SNIPPET;
+        private String noSnippet;
         
         private SnippetMap snippetMap;
         
@@ -835,9 +835,9 @@ public class CodeViewer extends JPanel {
         private JButton prevButton;
         private JButton nextButton;
         
-        private Insets statusInsets = new Insets(1,0,1,0);
-        private int arrowSize = 6;
-        private int overlap = 6;
+        private final Insets statusInsets = new Insets(1,0,1,0);
+        private final static int ARROW_SIZE = 6;
+        private final static int OVERLAP = 6;
         
         public SnippetNavigator(SnippetMap snippetMap) {
             this.snippetMap = snippetMap;
@@ -845,10 +845,10 @@ public class CodeViewer extends JPanel {
             
             setLayout(null);
             
-            NO_SNIPPET = getString("CodeViewer.snippets.noCodeHighlighted",
+            noSnippet = getString("CodeViewer.snippets.noCodeHighlighted",
                                    "No Code highlight selected");
             
-            statusLabel = new JLabel(NO_SNIPPET);
+            statusLabel = new JLabel(noSnippet);
             statusLabel.setHorizontalAlignment(JLabel.CENTER);
             statusLabel.setBorder(new Border() {
                 public boolean isBorderOpaque() {
@@ -888,9 +888,9 @@ public class CodeViewer extends JPanel {
                 prevButton.setBounds(insets.left, insets.top,
                         buttonSize.width, size.height - insets.top - insets.bottom);
 
-                statusLabel.setBounds(insets.left + buttonSize.width - overlap,
+                statusLabel.setBounds(insets.left + buttonSize.width - OVERLAP,
                         insets.top,
-                        labelSize.width + (2 * overlap), size.height - insets.top - insets.bottom);
+                        labelSize.width + (2 * OVERLAP), size.height - insets.top - insets.bottom);
                 
                 nextButton.setBounds(size.width - buttonSize.width,
                         insets.top,
@@ -933,14 +933,14 @@ public class CodeViewer extends JPanel {
             if (prevButton != null) {
                 Color arrowColor = UIManager.getColor("Label.foreground");
                 Color inactiveColor = UIManager.getColor("Label.disabledText");
-                Dimension buttonSize = new Dimension(arrowSize + 12 + overlap, 
-                                                     arrowSize + 12 + overlap);
+                Dimension buttonSize = new Dimension(ARROW_SIZE + 12 + OVERLAP, 
+                                                     ARROW_SIZE + 12 + OVERLAP);
                 
-                prevButton.setIcon(new ArrowIcon(ArrowIcon.WEST, arrowSize, arrowColor));
-                prevButton.setDisabledIcon(new ArrowIcon(ArrowIcon.WEST, arrowSize, inactiveColor));
+                prevButton.setIcon(new ArrowIcon(ArrowIcon.WEST, ARROW_SIZE, arrowColor));
+                prevButton.setDisabledIcon(new ArrowIcon(ArrowIcon.WEST, ARROW_SIZE, inactiveColor));
                 prevButton.setPreferredSize(buttonSize);
-                nextButton.setIcon(new ArrowIcon(ArrowIcon.EAST, arrowSize, arrowColor));
-                nextButton.setDisabledIcon(new ArrowIcon(ArrowIcon.EAST, arrowSize, inactiveColor));
+                nextButton.setIcon(new ArrowIcon(ArrowIcon.EAST, ARROW_SIZE, arrowColor));
+                nextButton.setDisabledIcon(new ArrowIcon(ArrowIcon.EAST, ARROW_SIZE, inactiveColor));
                 nextButton.setPreferredSize(buttonSize);
                 
                 statusLabel.setOpaque(true);
@@ -978,7 +978,7 @@ public class CodeViewer extends JPanel {
             private void setComponentState(String currentKey) {
                 
                 if (currentKey == null) {
-                    statusLabel.setText(NO_SNIPPET);
+                    statusLabel.setText(noSnippet);
                     
                 } else {
                     
@@ -1003,13 +1003,13 @@ public class CodeViewer extends JPanel {
     private static class CodeFileInfo {
         public URL url;
         public String styled;
-        public HashMap<String,ArrayList<Snippet>> snippets = new HashMap<String,ArrayList<Snippet>>();
+        public HashMap<String, List<Snippet>> snippets = new HashMap<String, List<Snippet>>();
         public JEditorPane textPane;
         public JPanel veneer;
     }
     
     private static class Stacker extends JLayeredPane {
-        Component master; // dictates sizing, scrolling
+        private Component master; // dictates sizing, scrolling
         
         public Stacker(Component master) {
             this.master = master;
@@ -1048,7 +1048,7 @@ public class CodeViewer extends JPanel {
                 // Count total number of snippets for key
                 int snippetTotal = 0;
                 int snippetIndex = 0;
-                ArrayList<Snippet> snippetList = null;
+                List<Snippet> snippetList = null;
                 URL files[] = snippetMap.getFilesForSet(snippetKey);               
                 for(URL file : files) {
                     CodeFileInfo codeFileInfo = codeCache.get(file);

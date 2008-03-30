@@ -40,10 +40,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -61,7 +58,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.LookAndFeel;
 import javax.swing.RowFilter;
-import javax.swing.RowFilter.Entry;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -99,7 +95,7 @@ public class DefaultsDisplay extends JPanel {
     private String OSXLookAndFeelName; // hack for look-and-feel name mismatch on OS X
     
     private Map<String,String> lookAndFeelsMap; 
-    private Map<String,JComponent> defaultsTablesMap;
+    private final Map<String,JComponent> defaultsTablesMap;
     
     private JComboBox lookAndFeelComboBox;
     private JCheckBox onlyVisualsCheckBox;
@@ -110,7 +106,7 @@ public class DefaultsDisplay extends JPanel {
     
     /** Creates a new instance of DefaultsDisplayer */
     public DefaultsDisplay() {
-        defaultsTablesMap = new HashMap();    
+        defaultsTablesMap = new HashMap<String,JComponent>();    
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             if (System.getProperty("os.name").equals("Mac OS X")) {
@@ -145,7 +141,7 @@ public class DefaultsDisplay extends JPanel {
         
         // Look for toolkit look and feels first
         UIManager.LookAndFeelInfo lookAndFeelInfos[] = UIManager.getInstalledLookAndFeels();
-        lookAndFeelsMap = new HashMap();
+        lookAndFeelsMap = new HashMap<String,String>();
         for(UIManager.LookAndFeelInfo info : lookAndFeelInfos) {
             String name = info.getName();
             // workaround for problem where Info and name property don't match on OS X
@@ -254,13 +250,10 @@ public class DefaultsDisplay extends JPanel {
                     UIDefaultsTableModel model = entry.getModel();
                     Object defaultsValue = model.getValueAt(entry.getIdentifier().intValue(),
                             UIDefaultsTableModel.VALUE_COLUMN);
-                    
-                    if (defaultsValue instanceof Color ||
+
+                    return defaultsValue instanceof Color ||
                             defaultsValue instanceof Font ||
-                            defaultsValue instanceof Icon) {
-                        return true;
-                    }
-                    return false;
+                            defaultsValue instanceof Icon;
                 }
             };
         }
@@ -270,7 +263,7 @@ public class DefaultsDisplay extends JPanel {
         }
     }
     
-    protected class ChangeLookAndFeelAction extends AbstractAction {
+    private class ChangeLookAndFeelAction extends AbstractAction {
         
         public ChangeLookAndFeelAction() {
             super("Change LookAndFeel");
@@ -292,18 +285,18 @@ public class DefaultsDisplay extends JPanel {
         }
     }
     
-    protected class UIDefaultsTableModel extends AbstractTableModel {
+    private static class UIDefaultsTableModel extends AbstractTableModel {
         private static final int KEY_COLUMN = 0;
         private static final int TYPE_COLUMN = 1;
         private static final int VALUE_COLUMN = 2;
         
         private UIDefaults defaults;
-        private ArrayList keys;;
+        private List<Object> keys;
         
         public UIDefaultsTableModel() {
             // make a local copy of the defaults table in case the look and feel changes
             defaults = new UIDefaults();
-            keys = new ArrayList();
+            keys = new ArrayList<Object>();
             UIDefaults realDefaults = UIManager.getDefaults();
             Enumeration keysEnum = realDefaults.keys();
             while (keysEnum.hasMoreElements()) {
@@ -365,9 +358,9 @@ public class DefaultsDisplay extends JPanel {
         
     }
     
-    public class RowRenderer extends JLabel implements TableCellRenderer {
-        protected Color rowColors[];
-        protected Border noFocusBorder = new EmptyBorder(1, 1, 1, 1); 
+    private static class RowRenderer extends JLabel implements TableCellRenderer {
+        private final Color[] rowColors;
+        private final Border noFocusBorder = new EmptyBorder(1, 1, 1, 1); 
         
         public RowRenderer(Color colors[]) {
             rowColors = colors;
@@ -411,7 +404,7 @@ public class DefaultsDisplay extends JPanel {
         }
     }
     
-    public class KeyRenderer extends RowRenderer {
+    private static class KeyRenderer extends RowRenderer {
         
         public KeyRenderer(Color colors[]) {
             super(colors);
@@ -419,11 +412,11 @@ public class DefaultsDisplay extends JPanel {
         }
     } 
     
-    public class ValueRenderer extends RowRenderer {
-        private JButton buttonIconRenderer;
-        private JRadioButton radioIconRenderer;
-        private JMenuItem menuItemIconRenderer;
-        private JCheckBox checkboxIconRenderer;
+    private static class ValueRenderer extends RowRenderer {
+        private final JButton buttonIconRenderer;
+        private final JRadioButton radioIconRenderer;
+        private final JMenuItem menuItemIconRenderer;
+        private final JCheckBox checkboxIconRenderer;
         
         public ValueRenderer(Color colors[]) {
             super(colors);
@@ -536,7 +529,7 @@ public class DefaultsDisplay extends JPanel {
         
         public static ColorIcon getIcon(Color color) {
             if (icons == null) {
-                icons = new HashMap();
+                icons = new HashMap<Color,ColorIcon>();
             }
             ColorIcon icon = icons.get(color);
             if (icon == null) {

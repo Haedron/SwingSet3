@@ -47,15 +47,15 @@ import java.awt.image.BufferedImage;
  * @author Administrator
  */
 public class RoundedTitleBorder extends RoundedBorder {
-    private String title;
-    private Color titleGradientColors[];
+    private final String title;
+    private final Color[] titleGradientColors;
   
     public RoundedTitleBorder(String title, Color titleGradientColor1, Color titleGradientColor2) {
         super(10);
         this.title = title;
         this.titleGradientColors = new Color[2];
         this.titleGradientColors[0] = titleGradientColor1;
-        this.titleGradientColors[1] = titleGradientColor2;               ;
+        this.titleGradientColors[1] = titleGradientColor2;
     }    
 
     public Insets getBorderInsets(Component c, Insets insets) {

@@ -61,7 +61,7 @@ public class Utilities {
         return path.substring(path.lastIndexOf("/") + 1);
     }
     
-    public static BufferedImage createCompatibleImage(int width, int height) {
+    private static BufferedImage createCompatibleImage(int width, int height) {
         
         return GraphicsEnvironment.getLocalGraphicsEnvironment().
                     getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height);

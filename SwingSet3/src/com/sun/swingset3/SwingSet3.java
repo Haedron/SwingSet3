@@ -31,10 +31,6 @@
 
 package com.sun.swingset3;
 
-import com.sun.swingset3.DemoSelectorPanel;
-import com.sun.swingset3.DemoPanel;
-import com.sun.swingset3.DemoList;
-import com.sun.swingset3.Demo;
 import com.sun.swingset3.utilities.AnimatingSplitPane;
 import com.sun.swingset3.utilities.Utilities;
 import org.jdesktop.application.Action;
@@ -49,7 +45,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
@@ -93,7 +88,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import com.sun.swingset3.codeview.CodeViewer;
@@ -107,33 +101,32 @@ import com.sun.swingset3.utilities.RoundedPanel;
 public class SwingSet3 extends SingleFrameApplication  {
     static final Logger logger = Logger.getLogger(SwingSet3.class.getName());
     
-    private static ServiceLoader<LookAndFeel> lookAndFeelLoader = ServiceLoader.load(LookAndFeel.class); 
-    private static ServiceLoader<DemoList> demoListLoader = ServiceLoader.load(DemoList.class);
+    private static final ServiceLoader<LookAndFeel> LOOK_AND_FEEL_LOADER = ServiceLoader.load(LookAndFeel.class); 
+    private static final ServiceLoader<DemoList> DEMO_LIST_LOADER = ServiceLoader.load(DemoList.class);
     
     public static String title;
 
-    public static final String controlVeryLightShadowKey = "controlVeryLightShadowColor";
-    public static final String controlLightShadowKey = "controlLightShadowColor";
-    public static final String controlMidShadowKey = "controlMidShadowColor";
-    public static final String controlVeryDarkShadowKey = "controlVeryDarkShadowColor";
-    public static final String controlDarkShadowKey = "controlDarkShadowColor";
-    public static final String titleGradientColor1Key = "titleGradientColor1";
-    public static final String titleGradientColor2Key = "titleGradientColor2";
-    public static final String titleForegroundKey = "titleForegroundColor";
-    public static final String codeHighlightKey = "codeHighlightColor";
-    public static final String titleFontKey = "titleFont";
-    public static final String subPanelBackgroundKey = "subPanelBackgroundColor";
+    public static final String CONTROL_VERY_LIGHT_SHADOW_KEY = "controlVeryLightShadowColor";
+    public static final String CONTROL_LIGHT_SHADOW_KEY = "controlLightShadowColor";
+    public static final String CONTROL_MID_SHADOW_KEY = "controlMidShadowColor";
+    public static final String CONTROL_VERY_DARK_SHADOW_KEY = "controlVeryDarkShadowColor";
+    public static final String CONTROL_DARK_SHADOW_KEY = "controlDarkShadowColor";
+    public static final String TITLE_GRADIENT_COLOR1_KEY = "titleGradientColor1";
+    public static final String TITLE_GRADIENT_COLOR2_KEY = "titleGradientColor2";
+    public static final String TITLE_FOREGROUND_KEY = "titleForegroundColor";
+    public static final String CODE_HIGHLIGHT_KEY = "codeHighlightColor";
+    public static final String TITLE_FONT_KEY = "titleFont";
+    public static final String SUB_PANEL_BACKGROUND_KEY = "subPanelBackgroundColor";
 
-    public static final int mainFrameWidth = 880;
-    public static final int mainFrameHeight = 640;
-    public static final int demoSelectorWidth = 200;
-    public static final int demoPanelHeight = 400;
-    public static final int demoPanelWidth = mainFrameWidth - demoSelectorWidth;
+    public static final int MAIN_FRAME_WIDTH = 880;
+    public static final int MAIN_FRAME_HEIGHT = 640;
+    public static final int DEMO_SELECTOR_WIDTH = 200;
+    public static final int DEMO_PANEL_HEIGHT = 400;
+    public static final int DEMO_PANEL_WIDTH = MAIN_FRAME_WIDTH - DEMO_SELECTOR_WIDTH;
 
-    public static final Insets sourcePaneInsets = new Insets(4,8,8,8);   
-    public static final Border emptyBorder = new EmptyBorder(0,0,0,0);
-    public static final Border panelBorder = new EmptyBorder(10,10,10,10);
-        
+    public static final Border EMPTY_BORDER = new EmptyBorder(0, 0, 0, 0);
+    public static final Border PANEL_BORDER = new EmptyBorder(10, 10, 10, 10);
+
     static {
         // Property must be set *early* due to Apple Bug#3909714
         if (System.getProperty("os.name").equals("Mac OS X")) {
@@ -258,8 +251,8 @@ public class SwingSet3 extends SingleFrameApplication  {
         if (userDemoList.isEmpty() || augment) {
             // Use ServiceLoader to find all DemoList implementations that may exist
             // within jar files supplied to swingset3
-            demoListLoader.iterator();
-            for(DemoList list: demoListLoader) {
+            DEMO_LIST_LOADER.iterator();
+            for(DemoList list: DEMO_LIST_LOADER) {
                 demoList.addAll(list.getDemoClassNames());
             }
         }
@@ -340,37 +333,37 @@ public class SwingSet3 extends SingleFrameApplication  {
         // Color palette algorithm courtesy of Jasper Potts
         Color controlColor = UIManager.getColor("control");
         
-	UIManager.put(controlVeryLightShadowKey, 
+	UIManager.put(CONTROL_VERY_LIGHT_SHADOW_KEY, 
                 Utilities.deriveColorHSB(controlColor, 0, 0, -0.02f));
-        UIManager.put(controlLightShadowKey, 
+        UIManager.put(CONTROL_LIGHT_SHADOW_KEY, 
                 Utilities.deriveColorHSB(controlColor, 0, 0, -0.06f));
-        UIManager.put(controlMidShadowKey, 
+        UIManager.put(CONTROL_MID_SHADOW_KEY, 
                 Utilities.deriveColorHSB(controlColor, 0, 0, -0.16f));
-        UIManager.put(controlVeryDarkShadowKey, 
+        UIManager.put(CONTROL_VERY_DARK_SHADOW_KEY, 
                 Utilities.deriveColorHSB(controlColor, 0, 0, -0.5f));
-        UIManager.put(controlDarkShadowKey, 
+        UIManager.put(CONTROL_DARK_SHADOW_KEY, 
                 Utilities.deriveColorHSB(controlColor, 0, 0, -0.32f));
         
         // Calculate gradient colors for title panels
         Color titleColor = UIManager.getColor(usingNimbus()? "nimbusBase" : "activeCaption");        
         float hsb[] = Color.RGBtoHSB(
                 titleColor.getRed(), titleColor.getGreen(), titleColor.getBlue(), null);
-        UIManager.put(titleGradientColor1Key, 
+        UIManager.put(TITLE_GRADIENT_COLOR1_KEY, 
                 Color.getHSBColor(hsb[0]-.013f, .15f, .85f));
-        UIManager.put(titleGradientColor2Key, 
+        UIManager.put(TITLE_GRADIENT_COLOR2_KEY, 
                 Color.getHSBColor(hsb[0]-.005f, .24f, .80f));
-        UIManager.put(titleForegroundKey, 
+        UIManager.put(TITLE_FOREGROUND_KEY, 
                 Color.getHSBColor(hsb[0], .54f, .40f));
         
         // Calculate highlight color for code pane
-        UIManager.put(codeHighlightKey,
+        UIManager.put(CODE_HIGHLIGHT_KEY,
                 Color.getHSBColor(hsb[0]-.005f, .20f, .95f));
        
         Font labelFont = UIManager.getFont("Label.font");
-        UIManager.put(titleFontKey, labelFont.deriveFont(Font.BOLD, labelFont.getSize()+4f));        
+        UIManager.put(TITLE_FONT_KEY, labelFont.deriveFont(Font.BOLD, labelFont.getSize()+4f));        
  
         Color panelColor = UIManager.getColor("Panel.background");
-        UIManager.put(subPanelBackgroundKey, 
+        UIManager.put(SUB_PANEL_BACKGROUND_KEY, 
                 Utilities.deriveColorHSB(panelColor, 0, 0, -.06f));
         
         applyDefaults();
@@ -379,7 +372,7 @@ public class SwingSet3 extends SingleFrameApplication  {
     
     protected void applyDefaults() {
         if (codeViewer != null) {
-            codeViewer.setHighlightColor(UIManager.getColor(codeHighlightKey));
+            codeViewer.setHighlightColor(UIManager.getColor(CODE_HIGHLIGHT_KEY));
         }        
     }
     
@@ -391,21 +384,21 @@ public class SwingSet3 extends SingleFrameApplication  {
        
         // Create demo selector panel on left
         demoSelectorPanel = new DemoSelectorPanel(demoListTitle, demoList);
-        demoSelectorPanel.setPreferredSize(new Dimension(demoSelectorWidth, mainFrameHeight));
+        demoSelectorPanel.setPreferredSize(new Dimension(DEMO_SELECTOR_WIDTH, MAIN_FRAME_HEIGHT));
         demoSelectorPanel.addPropertyChangeListener(new DemoSelectionListener());
         mainPanel.add(demoSelectorPanel, BorderLayout.WEST);
         
         // Create splitpane on right to hold demo and source code
         demoSplitPane = new AnimatingSplitPane(JSplitPane.VERTICAL_SPLIT);
         //demoSplitPane.setDividerLocation(.66f);
-        demoSplitPane.setBorder(emptyBorder);
+        demoSplitPane.setBorder(EMPTY_BORDER);
         mainPanel.add(demoSplitPane, BorderLayout.CENTER);
         
         // Create panel to contain currently running demo
         demoContainer = new JPanel();
         demoContainer.setLayout(new BorderLayout());
-        demoContainer.setBorder(panelBorder);
-        demoContainer.setPreferredSize(new Dimension(demoPanelWidth, demoPanelHeight));
+        demoContainer.setBorder(PANEL_BORDER);
+        demoContainer.setPreferredSize(new Dimension(DEMO_PANEL_WIDTH, DEMO_PANEL_HEIGHT));
         demoSplitPane.setTopComponent(demoContainer);
 
         currentDemoPanel = demoPlaceholder;
@@ -416,7 +409,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         codeViewer = new CodeViewer();
         codeContainer = new JPanel(new BorderLayout());
         codeContainer.add(codeViewer);
-        codeContainer.setBorder(panelBorder);
+        codeContainer.setBorder(PANEL_BORDER);
         demoSplitPane.setBottomComponent(codeContainer);
         
         addPropertyChangeListener(new SwingSetPropertyListener());        
@@ -475,8 +468,8 @@ public class SwingSet3 extends SingleFrameApplication  {
             menu.add(createLookAndFeelItem(lafInfo.getName(), lafInfo.getClassName()));
         }  
         // Now load any look and feels defined externally as service via java.util.ServiceLoader
-        lookAndFeelLoader.iterator();
-        for (LookAndFeel laf : lookAndFeelLoader) {           
+        LOOK_AND_FEEL_LOADER.iterator();
+        for (LookAndFeel laf : LOOK_AND_FEEL_LOADER) {           
             menu.add(createLookAndFeelItem(laf.getName(), laf.getClass().getName()));
         }
          
@@ -521,7 +514,7 @@ public class SwingSet3 extends SingleFrameApplication  {
                     Utilities.deriveColorHSB(UIManager.getColor("Panel.background"),
                     0, 0, -.2f));
             JScrollPane scrollpane = new JScrollPane(exceptionText);
-            scrollpane.setBorder(emptyBorder);
+            scrollpane.setBorder(EMPTY_BORDER);
             scrollpane.setPreferredSize(new Dimension(600,240));
             panel.add(scrollpane);
             messagePanel.add(panel, BorderLayout.SOUTH);            
@@ -743,7 +736,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         }
     }
     
-    public static class EditPropertiesAction extends AbstractAction {
+    private static class EditPropertiesAction extends AbstractAction {
         public EditPropertiesAction() {
             super("Edit Properties");
         }

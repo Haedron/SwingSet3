@@ -84,7 +84,7 @@ public class AnimatingSplitPane extends JSplitPane {
         super.setDividerLocation(dividerLocation);
     }
     
-    public static class NakedSplitPaneUI extends BasicSplitPaneUI {
+    private static class NakedSplitPaneUI extends BasicSplitPaneUI {
 
         @Override
         public BasicSplitPaneDivider createDefaultDivider() {

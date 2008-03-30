@@ -36,7 +36,7 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
@@ -73,7 +73,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
         // PENDING(prinz) - should cull ranges not visible
         int len = highlights.size();
         for (int i = 0; i < len; i++) {
-	    HighlightInfo info = (HighlightInfo) highlights.elementAt(i);
+	    HighlightInfo info = highlights.elementAt(i);
 	    if (!(info instanceof LayeredHighlightInfo)) {
 		// Avoid allocing unless we need it.
 		Rectangle a = component.getBounds();
@@ -83,7 +83,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
 		a.width -= insets.left + insets.right;
 		a.height -= insets.top + insets.bottom;
 		for (; i < len; i++) {
-		    info = (HighlightInfo)highlights.elementAt(i);
+		    info = highlights.elementAt(i);
 		    if (!(info instanceof LayeredHighlightInfo)) {
 			Highlighter.HighlightPainter p = info.getPainter();
 			p.paint(g, info.getStartOffset(), info.getEndOffset(),
@@ -179,7 +179,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
 		int p0 = -1;
 		int p1 = -1;
 		for (int i = 0; i < len; i++) {
-                    HighlightInfo hi = (HighlightInfo)highlights.elementAt(i);
+                    HighlightInfo hi = highlights.elementAt(i);
                     if (hi instanceof LayeredHighlightInfo) {
                         LayeredHighlightInfo info = (LayeredHighlightInfo)hi;
                         minX = Math.min(minX, info.x);
@@ -215,7 +215,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
 		int p0 = Integer.MAX_VALUE;
 		int p1 = 0;
 		for (int i = 0; i < len; i++) {
-		    HighlightInfo info = (HighlightInfo) highlights.elementAt(i);
+		    HighlightInfo info = highlights.elementAt(i);
 		    p0 = Math.min(p0, info.p0.getOffset());
 		    p1 = Math.max(p1, info.p1.getOffset());
 		}
@@ -353,10 +353,10 @@ public class SnippetHighlighter extends LayeredHighlighter {
     
     private final static Highlighter.Highlight[] noHighlights =
             new Highlighter.Highlight[0];
-    private Vector highlights = new Vector();  // Vector<HighlightInfo>
+    private final Vector<HighlightInfo> highlights = new Vector<HighlightInfo>();
     private JTextComponent component;
     private boolean drawsLayeredHighlights;
-    private SafeDamager safeDamager = new SafeDamager();
+    private final SafeDamager safeDamager = new SafeDamager();
 
 
     /**
@@ -510,7 +510,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
     }
 
 
-    class HighlightInfo implements Highlighter.Highlight {
+    private static class HighlightInfo implements Highlighter.Highlight {
 
 	public int getStartOffset() {
 	    return p0.getOffset();
@@ -534,7 +534,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
      * LayeredHighlightPainter is used when a drawsLayeredHighlights is
      * true. It maintains a rectangle of the region to paint.
      */
-    class LayeredHighlightInfo extends HighlightInfo {
+    private static class LayeredHighlightInfo extends HighlightInfo {
 
 	void union(Shape bounds) {
 	    if (bounds == null)
@@ -596,8 +596,8 @@ public class SnippetHighlighter extends LayeredHighlighter {
      * call.
      */
     class SafeDamager implements Runnable {
-        private Vector p0 = new Vector(10);
-        private Vector p1 = new Vector(10);
+        private final List<Position> p0 = new ArrayList<Position>();
+        private final List<Position> p1 = new ArrayList<Position>();
         private Document lastDoc = null;
 
         /**
@@ -612,8 +612,8 @@ public class SnippetHighlighter extends LayeredHighlighter {
                     int len = p0.size();
                     for (int i = 0; i < len; i++){
                         mapper.damageRange(component,
-                                ((Position)p0.get(i)).getOffset(),
-                                ((Position)p1.get(i)).getOffset());
+                                p0.get(i).getOffset(),
+                                p1.get(i).getOffset());
                     }
                 }
             }
@@ -634,7 +634,7 @@ public class SnippetHighlighter extends LayeredHighlighter {
          * component is null. In this case it removes all ranges added
          * before from range queue.
          */
-        public synchronized void damageRange(Position pos0, Position pos1) {
+        private synchronized void damageRange(Position pos0, Position pos1) {
             if (component == null) {
                 p0.clear();
                 lastDoc = null;

@@ -71,8 +71,6 @@ import com.sun.swingset3.utilities.Utilities;
  * @author Administrator
  */
 public class DemoSelectorPanel extends JPanel {    
-    private static final Border emptyBorder = new EmptyBorder(0,0,0,0);
-    
     private static final Border chiselBorder = new ChiselBorder();
     private static final Border panelBorder = new CompoundBorder(
             chiselBorder, new EmptyBorder(6,8,6,0));
@@ -85,14 +83,15 @@ public class DemoSelectorPanel extends JPanel {
     private JLabel demoListLabel;
     private JPanel viewPanel;
     private JScrollPane scrollPane;
-    private List<CollapsiblePanel> collapsePanels;
+    // need to track components that have defaults customizations
+    private final List<CollapsiblePanel> collapsePanels = new ArrayList<CollapsiblePanel>();
     private Icon expandedIcon;
     private Icon collapsedIcon;
     private Color visitedForeground;
     private Color failedForeground;
        
     private ButtonGroup group;
-    private ActionListener demoActionListener = new DemoActionListener();
+    private final ActionListener demoActionListener = new DemoActionListener();
     private int buttonHeight = 0;
     
     private Demo selectedDemo;
@@ -106,9 +105,6 @@ public class DemoSelectorPanel extends JPanel {
         // only one demo may be selected at a time
         group = new ButtonGroup();
         
-        // need to track components that have defaults customizations
-        collapsePanels = new ArrayList();
-       
         // create demo set title area at top
         add(createTitleArea(demoSetTitle), BorderLayout.NORTH);
         
@@ -124,8 +120,8 @@ public class DemoSelectorPanel extends JPanel {
     protected JComponent createTitleArea(String demoSetTitle) {
         JPanel titleAreaPanel = new JPanel(new BorderLayout());
         titlePanel = new GradientPanel(
-                UIManager.getColor(SwingSet3.titleGradientColor1Key),
-                UIManager.getColor(SwingSet3.titleGradientColor2Key));
+                UIManager.getColor(SwingSet3.TITLE_GRADIENT_COLOR1_KEY),
+                UIManager.getColor(SwingSet3.TITLE_GRADIENT_COLOR2_KEY));
         titlePanel.setLayout(new BorderLayout());
         titlePanel.setBorder(panelBorder);
         demoListLabel = new JLabel(demoSetTitle);
@@ -159,13 +155,13 @@ public class DemoSelectorPanel extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
                
-        HashMap<String,JPanel> categoryMap = new HashMap();
+        HashMap<String,JPanel> categoryMap = new HashMap<String,JPanel>();
         GridBagLayout categoryGridbag = null;
         GridBagConstraints cc = new GridBagConstraints();
         cc.gridx = cc.gridy = 0;
         cc.weightx = 1;
         cc.fill = GridBagConstraints.HORIZONTAL;
-        CollapsiblePanel collapsePanel = null;
+        CollapsiblePanel collapsePanel;
         for(Demo demo: demoSet) {
             String category = demo.getCategory();
             JPanel categoryPanel = categoryMap.get(category);
@@ -211,32 +207,32 @@ public class DemoSelectorPanel extends JPanel {
     protected void applyDefaults() {
         
         expandedIcon = new ArrowIcon(ArrowIcon.SOUTH,
-                UIManager.getColor(SwingSet3.titleForegroundKey));
+                UIManager.getColor(SwingSet3.TITLE_FOREGROUND_KEY));
         collapsedIcon = new ArrowIcon(ArrowIcon.EAST,
-                UIManager.getColor(SwingSet3.titleForegroundKey));
+                UIManager.getColor(SwingSet3.TITLE_FOREGROUND_KEY));
         
         setBorder(new MatteBorder(0,0,0,1, 
-                UIManager.getColor(SwingSet3.controlMidShadowKey)));
+                UIManager.getColor(SwingSet3.CONTROL_MID_SHADOW_KEY)));
         
         if (titlePanel != null) {
             titlePanel.setGradientColor1(
-                UIManager.getColor(SwingSet3.titleGradientColor1Key));
+                UIManager.getColor(SwingSet3.TITLE_GRADIENT_COLOR1_KEY));
             titlePanel.setGradientColor2(
-                UIManager.getColor(SwingSet3.titleGradientColor2Key));
+                UIManager.getColor(SwingSet3.TITLE_GRADIENT_COLOR2_KEY));
         }
 
         if (demoListLabel != null) {
-           demoListLabel.setForeground(UIManager.getColor(SwingSet3.titleForegroundKey));
-           demoListLabel.setFont(UIManager.getFont(SwingSet3.titleFontKey));
+           demoListLabel.setForeground(UIManager.getColor(SwingSet3.TITLE_FOREGROUND_KEY));
+           demoListLabel.setFont(UIManager.getFont(SwingSet3.TITLE_FONT_KEY));
         }
         if (viewPanel != null) {
-            viewPanel.setBackground(UIManager.getColor(SwingSet3.subPanelBackgroundKey));
+            viewPanel.setBackground(UIManager.getColor(SwingSet3.SUB_PANEL_BACKGROUND_KEY));
         }        
         if (collapsePanels != null) {
             for (CollapsiblePanel collapsePanel : collapsePanels) {
                 collapsePanel.setFont(
                         UIManager.getFont("CheckBox.font").deriveFont(Font.BOLD));
-                collapsePanel.setForeground(UIManager.getColor(SwingSet3.titleForegroundKey));
+                collapsePanel.setForeground(UIManager.getColor(SwingSet3.TITLE_FOREGROUND_KEY));
                 collapsePanel.setExpandedIcon(expandedIcon);
                 collapsePanel.setCollapsedIcon(collapsedIcon);
             }
@@ -254,7 +250,7 @@ public class DemoSelectorPanel extends JPanel {
         firePropertyChange("selectedDemo", oldSelectedDemo, demo);
     }
     
-    protected class DemoButton extends JToggleButton {
+    private class DemoButton extends JToggleButton {
         private Demo demo;
         
         public DemoButton(Demo demo) {
@@ -322,7 +318,7 @@ public class DemoSelectorPanel extends JPanel {
         }
     }
     
-    protected static class DemoButtonBorder implements Border {
+    private static class DemoButtonBorder implements Border {
         private Insets insets = new Insets(2, 1, 1, 1);
         
         public DemoButtonBorder() {            
@@ -349,7 +345,7 @@ public class DemoSelectorPanel extends JPanel {
         }
     }
     
-    protected static class ChiselBorder implements Border {
+    private static class ChiselBorder implements Border {
         private Insets insets = new Insets(1, 0, 1, 0);
         
         public ChiselBorder() {            

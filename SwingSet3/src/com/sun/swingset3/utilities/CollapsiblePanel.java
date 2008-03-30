@@ -56,13 +56,13 @@ import org.jdesktop.animation.timing.interpolation.PropertySetter;
 public class CollapsiblePanel extends JPanel {
     public enum Orientation { HORIZONTAL, VERTICAL }
       
-    protected JPanel panel;
-    protected JComponent child;
+    private JPanel panel;
+    private JComponent child;
     
-    protected JCheckBox expandCheckBox; // may be null, if no title was supplied
-    protected Orientation orientation = Orientation.VERTICAL;
-    protected Dimension childPrefSize;    
-    protected boolean expanded = true;
+    private JCheckBox expandCheckBox; // may be null, if no title was supplied
+    private Orientation orientation = Orientation.VERTICAL;
+    private Dimension childPrefSize;    
+    private boolean expanded = true;
     
     public CollapsiblePanel(JComponent child) {
         this(child, Orientation.VERTICAL);

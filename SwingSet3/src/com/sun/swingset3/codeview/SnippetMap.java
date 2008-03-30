@@ -31,13 +31,10 @@
 
 package com.sun.swingset3.codeview;
 
-import com.sun.swingset3.codeview.Snippet;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Data structure to support maintaining Snippet information across a 
@@ -65,10 +62,10 @@ import java.util.Set;
  * @author aim
  */
 public class SnippetMap {
-    private HashMap <String,ArrayList>snippetSets = new HashMap();    
+    private final HashMap<String, List<FileSnippets>> snippetSets = new HashMap<String, List<FileSnippets>>();    
     
     private String currentKey;
-    private ArrayList<FileSnippets> currentSet;
+    private List<FileSnippets> currentSet;
     private FileSnippets currentFileSnippets;
     private int currentFileSnippetsIndex;
     private int currentSnippetIndex;
@@ -86,7 +83,7 @@ public class SnippetMap {
     }
     
     public void add(String key, URL codeFile, Snippet snippet) {
-        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(key);
+        List<FileSnippets> fileSnippetList = snippetSets.get(key);
         if (fileSnippetList == null) {
             // new key! so create new set...
             fileSnippetList = new ArrayList<FileSnippets>();
@@ -105,7 +102,7 @@ public class SnippetMap {
                                 
     }
     
-    public Set keySet() {
+    public Set<String> keySet() {
         return snippetSets.keySet();
     }
     
@@ -120,8 +117,8 @@ public class SnippetMap {
     }
     
     public URL[] getFilesForSet(String key) {
-        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(key);
-        URL files[] = null;
+        List<FileSnippets> fileSnippetList = snippetSets.get(key);
+        URL files[];
         if (fileSnippetList != null) {
             files = new URL[fileSnippetList.size()];
             int i = 0;
@@ -135,18 +132,18 @@ public class SnippetMap {
     }
     
     public Snippet[] getSnippetsForFile(String key, URL file) {
-        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(key);
+        List<FileSnippets> fileSnippetList = snippetSets.get(key);
         FileSnippets fileSnippets = findFileSnippetsForFile(fileSnippetList, file);
         if (fileSnippets != null) {          
             if (fileSnippets.snippets != null) {
-                return (Snippet[])fileSnippets.snippets.toArray(new Snippet[0]);
+                return fileSnippets.snippets.toArray(new Snippet[0]);
             } 
         }
         return new Snippet[0];        
     }
     
     public int getIndexForSnippet(Snippet snippet) {
-        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(snippet.key); 
+        List<FileSnippets> fileSnippetList = snippetSets.get(snippet.key); 
         if (fileSnippetList != null) {
             int index = 1;
             for(FileSnippets fileSnippets : fileSnippetList) {
@@ -163,7 +160,7 @@ public class SnippetMap {
     }
     
     public URL getFileForSnippet(Snippet snippet) {
-        ArrayList<FileSnippets> fileSnippetList = snippetSets.get(snippet.key); 
+        List<FileSnippets> fileSnippetList = snippetSets.get(snippet.key); 
         if (fileSnippetList != null) {
             for(FileSnippets fileSnippets : fileSnippetList) {
                 for(Snippet snippetInFile : fileSnippets.snippets) {
@@ -201,7 +198,7 @@ public class SnippetMap {
             currentFileSnippetsIndex = -1;
             currentSnippetIndex = -1;
         } else {   
-            ArrayList<FileSnippets> fileSnippetList = snippetSets.get(key); 
+            List<FileSnippets> fileSnippetList = snippetSets.get(key); 
             if (fileSnippetList == null) {
                 throw new IllegalArgumentException("snippet key " + key + " does not exist.");
             }
@@ -318,7 +315,7 @@ public class SnippetMap {
         return null;
     }
      
-    private FileSnippets findFileSnippetsForFile(ArrayList<FileSnippets> fileSnippetList, URL file) {
+    private static FileSnippets findFileSnippetsForFile(List<FileSnippets> fileSnippetList, URL file) {
         for(FileSnippets fileSnippets : fileSnippetList) {
             if (fileSnippets.file == file) {
                 return fileSnippets;
@@ -328,10 +325,10 @@ public class SnippetMap {
     }
      
     // data structure for keeping track of a particular snippet set's snippets within one file'
-    private class FileSnippets {
-        public String key;
-        public URL file;
-        public ArrayList<Snippet> snippets;
+    private static class FileSnippets {
+        public final String key;
+        public final URL file;
+        public final ArrayList<Snippet> snippets;
         
         public FileSnippets(String key, URL file) {
             this.key = key;

@@ -43,8 +43,8 @@ import javax.swing.JPanel;
  * @author Aim
  */
 public class GradientPanel extends JPanel {
-    protected Color colors[] = new Color[2];
-    protected Image image; 
+    private final Color[] colors = new Color[2];
+    private Image image; 
     
     public GradientPanel(Color color1, Color color2) {
         super();
@@ -86,7 +86,6 @@ public class GradientPanel extends JPanel {
    
     @Override
     protected void paintComponent(Graphics g) {
-        Dimension size = getSize();
         Image gradientImage = getGradientImage();
         g.drawImage(gradientImage, 0, 0, null);
         super.paintComponent(g);

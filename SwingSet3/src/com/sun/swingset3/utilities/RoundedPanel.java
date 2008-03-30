@@ -48,7 +48,7 @@ import org.jdesktop.swingx.JXPanel;
  * @author Administrator
  */
 public class RoundedPanel extends JXPanel {
-    private int cornerRadius;
+    private final int cornerRadius;
     private boolean contentAreaFilled;
     
     private transient RoundRectangle2D.Float roundBounds;

@@ -87,7 +87,7 @@ public class Demo {
         return convertToDemoName(className);
     }
         
-    protected static String convertToDemoName(String simpleClassName) {
+    private static String convertToDemoName(String simpleClassName) {
         StringBuffer nameBuffer = new StringBuffer();
         if (simpleClassName.endsWith("Demo")) {
             nameBuffer.append(simpleClassName.substring(0, simpleClassName.indexOf("Demo")));
@@ -230,9 +230,7 @@ public class Demo {
             }
             
             // Now get any names registered in DemoProperties meta-data
-            for (String path : sourceFilePaths) {
-                pathNames.add(path);
-            }
+            pathNames.addAll(Arrays.asList(sourceFilePaths));
 
             // Now find all the files
             for (String path : pathNames) {
@@ -312,7 +310,7 @@ public class Demo {
         pcs.removePropertyChangeListener(pcl);
     }
     
-    public void init() {
+    private void init() {
         setState(State.INITIALIZED);
         try {
             Method initMethod = demoClass.getMethod("init", (Class[])null);

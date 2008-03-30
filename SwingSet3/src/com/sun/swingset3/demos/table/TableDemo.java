@@ -510,12 +510,11 @@ public class TableDemo extends JPanel {
     private static class OscarDataLoader extends javax.swing.SwingWorker<List<OscarCandidate>, OscarCandidate> {
         private final URL oscarData;
         private final OscarTableModel oscarModel;
-        private final ArrayList candidates;
+        private final List<OscarCandidate> candidates = new ArrayList<OscarCandidate>();
 
         private OscarDataLoader(URL oscarURL, OscarTableModel oscarTableModel) {
             this.oscarData = oscarURL;
             this.oscarModel = oscarTableModel;
-            this.candidates = new ArrayList<OscarCandidate>();
         }
 
         @Override

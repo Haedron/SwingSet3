@@ -241,7 +241,7 @@ public class CodeStyler {
             return "";
         }
         StringBuffer buf = new StringBuffer();
-        if (line.indexOf("\"") <= -1) {
+        if (!line.contains("\"")) {
             return keywordFilter(line);
         }
         int start = 0;
@@ -330,7 +330,7 @@ public class CodeStyler {
      * ending characters. Not yet used in code or fully working :)
      */
     private static boolean isInsideString(String line, int position) {
-        if (line.indexOf("\"") < 0) {
+        if (!line.contains("\"")) {
             return false;
         }
         int index;

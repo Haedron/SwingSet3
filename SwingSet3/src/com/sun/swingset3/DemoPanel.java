@@ -272,14 +272,14 @@ public class DemoPanel extends JXPanel {
 
         private void applyDefaults() {
             setBorder(new RoundedTitleBorder(demoName,
-                    UIManager.getColor(SwingSet3.titleGradientColor1Key),
-                    UIManager.getColor(SwingSet3.titleGradientColor2Key)));
+                    UIManager.getColor(SwingSet3.TITLE_GRADIENT_COLOR1_KEY),
+                    UIManager.getColor(SwingSet3.TITLE_GRADIENT_COLOR2_KEY)));
 
-            setFont(UIManager.getFont(SwingSet3.titleFontKey));
+            setFont(UIManager.getFont(SwingSet3.TITLE_FONT_KEY));
             Color bg = Utilities.deriveColorHSB(
                     UIManager.getColor("Panel.background"), 0, 0, -.06f);
             setBackground(bg);
-            setForeground(UIManager.getColor(SwingSet3.titleForegroundKey));
+            setForeground(UIManager.getColor(SwingSet3.TITLE_FOREGROUND_KEY));
             if (demoPanel != null) {
                 demoPanel.setBackground(Utilities.deriveColorHSB(bg, 0, 0, .04f));
             }

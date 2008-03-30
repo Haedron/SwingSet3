@@ -102,7 +102,7 @@ public class HTMLPanel extends JEditorPane {
         listenerList.remove(HTMLPanel.ComponentCreationListener.class, l);
     }
 
-    protected class ComponentEditorKit extends HTMLEditorKit {
+    private class ComponentEditorKit extends HTMLEditorKit {
         @Override
         public ViewFactory getViewFactory() {
             return new ComponentFactory();

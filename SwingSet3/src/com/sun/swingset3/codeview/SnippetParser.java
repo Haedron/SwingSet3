@@ -32,9 +32,7 @@
 package com.sun.swingset3.codeview;
 
 import java.text.CharacterIterator;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Stack;
+import java.util.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Segment;
@@ -53,16 +51,16 @@ public class SnippetParser {
         // never instantiate
     }
     
-    public static HashMap<String,ArrayList<Snippet>> parse(Document document) {
+    public static HashMap<String,List<Snippet>> parse(Document document) {
         
         return parse(document, START_MARKER, END_MARKER);
     }
     
-    public static HashMap<String,ArrayList<Snippet>> parse(Document document,
+    private static HashMap<String,List<Snippet>> parse(Document document,
             String startMarker, String endMarker) {
-        HashMap<String,ArrayList<Snippet>> snippetMap = new HashMap();
-        Stack<Snippet> stack = new Stack(); // snippets may be nested
-        char startMarkerChars[] = startMarker.toCharArray();;
+        HashMap<String,List<Snippet>> snippetMap = new HashMap<String,List<Snippet>>();
+        Stack<Snippet> stack = new Stack<Snippet>(); // snippets may be nested
+        char startMarkerChars[] = startMarker.toCharArray();
         char endMarkerChars[] = endMarker.toCharArray();
         int nleft = document.getLength();
         Segment segment = new Segment();
@@ -94,10 +92,10 @@ public class SnippetParser {
                                     snippet.key = keyBuf.toString().trim();
                                 }
                                 snippet.endLine = charCount + 1;
-                                ArrayList snippetList = snippetMap.get(snippet.key);
+                                List<Snippet> snippetList = snippetMap.get(snippet.key);
                                 
                                 if (snippetList == null) {
-                                    snippetList = new ArrayList();
+                                    snippetList = new ArrayList<Snippet>();
                                     snippetMap.put(snippet.key, snippetList);
                                 }
                                 snippetList.add(snippet);                                
