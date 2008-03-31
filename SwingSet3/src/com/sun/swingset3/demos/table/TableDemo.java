@@ -90,8 +90,7 @@ import com.sun.swingset3.demos.DemoUtilities;
         category = "Data",
         description = "Demonstrates use of Swing's data grid component, JTable, including asynchronous loading and sorting/filtering.",
         sourceFiles = {
-                "com/sun/swingset3/demos/DemoUtilities.java",
-                "com/sun/swingset3/demos/JHyperlink.java",
+                "com/sun/swingset3/demos/table/TableDemo.java",
                 "com/sun/swingset3/demos/table/HyperlinkCellRenderer.java",
                 "com/sun/swingset3/demos/table/IMDBLink.java",
                 "com/sun/swingset3/demos/table/Link.java",
@@ -99,7 +98,8 @@ import com.sun.swingset3.demos.DemoUtilities;
                 "com/sun/swingset3/demos/table/OscarCellRenderers.java",
                 "com/sun/swingset3/demos/table/OscarDataParser.java",
                 "com/sun/swingset3/demos/table/OscarTableModel.java",
-                "com/sun/swingset3/demos/table/TableDemo.java",
+                "com/sun/swingset3/demos/DemoUtilities.java",
+                "com/sun/swingset3/demos/JHyperlink.java",
                 "com/sun/swingset3/demos/table/resources/bestpicture",
                 //"com/sun/swingset3/demos/table/resources/oscars.xml", file too large!!
                 "com/sun/swingset3/demos/table/resources/TableDemo.properties",

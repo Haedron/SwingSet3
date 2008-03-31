@@ -57,8 +57,8 @@ import com.sun.swingset3.demos.JHyperlink;
         category = "Controls",
         description = "Demonstrates the many uses of JButton, Swing's push button component.",
         sourceFiles = {
-                "com/sun/swingset3/demos/JHyperlink.java",
                 "com/sun/swingset3/demos/button/ButtonDemo.java",
+                "com/sun/swingset3/demos/JHyperlink.java",
                 "com/sun/swingset3/demos/button/resources/ButtonDemo.html",
                 "com/sun/swingset3/demos/button/resources/images/blogs.png",
                 "com/sun/swingset3/demos/button/resources/images/ButtonDemo.gif",

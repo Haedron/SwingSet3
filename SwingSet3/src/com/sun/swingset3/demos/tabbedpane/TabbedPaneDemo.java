@@ -53,8 +53,8 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Containers",
         description = "Demonstrates JTabbedPane, a container which allows tabbed navigation of components",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java",
                 "com/sun/swingset3/demos/tabbedpane/TabbedPaneDemo.java",
+                "com/sun/swingset3/demos/ResourceManager.java",
                 "com/sun/swingset3/demos/tabbedpane/resources/TabbedPaneDemo.properties",
                 "com/sun/swingset3/demos/tabbedpane/resources/images/blake.gif",
                 "com/sun/swingset3/demos/tabbedpane/resources/images/brooke.gif",

@@ -48,8 +48,8 @@ import com.sun.swingset3.demos.DemoUtilities;
         category = "Toplevel Containers",
         description = "Demonstrates JDialog, Swing's top-level dialog container.",
         sourceFiles = {
-                "com/sun/swingset3/demos/DemoUtilities.java",
                 "com/sun/swingset3/demos/dialog/DialogDemo.java",
+                "com/sun/swingset3/demos/DemoUtilities.java",
                 "com/sun/swingset3/demos/dialog/resources/DialogDemo.html",
                 "com/sun/swingset3/demos/dialog/resources/images/DialogDemo.gif"
                 }

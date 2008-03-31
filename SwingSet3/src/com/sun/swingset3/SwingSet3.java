@@ -251,7 +251,6 @@ public class SwingSet3 extends SingleFrameApplication  {
         if (userDemoList.isEmpty() || augment) {
             // Use ServiceLoader to find all DemoList implementations that may exist
             // within jar files supplied to swingset3
-            DEMO_LIST_LOADER.iterator();
             for(DemoList list: DEMO_LIST_LOADER) {
                 demoList.addAll(list.getDemoClassNames());
             }

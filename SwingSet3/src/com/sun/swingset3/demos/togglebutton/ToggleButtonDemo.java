@@ -55,10 +55,10 @@ import com.sun.swingset3.demos.ResourceManager;
         category = "Controls",
         description = "Demonstrates JCheckBox & JRadioButton",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java",
+                "com/sun/swingset3/demos/togglebutton/ToggleButtonDemo.java",
                 "com/sun/swingset3/demos/togglebutton/DirectionPanel.java",
                 "com/sun/swingset3/demos/togglebutton/LayoutControlPanel.java",
-                "com/sun/swingset3/demos/togglebutton/ToggleButtonDemo.java",
+                "com/sun/swingset3/demos/ResourceManager.java",
                 "com/sun/swingset3/demos/togglebutton/resources/ToggleButtonDemo.properties",
                 "com/sun/swingset3/demos/togglebutton/resources/images/b1.gif",
                 "com/sun/swingset3/demos/togglebutton/resources/images/b1d.gif",

@@ -50,8 +50,8 @@ import com.sun.swingset3.DemoProperties;
         category = "Choosers",
         description = "Demonstrates JOptionPane, a component which displays standard message dialogs (question, warning, error, etc).",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java",
                 "com/sun/swingset3/demos/optionpane/OptionPaneDemo.java",
+                "com/sun/swingset3/demos/ResourceManager.java",
                 "com/sun/swingset3/demos/optionpane/resources/OptionPaneDemo.properties",
                 "com/sun/swingset3/demos/optionpane/resources/images/bottle.gif",
                 "com/sun/swingset3/demos/optionpane/resources/images/OptionPaneDemo.gif"

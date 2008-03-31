@@ -42,14 +42,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -57,17 +54,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
-import com.sun.swingset3.utilities.ArrowIcon;
 import com.sun.swingset3.utilities.RoundedBorder;
 import com.sun.swingset3.utilities.RoundedPanel;
 import com.sun.swingset3.utilities.Utilities;
-import java.awt.Image;
-import javax.swing.border.LineBorder;
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
  * GUI component for viewing a set of one or more Java source code files,
@@ -340,7 +332,8 @@ public class CodeViewer extends JPanel {
             configureSnippetSetsComboBox();
  
         } else {
-            currentCodeFilesInfo = new HashMap<URL, CodeFileInfo>();
+            // Use LinkedHashMap to save source order
+            currentCodeFilesInfo = new LinkedHashMap<URL, CodeFileInfo>();
             additionalSourceFiles = new ArrayList<URL>();
 
             boolean needProcessing = false;
@@ -368,83 +361,87 @@ public class CodeViewer extends JPanel {
                     registerSnippets(codeFileInfo);
                     createCodeFileTab(codeFileInfo);
                 }
+
+                createAdditionalTabs();
                 configureSnippetSetsComboBox();
             }
-
-            JPanel pnImages = null;
-
-            for (URL sourceFile : additionalSourceFiles) {
-                String sourcePath = sourceFile.getPath();
-                
-                int i = sourcePath.indexOf('!');
-                
-                if (i >= 0) {
-                    sourcePath = sourcePath.substring(i + 1);
-                }
-
-                if (sourceFile.getFile().matches(SOURCES_IMAGES)) {
-                    if (pnImages == null) {
-                        pnImages = new JPanel();
-
-                        pnImages.setLayout(new BoxLayout(pnImages, BoxLayout.Y_AXIS));
-                    }
-                    
-                    JLabel label = new JLabel();
-                    
-                    label.setIcon(new ImageIcon(sourceFile));
-                    label.setBorder(new EmptyBorder(10, 0, 40, 0));
-                    
-                    pnImages.add(new JLabel(sourcePath));
-                    pnImages.add(label);
-                }
-                
-                if (sourceFile.getFile().matches(SOURCES_TEXT)) {
-                    BufferedReader reader = null;
-                    
-                    try {
-                        reader = new BufferedReader(new InputStreamReader(sourceFile.openStream()));
-
-                        StringBuilder content = new StringBuilder();
-
-                        String line;
-                        
-                        while ((line = reader.readLine()) != null) {
-                            content.append(line).append('\n');
-                            
-                        }
-
-                        JTextArea textArea = new JTextArea(content.toString());
-                        Font font = textArea.getFont();
-                        textArea.setEditable(false);
-                        textArea.setFont(new Font("Monospaced", font.getStyle(), font.getSize()));
-                        
-                        JScrollPane scrollPane = new JScrollPane(textArea);
-                        scrollPane.setBorder(null);
-                
-                        codeTabbedPane.addTab(Utilities.getURLFileName(sourceFile), scrollPane);
-                    } catch (IOException e) {
-                        System.err.println(e);
-                    } finally {
-                        if (reader != null) {
-                            try {
-                                reader.close();
-                            } catch (IOException e) {
-                                System.err.println(e);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (pnImages != null) {
-                JScrollPane scrollPane = new JScrollPane(pnImages);
-                scrollPane.setBorder(null);
-                
-                codeTabbedPane.addTab(getString("CodeViewer.images", "Images"), scrollPane);
-            }
-        }       
+        }
     }
-    
+
+    private void createAdditionalTabs() {
+        JPanel pnImages = null;
+
+        for (URL sourceFile : additionalSourceFiles) {
+            String sourcePath = sourceFile.getPath();
+
+            int i = sourcePath.indexOf('!');
+
+            if (i >= 0) {
+                sourcePath = sourcePath.substring(i + 1);
+            }
+
+            if (sourceFile.getFile().matches(SOURCES_IMAGES)) {
+                if (pnImages == null) {
+                    pnImages = new JPanel();
+
+                    pnImages.setLayout(new BoxLayout(pnImages, BoxLayout.Y_AXIS));
+                }
+
+                JLabel label = new JLabel();
+
+                label.setIcon(new ImageIcon(sourceFile));
+                label.setBorder(new EmptyBorder(10, 0, 40, 0));
+
+                pnImages.add(new JLabel(sourcePath));
+                pnImages.add(label);
+            }
+
+            if (sourceFile.getFile().matches(SOURCES_TEXT)) {
+                BufferedReader reader = null;
+
+                try {
+                    reader = new BufferedReader(new InputStreamReader(sourceFile.openStream()));
+
+                    StringBuilder content = new StringBuilder();
+
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        content.append(line).append('\n');
+
+                    }
+
+                    JTextArea textArea = new JTextArea(content.toString());
+                    Font font = textArea.getFont();
+                    textArea.setEditable(false);
+                    textArea.setFont(new Font("Monospaced", font.getStyle(), font.getSize()));
+
+                    JScrollPane scrollPane = new JScrollPane(textArea);
+                    scrollPane.setBorder(null);
+
+                    codeTabbedPane.addTab(Utilities.getURLFileName(sourceFile), scrollPane);
+                } catch (IOException e) {
+                    System.err.println(e);
+                } finally {
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch (IOException e) {
+                            System.err.println(e);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (pnImages != null) {
+            JScrollPane scrollPane = new JScrollPane(pnImages);
+            scrollPane.setBorder(null);
+
+            codeTabbedPane.addTab(getString("CodeViewer.images", "Images"), scrollPane);
+        }
+    }
+
     private class SourceProcessor extends SwingWorker<Void, CodeFileInfo> {
         private final Map<URL, CodeFileInfo> codeFilesInfo;
 
@@ -458,40 +455,13 @@ public class CodeViewer extends JPanel {
                 if (entry.getValue() == null) {
                     entry.setValue(initializeCodeFileInfo(entry.getKey()));
                 }
-                publish(entry.getValue());
+                
+                // We don't publish intermediate to avoid tab mixing 
+                codeCache.put(entry.getKey(), entry.getValue());
             }
             
             return null;
         }
-        
-        // old signature, needed until OS X migrates to newer process() signature
-        protected void process(CodeFileInfo... codeFileInfoSet) {
-            for (CodeFileInfo codeFileInfo : codeFileInfoSet) {
-                processOneFile(codeFileInfo);
-            }
-        }
-        // updated signature
-        protected void process(List<CodeFileInfo> codeFileInfoList) {
-            for (CodeFileInfo codeFileInfo : codeFileInfoList) {
-                processOneFile(codeFileInfo);
-            }
-        }
-
-        private void processOneFile(CodeFileInfo codeFileInfo) {
-            // Store code info no matter what
-            codeCache.put(codeFileInfo.url, codeFileInfo);
-
-            // It's possible that by now another set of source files has been loaded.
-            // so check first before adding the source tab;'
-            if (currentCodeFilesInfo == codeFilesInfo) {
-                registerSnippets(codeFileInfo);
-                createCodeFileTab(codeFileInfo);
-            } else {
-                logger.log(Level.FINEST, "source files changed before " +
-                        Utilities.getURLFileName(codeFileInfo.url) + "was processed.");
-            }
-
-        } // processOneFile
         
         private CodeFileInfo initializeCodeFileInfo(URL sourceFile) {
             CodeFileInfo codeFileInfo = new CodeFileInfo();
@@ -516,7 +486,18 @@ public class CodeViewer extends JPanel {
 
         protected void done() {
             try {
-                get();
+                // It's possible that by now another set of source files has been loaded.
+                // so check first before adding the source tab;'
+                if (currentCodeFilesInfo == codeFilesInfo) {
+                    for (CodeFileInfo codeFileInfo : currentCodeFilesInfo.values()) {
+                        registerSnippets(codeFileInfo);
+                        createCodeFileTab(codeFileInfo);
+                    }
+                } else {
+                    logger.log(Level.FINEST, "source files changed before sources was processed.");
+                }
+
+                createAdditionalTabs();
                 configureSnippetSetsComboBox();
             } catch (Exception ex) {
                 System.err.println(ex);

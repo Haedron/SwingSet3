@@ -54,8 +54,8 @@ import com.sun.swingset3.DemoProperties;
         category = "Controls",
         description = "Demonstrates JComboBox, a control which allows the user to make a selection from a popup list",
         sourceFiles = {
-                "com/sun/swingset3/demos/ResourceManager.java",
                 "com/sun/swingset3/demos/combobox/ComboBoxDemo.java",
+                "com/sun/swingset3/demos/ResourceManager.java",
                 "com/sun/swingset3/demos/combobox/resources/ComboBoxDemo.properties",
                 "com/sun/swingset3/demos/combobox/resources/images/brenteyes.jpg",
                 "com/sun/swingset3/demos/combobox/resources/images/brenthair.jpg",
