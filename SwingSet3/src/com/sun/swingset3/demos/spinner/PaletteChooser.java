@@ -40,7 +40,7 @@ import com.sun.swingset3.demos.ResourceManager;
 /**
  * @author Mikhail Lapshin
  */
-public class CosinePaletteChooser extends JPanel {
+public class PaletteChooser extends JPanel {
     private static final int MIN_COLOR = 50;
     private static final int MAX_COLOR = 255;
     private static final int R_STEPS = 5;
@@ -53,7 +53,7 @@ public class CosinePaletteChooser extends JPanel {
     public static final String PALETTE_PROPERTY_NAME = "palette";
 
     private final ResourceManager resourceManager;
-    private CosinePalette palette;
+    private Palette palette;
     private final JPaletteShower shower;
     private final ChangeListener changeListener;
 
@@ -64,9 +64,9 @@ public class CosinePaletteChooser extends JPanel {
     private JSpinner gaSpinner;
     private JSpinner baSpinner;
 
-    public CosinePaletteChooser(ResourceManager resourceManager) {
+    public PaletteChooser(ResourceManager resourceManager) {
         this.resourceManager = resourceManager;
-        palette = new CosinePalette(MAX_COLOR - MIN_COLOR, MIN_COLOR, MAX_COLOR,
+        palette = new Palette(MAX_COLOR - MIN_COLOR, MIN_COLOR, MAX_COLOR,
                 Math.toRadians(R_ANGLE), Math.toRadians(G_ANGLE),
                 Math.toRadians(B_ANGLE), R_STEPS, G_STEPS, B_STEPS);
         shower = new JPaletteShower(palette, 250, 25);
@@ -90,8 +90,8 @@ public class CosinePaletteChooser extends JPanel {
         return Math.toRadians(getIntValue(spinner));
     }
 
-    private CosinePalette createPalette() {
-        return new CosinePalette(getWidth(), MIN_COLOR, MAX_COLOR,
+    private Palette createPalette() {
+        return new Palette(getWidth(), MIN_COLOR, MAX_COLOR,
                 toRadians(raSpinner), toRadians(gaSpinner),
                 toRadians(baSpinner), getIntValue(rsSpinner),
                 getIntValue(gsSpinner), getIntValue(bsSpinner));
@@ -153,11 +153,11 @@ public class CosinePaletteChooser extends JPanel {
         return spinner;
     }
 
-    public CosinePalette getPalette() {
+    public Palette getPalette() {
         return palette;
     }
 
-    private void setPalette(CosinePalette palette) {
+    private void setPalette(Palette palette) {
         Palette oldValue = this.palette;
         this.palette = palette;
         firePropertyChange(PALETTE_PROPERTY_NAME, oldValue, palette);

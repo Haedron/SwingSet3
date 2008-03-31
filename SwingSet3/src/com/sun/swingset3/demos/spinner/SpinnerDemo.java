@@ -50,13 +50,12 @@ import com.sun.swingset3.demos.ResourceManager;
         sourceFiles = {
                 "com/sun/swingset3/demos/spinner/SpinnerDemo.java",
                 "com/sun/swingset3/demos/spinner/Coords.java",
-                "com/sun/swingset3/demos/spinner/CosinePalette.java",
-                "com/sun/swingset3/demos/spinner/CosinePaletteChooser.java",
                 "com/sun/swingset3/demos/spinner/JMandelbrot.java",
                 "com/sun/swingset3/demos/spinner/JPaletteShower.java",
                 "com/sun/swingset3/demos/spinner/JSpinnerPanel.java",
                 "com/sun/swingset3/demos/spinner/MandelbrotControl.java",
                 "com/sun/swingset3/demos/spinner/Palette.java",
+                "com/sun/swingset3/demos/spinner/PaletteChooser.java",
                 "com/sun/swingset3/demos/ResourceManager.java",
                 "com/sun/swingset3/demos/spinner/resources/SpinnerDemo.properties",
                 "com/sun/swingset3/demos/spinner/resources/images/SpinnerDemo.gif"
@@ -80,8 +79,8 @@ public class SpinnerDemo extends JPanel {
         setLayout(new BorderLayout());
 
         // Create main components
-        CosinePaletteChooser chooser =
-                new CosinePaletteChooser(resourceManager);
+        PaletteChooser chooser =
+                new PaletteChooser(resourceManager);
         final JMandelbrot mandelbrot =
                 new JMandelbrot(400, 400, chooser.getPalette(), resourceManager);
         MandelbrotControl mandelbrotControl =
@@ -89,7 +88,7 @@ public class SpinnerDemo extends JPanel {
 
         // Connect palette chooser and mandelbrot component 
         chooser.addPropertyChangeListener(
-                CosinePaletteChooser.PALETTE_PROPERTY_NAME,
+                PaletteChooser.PALETTE_PROPERTY_NAME,
                 new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
                         mandelbrot.setPalette((Palette) evt.getNewValue());

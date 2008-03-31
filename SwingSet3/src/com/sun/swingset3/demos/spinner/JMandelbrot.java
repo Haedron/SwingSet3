@@ -45,25 +45,21 @@ public class JMandelbrot extends JComponent {
     private static final double EPSILON = 1E-16;
     private static final int MIN_WIDTH = 50;
     private static final int MIN_HEIGHT = 50;
+    private static final double ZOOM_RATE = 3;
+    private static final int NUM_OF_THREADS = 4;
 
     private Coords center;
     public static final String CENTER_PROPERTY_NAME = "center";
 
-    private double zoomRate = 3;
-    public static final String ZOOM_RATE_PROPERTY_NAME = "zoomRate";
-
     private int maxIteration = 300;
     public static final String MAX_ITERATION_PROPERTY_NAME = "maxIteration";
-
-    private int numOfThreads = 4;
-    public static final String NUM_OF_THREADS_PROPERTY_NAME = "numOfThreads";
 
     private Palette palette;
     public static final String PALETTE_PROPERTY_NAME = "palette";
 
     private Image buffer;
     private final MandelbrotCalculator[] calculators =
-            new MandelbrotCalculator[numOfThreads];
+            new MandelbrotCalculator[NUM_OF_THREADS];
 
     private double xLowLimit = -2;
     private double xHighLimit = 2;
@@ -124,25 +120,25 @@ public class JMandelbrot extends JComponent {
                 double newIntervalHeight;
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     boolean limitReached = false;
-                    newIntervalWidth = intervalWidth / zoomRate;
+                    newIntervalWidth = intervalWidth / ZOOM_RATE;
                     if ((newIntervalWidth / getWidth()) < EPSILON) {
                         newIntervalWidth = intervalWidth;
                         limitReached = true;
                     }
-                    newIntervalHeight = intervalHeight / zoomRate;
+                    newIntervalHeight = intervalHeight / ZOOM_RATE;
                     if ((newIntervalHeight / getHeight()) < EPSILON) {
                         newIntervalHeight = intervalHeight;
                         limitReached = true;
                     }
                     if (!limitReached) {
-                        xLowLimit = x - (x - xLowLimit) / zoomRate;
-                        yLowLimit = y - (y - yLowLimit) / zoomRate;
+                        xLowLimit = x - (x - xLowLimit) / ZOOM_RATE;
+                        yLowLimit = y - (y - yLowLimit) / ZOOM_RATE;
                     }
                 } else {
-                    newIntervalWidth = intervalWidth * zoomRate;
-                    newIntervalHeight = intervalHeight * zoomRate;
-                    xLowLimit = x - (x - xLowLimit) * zoomRate;
-                    yLowLimit = y - (y - yLowLimit) * zoomRate;
+                    newIntervalWidth = intervalWidth * ZOOM_RATE;
+                    newIntervalHeight = intervalHeight * ZOOM_RATE;
+                    xLowLimit = x - (x - xLowLimit) * ZOOM_RATE;
+                    yLowLimit = y - (y - yLowLimit) * ZOOM_RATE;
                 }
 
                 xHighLimit = xLowLimit + newIntervalWidth;
@@ -176,7 +172,7 @@ public class JMandelbrot extends JComponent {
     }
 
     public void calculatePicture() {
-        int yStep = getHeight() / numOfThreads;
+        int yStep = getHeight() / NUM_OF_THREADS;
         int yStart = 0;
         for (int i = 0; i < calculators.length; i++) {
             if ((calculators[i] != null) && !calculators[i].isDone()) {
@@ -296,16 +292,6 @@ public class JMandelbrot extends JComponent {
         return yHighLimit;
     }
 
-    public double getZoomRate() {
-        return zoomRate;
-    }
-
-    public void setZoomRate(double zoomRate) {
-        double oldValue = this.zoomRate;
-        this.zoomRate = zoomRate;
-        firePropertyChange(ZOOM_RATE_PROPERTY_NAME, oldValue, zoomRate);
-    }
-
     public Coords getCenter() {
         return center;
     }
@@ -334,15 +320,5 @@ public class JMandelbrot extends JComponent {
         palette.setSize(maxIteration);
         this.palette = palette;
         firePropertyChange(PALETTE_PROPERTY_NAME, oldValue, palette);
-    }
-
-    public int getNumOfThreads() {
-        return numOfThreads;
-    }
-
-    public void setNumOfThreads(int numOfThreads) {
-        int oldValue = this.numOfThreads;
-        this.numOfThreads = numOfThreads;
-        firePropertyChange(NUM_OF_THREADS_PROPERTY_NAME, oldValue, numOfThreads);
     }
 }
