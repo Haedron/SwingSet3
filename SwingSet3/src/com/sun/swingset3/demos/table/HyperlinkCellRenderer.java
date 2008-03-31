@@ -65,6 +65,9 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
     private final ArrayList<Integer> columnModelIndeces = new ArrayList<Integer>();
 
     private Color rowColors[];
+    private Color foreground;
+    private Color visitedForeground;
+    private Border focusBorder;
     private Border noFocusBorder;
 
     private boolean underlineOnRollover = true;
@@ -75,13 +78,12 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
     private HashMap<Object, int[]> visitedCache;
 
     public HyperlinkCellRenderer(Action action, boolean underlineOnRollover) {
-        setOpaque(true);
-        setBorderPainted(true);
         setAction(action);
         setHorizontalAlignment(JHyperlink.LEFT);
         rowColors = new Color[1];
         rowColors[0] = UIManager.getColor("Table.background");
         this.underlineOnRollover = underlineOnRollover;
+        applyDefaults();
     }
 
     public void setRowColors(Color[] colors) {
@@ -90,16 +92,22 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
 
     public void updateUI() {
         super.updateUI();
-        setForeground(null);
-        setBackground(null);
+        applyDefaults();        
+    }
+    
+    protected void applyDefaults() {
+        setOpaque(true);
+        setBorderPainted(false);
+        foreground = UIManager.getColor("Hyperlink.foreground");
+        visitedForeground = UIManager.getColor("Hyperlink.visitedForeground");
 
         // Make sure border used on non-focussed cells is same size as focussed border
-        Border focusBorder = UIManager.getBorder("Table.focusCellHighlightBorder");
+        focusBorder = UIManager.getBorder("Table.focusCellHighlightBorder");
         if (focusBorder != null) {
             Insets insets = focusBorder.getBorderInsets(this);
             noFocusBorder = new EmptyBorder(insets.top, insets.left, insets.bottom, insets.right);
         } else {
-            noFocusBorder = new EmptyBorder(1, 1, 1, 1);
+            focusBorder = noFocusBorder = new EmptyBorder(1, 1, 1, 1);
         }
     }
 
@@ -129,22 +137,17 @@ public class HyperlinkCellRenderer extends JHyperlink implements TableCellRender
 
         if (!isSelected) {
             setBackground(rowColors[row % rowColors.length]);
-            //setForeground(table.getForeground());
+            //setForeground(isCellLinkVisited(value, row, column)?
+            //  visitedForeground : foreground);
+            setForeground(foreground);
+            setVisitedForeground(visitedForeground);
         } else {
             setBackground(table.getSelectionBackground());
-            //setForeground(table.getSelectionForeground());
+            setForeground(table.getSelectionForeground());
+            setVisitedForeground(table.getSelectionForeground());
         }
-
-        Border border = null;
-        if (hasFocus) {
-            if (isSelected) {
-                border = UIManager.getBorder("Table.focusSelectedCellHighlightBorder");
-            }
-            if (border == null) {
-                border = UIManager.getBorder("Table.focusCellHighlightBorder");
-            }
-        }
-        setBorder(border != null ? border : noFocusBorder);
+        //setBorder(hasFocus? focusBorder : noFocusBorder);
+        //System.out.println("border insets="+getBorder().getBorderInsets(this));
 
         return this;
     }

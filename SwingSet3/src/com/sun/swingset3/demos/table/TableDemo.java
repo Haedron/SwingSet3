@@ -101,7 +101,7 @@ import com.sun.swingset3.demos.DemoUtilities;
                 "com/sun/swingset3/demos/table/OscarTableModel.java",
                 "com/sun/swingset3/demos/table/TableDemo.java",
                 "com/sun/swingset3/demos/table/resources/bestpicture",
-                "com/sun/swingset3/demos/table/resources/oscars.xml",
+                //"com/sun/swingset3/demos/table/resources/oscars.xml", file too large!!
                 "com/sun/swingset3/demos/table/resources/TableDemo.properties",
                 "com/sun/swingset3/demos/table/resources/images/goldstar.png",
                 "com/sun/swingset3/demos/table/resources/images/nominee.png",
@@ -192,15 +192,6 @@ public class TableDemo extends JPanel {
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         controlPanel.setLayout(gridbag);
-
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridwidth = 2;
-        c.gridheight = 1;
-        c.insets = new Insets(0, 10, 0, 10);
-        c.anchor = GridBagConstraints.CENTER;
-        JLabel title = new JLabel(getString("TableDemo.title", "Academy Award Results"));
-        controlPanel.add(title, c);
 
         c.gridx = 0;
         c.gridy = 1;
@@ -591,7 +582,7 @@ public class TableDemo extends JPanel {
                     DemoUtilities.browse(imdbURI);
                 } else {
                     showMessage("IMDB Link",
-                            getString("AdvancedTableDemo.imdbLinkNotFound",
+                            getString("TableDemo.imdbLinkNotFound",
                                     "Unable to locate IMDB URL for") + "\n" +
                                     candidate.getMovieTitle());
                 }

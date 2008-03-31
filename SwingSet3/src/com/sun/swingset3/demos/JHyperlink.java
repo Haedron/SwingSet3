@@ -66,8 +66,8 @@ public class JHyperlink extends JButton {
 
     //remind(aim): lookup colors instead of hardcoding them
     private Color normalForeground;
-    private final Color activeForeground;
-    private final Color visitedForeground;
+    private Color activeForeground;
+    private Color visitedForeground;
     private boolean drawUnderline = true;
     
     static {
@@ -158,6 +158,10 @@ public class JHyperlink extends JButton {
         super.setForeground(foreground);
     }
     
+    public void setVisitedForeground(Color visited) {
+        visitedForeground = visited;
+    }
+    
     public void setDrawUnderline(boolean drawUnderline) {
         this.drawUnderline = drawUnderline;
     }
@@ -195,11 +199,18 @@ public class JHyperlink extends JButton {
                     getVerticalTextPosition(), getHorizontalTextPosition(),
                     viewRect, iconRect, textRect, getIconTextGap());
             
+            // getBaseline not returning correct results, so workaround for now
+            if (UIManager.getLookAndFeel().getName().equals("Nimbus")) {
+                baseline += 7;
+            } else {
+                baseline += 3;
+            }
+            
             g.setColor(getForeground());
             g.drawLine(textRect.x,
-                    baseline + 2,
+                    baseline,
                     textRect.x + textRect.width,
-                    baseline + 2);
+                    baseline);
         }
         
     }

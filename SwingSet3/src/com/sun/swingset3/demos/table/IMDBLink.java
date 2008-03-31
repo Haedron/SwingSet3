@@ -117,8 +117,7 @@ public class IMDBLink {
                 }
             }
         }
-        // Couldn't locate IMDB uri for movie title        
-        return null;
+        return matches.isEmpty()? null : matches.get(0);
     }
 
 
