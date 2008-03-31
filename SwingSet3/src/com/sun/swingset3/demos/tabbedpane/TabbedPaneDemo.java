@@ -62,7 +62,7 @@ import com.sun.swingset3.demos.ResourceManager;
                 "com/sun/swingset3/demos/tabbedpane/resources/images/david.gif",
                 "com/sun/swingset3/demos/tabbedpane/resources/images/ewan.gif",
                 "com/sun/swingset3/demos/tabbedpane/resources/images/ewan.jpg",
-                "com/sun/swingset3/demos/tabbedpane/resources/images/hania.jpg",
+                "com/sun/swingset3/demos/tabbedpane/resources/images/miranda.jpg",
                 "com/sun/swingset3/demos/tabbedpane/resources/images/matthew.gif",
                 "com/sun/swingset3/demos/tabbedpane/resources/images/stephen.gif",
                 "com/sun/swingset3/demos/tabbedpane/resources/images/TabbedPaneDemo.gif"
@@ -132,14 +132,15 @@ public class TabbedPaneDemo extends JPanel implements ActionListener {
         JLabel pix = new JLabel(resourceManager.createImageIcon("camille.jpg", name));
         tabbedpane.add(name, pix);
 
+        name = resourceManager.getString("TabbedPaneDemo.miranda");
+        pix = new JLabel(resourceManager.createImageIcon("miranda.jpg", name));
+        pix.setToolTipText(resourceManager.getString("TabbedPaneDemo.miranda.tooltip"));
+        tabbedpane.add(name, pix);
+        
         name = resourceManager.getString("TabbedPaneDemo.ewan");
         pix = new JLabel(resourceManager.createImageIcon("ewan.jpg", name));
         tabbedpane.add(name, pix);
-
-        name = resourceManager.getString("TabbedPaneDemo.hania");
-        pix = new JLabel(resourceManager.createImageIcon("hania.jpg", name));
-        tabbedpane.add(name, pix);
-
+        
         name = resourceManager.getString("TabbedPaneDemo.bounce");
         spin = new HeadSpin();
         tabbedpane.add(name, spin);
