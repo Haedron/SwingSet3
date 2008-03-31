@@ -65,6 +65,9 @@ import com.sun.swingset3.utilities.ArrowIcon;
 import com.sun.swingset3.utilities.RoundedBorder;
 import com.sun.swingset3.utilities.RoundedPanel;
 import com.sun.swingset3.utilities.Utilities;
+import java.awt.Image;
+import javax.swing.border.LineBorder;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
  * GUI component for viewing a set of one or more Java source code files,
@@ -119,11 +122,11 @@ public class CodeViewer extends JPanel {
 
     public static final String SOURCES_IMAGES = ".+\\.jpg|.+\\.gif|.+\\.png";
     
-    private static final Logger logger = Logger.getLogger(CodeViewer.class.getName());
-    
     private static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(255,255,176); 
     private static BufferedImage SNIPPET_GLYPH;
     private static String NO_SNIPPET_SELECTED;
+
+    static final Logger logger = Logger.getLogger(CodeViewer.class.getName());
     
     static {
         try {
@@ -744,10 +747,16 @@ public class CodeViewer extends JPanel {
             }
         }
     }
-    private class FirstSnippetAction extends AbstractAction {
+    
+    private abstract class SnippetAction extends AbstractAction {
+        public SnippetAction(String name, String shortDescription) {
+            super(name);
+            putValue(AbstractAction.SHORT_DESCRIPTION, shortDescription);
+        }      
+    }
+    private class FirstSnippetAction extends SnippetAction {
         public FirstSnippetAction() {
-            super("FirstSnippet");
-            putValue(AbstractAction.SHORT_DESCRIPTION, 
+            super("FirstSnippet",
                     getString("CodeViewer.snippets.navigateFirst",
                               "move to first code snippet within highlighted set"));
         } 
@@ -756,34 +765,33 @@ public class CodeViewer extends JPanel {
         }        
     }
     
-    private class NextSnippetAction extends AbstractAction {
+    private class NextSnippetAction extends SnippetAction {
         public NextSnippetAction() {
-            super("NextSnippet");
-            putValue(AbstractAction.SHORT_DESCRIPTION, 
+            super("NextSnippet", 
                     getString("CodeViewer.snippets.navigateNext",
                               "move to next code snippet within highlighted set"));
-        } 
+        }
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveToNextSnippet();
-        }        
+        }
     }
     
-    private class PreviousSnippetAction extends AbstractAction {
+    private class PreviousSnippetAction extends SnippetAction {
         public PreviousSnippetAction() {
-            super("PreviousSnippet");
-            putValue(AbstractAction.SHORT_DESCRIPTION, 
+            super("PreviousSnippet", 
                     getString("CodeViewer.snippets.navigatePrevious",
                               "move to previous code fragment within highlighted set"));
         }
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveToPreviousSnippet();
         }
     }
   
-    private class LastSnippetAction extends AbstractAction {
+    private class LastSnippetAction extends SnippetAction {
         public LastSnippetAction() {
-            super("LastSnippet");
-            putValue(AbstractAction.SHORT_DESCRIPTION, 
+            super("LastSnippet", 
                     getString("CodeViewer.snippets.navigateLast",
                               "move to last code snippet within highlighted set"));
         } 
@@ -811,7 +819,7 @@ public class CodeViewer extends JPanel {
             
             Color foreground = renderer.getForeground();
             Color countForeground = Utilities.deriveColorHSB(foreground, 
-                    0, 0, isSelected? -.6f : .45f);
+                    0, 0, isSelected? .5f : .4f);
             
             String text = "<html><font color=\"" +
                     Utilities.getHTMLColorString(foreground) + "\">" + value + 
@@ -826,179 +834,7 @@ public class CodeViewer extends JPanel {
         }
     }
     
-    private class SnippetNavigator extends JPanel {
-        private String noSnippet;
-        
-        private SnippetMap snippetMap;
-        
-        private JLabel statusLabel;
-        private JButton prevButton;
-        private JButton nextButton;
-        
-        private final Insets statusInsets = new Insets(1,0,1,0);
-        private final static int ARROW_SIZE = 6;
-        private final static int OVERLAP = 6;
-        
-        public SnippetNavigator(SnippetMap snippetMap) {
-            this.snippetMap = snippetMap;
-            snippetMap.addPropertyChangeListener(new SnippetHighlightListener());
-            
-            setLayout(null);
-            
-            noSnippet = getString("CodeViewer.snippets.noCodeHighlighted",
-                                   "No Code highlight selected");
-            
-            statusLabel = new JLabel(noSnippet);
-            statusLabel.setHorizontalAlignment(JLabel.CENTER);
-            statusLabel.setBorder(new Border() {
-                public boolean isBorderOpaque() {
-                    return true;
-                }
-                public Insets getBorderInsets(Component c) {
-                    return statusInsets;
-                }
-                public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
-                    if (prevButton.isVisible()) {
-                        g.setColor(UIManager.getColor("controlDkShadow"));
-                        g.drawLine(x, y, x + w, y);
-                        g.drawLine(x, y + h - 1, x + w - 1, y + h - 1);
-                    }
-                }
-            });
-            add(statusLabel);
-            
-            prevButton = (JButton)add(new JButton());
-            prevButton.setVisible(false);
-                       
-            nextButton = (JButton)add(new JButton());
-            nextButton.setVisible(false);
-            
-            applyDefaults();
-            
-        }
-        
-        public void doLayout() {
-            Dimension size = getSize();
-            Insets insets = getInsets();
-            Dimension labelSize = statusLabel.getPreferredSize();
-            
-            if (prevButton.isVisible()) {
-                Dimension buttonSize = prevButton.getPreferredSize();
 
-                prevButton.setBounds(insets.left, insets.top,
-                        buttonSize.width, size.height - insets.top - insets.bottom);
-
-                statusLabel.setBounds(insets.left + buttonSize.width - OVERLAP,
-                        insets.top,
-                        labelSize.width + (2 * OVERLAP), size.height - insets.top - insets.bottom);
-                
-                nextButton.setBounds(size.width - buttonSize.width,
-                        insets.top,
-                        buttonSize.width, size.height - insets.top - insets.bottom);
-            } else {
-                
-                statusLabel.setBounds(insets.left, insets.top,
-                        size.width - insets.left - insets.right,
-                        size.height - insets.top - insets.bottom);
-            }
-        }
-        
-        public Dimension getPreferredSize() {
-            Dimension prefSize;
-            Insets insets = getInsets();
-
-            Dimension labelSize = statusLabel.getPreferredSize();
-           
-            if (prevButton.isVisible()) {
-                Dimension buttonSize = prevButton.getPreferredSize();
-            
-                prefSize = new Dimension(buttonSize.width*2 + labelSize.width  +       
-                    insets.left + insets.right,
-                    Math.max(buttonSize.height, 
-                    labelSize.height) + insets.top + insets.bottom);
-            } else {
-                prefSize = new Dimension(labelSize.width + insets.left + insets.right,
-                    labelSize.height + insets.top + insets.bottom);
-            }
-            return prefSize;
-            
-        }
-        
-        public void updateUI() {
-            super.updateUI();
-            applyDefaults();
-        }
-        
-        protected void applyDefaults() {
-            if (prevButton != null) {
-                Color arrowColor = UIManager.getColor("Label.foreground");
-                Color inactiveColor = UIManager.getColor("Label.disabledText");
-                Dimension buttonSize = new Dimension(ARROW_SIZE + 12 + OVERLAP, 
-                                                     ARROW_SIZE + 12 + OVERLAP);
-                
-                prevButton.setIcon(new ArrowIcon(ArrowIcon.WEST, ARROW_SIZE, arrowColor));
-                prevButton.setDisabledIcon(new ArrowIcon(ArrowIcon.WEST, ARROW_SIZE, inactiveColor));
-                prevButton.setPreferredSize(buttonSize);
-                nextButton.setIcon(new ArrowIcon(ArrowIcon.EAST, ARROW_SIZE, arrowColor));
-                nextButton.setDisabledIcon(new ArrowIcon(ArrowIcon.EAST, ARROW_SIZE, inactiveColor));
-                nextButton.setPreferredSize(buttonSize);
-                
-                statusLabel.setOpaque(true);
-                statusLabel.setFont(UIManager.getFont("Label.font").deriveFont(12f));
-            }
-        }
-        
-        public void setNavigatePreviousAction(Action action) {
-            setButtonAction(prevButton, action);
-        }
-        
-        public void setNavigateNextAction(Action action) {
-            setButtonAction(nextButton, action);
-        }
-        
-        private void setButtonAction(JButton button, Action action) {
-            Icon icon = button.getIcon();
-            button.setAction(action);
-            button.setHideActionText(true);
-            button.setIcon(icon); // icon gets obliterated when action set!
-        }
-        
-        private class SnippetHighlightListener implements PropertyChangeListener {
-            public void propertyChange(PropertyChangeEvent e) {
-                String propertyName = e.getPropertyName();
-                if (propertyName.equals("currentSet")) {
-                    String key = (String)e.getNewValue();
-                    setComponentState(key);
-                    
-                } else if (propertyName.equals("currentSnippet")) {
-                    setComponentState(snippetMap.getCurrentSet());
-                }
-            }
-            
-            private void setComponentState(String currentKey) {
-                
-                if (currentKey == null) {
-                    statusLabel.setText(noSnippet);
-                    
-                } else {
-                    
-                    String place = "<html><b>"+
-                            snippetMap.getIndexForSnippet(snippetMap.getCurrentSnippet()) + 
-                            "</b>" +
-                            " of " + snippetMap.getSnippetCountForSet(currentKey) + "</html>";
-                    statusLabel.setText(place);
-                    
-                }
-                boolean moreThanOne = snippetMap.getSnippetCountForSet(currentKey) > 1;
-                
-                prevButton.setVisible(moreThanOne);
-                prevButton.setEnabled(snippetMap.previousSnippetExists());
-                nextButton.setVisible(moreThanOne);
-                nextButton.setEnabled(snippetMap.nextSnippetExists());
-            }
-        }
-    }
-    
  
     private static class CodeFileInfo {
         public URL url;
