@@ -120,7 +120,7 @@ public class SwingSet3 extends SingleFrameApplication  {
 
     public static final int MAIN_FRAME_WIDTH = 880;
     public static final int MAIN_FRAME_HEIGHT = 640;
-    public static final int DEMO_SELECTOR_WIDTH = 200;
+    public static final int DEMO_SELECTOR_WIDTH = 186;
     public static final int DEMO_PANEL_HEIGHT = 400;
     public static final int DEMO_PANEL_WIDTH = MAIN_FRAME_WIDTH - DEMO_SELECTOR_WIDTH;
 
@@ -211,18 +211,8 @@ public class SwingSet3 extends SingleFrameApplication  {
         runningDemoCache = new HashMap<String, DemoPanel>();
         setDemoList(resourceMap.getString("demos.title"), getDemoClassNames(args));
 
-        JPanel introPanel = new RoundedPanel(new BorderLayout());
-        introPanel.setBackground(new Color(100, 130, 160));
-        introPanel.setBorder(new RoundedBorder());
-        // need extra panel wrapper to add border around label's image
-        JPanel introBorder = new JPanel(new BorderLayout());
-        introBorder.setBorder(new EmptyBorder(0,4,0,4));
-        introBorder.setBackground(introPanel.getBackground());
-        JLabel intro = new JLabel(new ImageIcon(SwingSet3.class.getResource("resources/images/home.png")));
-        intro.setVerticalAlignment(JLabel.TOP);
-        introBorder.add(intro, BorderLayout.CENTER);
-        introPanel.add(introBorder, BorderLayout.CENTER);
-        setDemoPlaceholder(introPanel);
+        IntroPanel intro = new IntroPanel();
+        setDemoPlaceholder(intro);
 
     }
     
@@ -548,7 +538,6 @@ public class SwingSet3 extends SingleFrameApplication  {
                 demoPanel.setPreferredSize(currentDemoPanel.getPreferredSize());
                 runningDemoCache.put(demo.getName(), demoPanel);
             } 
-           
             demoContainer.remove(currentDemoPanel);
             currentDemoPanel = demoPanel;
             demoContainer.add(currentDemoPanel, BorderLayout.CENTER);
