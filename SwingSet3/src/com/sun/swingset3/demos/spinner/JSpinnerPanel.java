@@ -55,10 +55,6 @@ public class JSpinnerPanel extends JPanel {
     }
 
     public void addSpinner(String labelText, JSpinner spinner) {
-        addSpinner(labelText, spinner, false);
-    }
-
-    public void addSpinner(String labelText, JSpinner spinner, boolean stretch) {
         JLabel label = new JLabel(labelText);
         label.setHorizontalAlignment(SwingConstants.TRAILING);
         labelPanel.add(label);
