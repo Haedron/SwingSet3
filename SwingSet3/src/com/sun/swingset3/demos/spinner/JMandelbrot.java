@@ -171,6 +171,7 @@ public class JMandelbrot extends JComponent {
         });
     }
 
+    //<snip>Use SwingWorker to asynchronously calculate parts of the picture     
     public void calculatePicture() {
         int yStep = getHeight() / NUM_OF_THREADS;
         int yStart = 0;
@@ -190,6 +191,7 @@ public class JMandelbrot extends JComponent {
             yStart = yEnd;
         }
     }
+    //</snip>
 
     private Coords calcCenter() {
         return new Coords(xLowLimit + (xHighLimit - xLowLimit) / 2,
@@ -202,6 +204,7 @@ public class JMandelbrot extends JComponent {
         g.drawImage(buffer, 0, 0, null);
     }
 
+    //<snip>Use SwingWorker to asynchronously calculate parts of the picture
     private class MandelbrotCalculator extends SwingWorker<Object, Object> {
         private final int xStart;
         private final int xEnd;
@@ -262,6 +265,7 @@ public class JMandelbrot extends JComponent {
             repaint();
         }
     }
+    //</snip>     
 
     // Getters and Setters
 

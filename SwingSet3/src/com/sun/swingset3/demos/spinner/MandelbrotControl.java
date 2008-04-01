@@ -64,20 +64,27 @@ public class MandelbrotControl extends JPanel {
                 resourceManager.getString("SpinnerDemo.fractalControls")));
         JSpinnerPanel spinnerPanel = new JSpinnerPanel();
 
+        //<snip>Create spinner
         iterSpinner = new JSpinner(new SpinnerNumberModel(
                 mandelbrot.getMaxIteration(), 10, 100000, 50));
+        //</snip>
+        //<snip>Add change listener using anonymus inner class 
         iterSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 mandelbrot.setMaxIteration((Integer) iterSpinner.getValue());
                 mandelbrot.calculatePicture();
             }
         });
+        //</snip>
         spinnerPanel.addSpinner(
                 resourceManager.getString("SpinnerDemo.iterations"), iterSpinner);
 
+        //<snip>Create spinner
         final double xValue = mandelbrot.getCenter().getX();
         double width = mandelbrot.getXHighLimit() - mandelbrot.getXLowLimit();
         xSpinner = new CoordSpinner(xValue, width * COORD_SPINNER_STEP);
+        //</snip>
+        //<snip>Add change listener using anonymus inner class
         xSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 Double newX = (Double) xSpinner.getValue();
@@ -86,12 +93,16 @@ public class MandelbrotControl extends JPanel {
                 mandelbrot.calculatePicture();
             }
         });
+        //</snip>
         spinnerPanel.addSpinner(
                 resourceManager.getString("SpinnerDemo.x"), xSpinner);
 
+        //<snip>Create spinner
         final double yValue = mandelbrot.getCenter().getY();
         double height = mandelbrot.getYHighLimit() - mandelbrot.getYLowLimit();
         ySpinner = new CoordSpinner(yValue, height * COORD_SPINNER_STEP);
+        //</snip>
+        //<snip>Add change listener using anonymus inner class
         ySpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 Double newY = (Double) ySpinner.getValue();
@@ -100,6 +111,7 @@ public class MandelbrotControl extends JPanel {
                 mandelbrot.calculatePicture();
             }
         });
+        //</snip>
         spinnerPanel.addSpinner(
                 resourceManager.getString("SpinnerDemo.y"), ySpinner);
 
@@ -124,6 +136,8 @@ public class MandelbrotControl extends JPanel {
         );
     }
 
+    //<snip>Customized spinner class
+    // It uses special format for NumberEditor and has constant preferred width
     private static class CoordSpinner extends JSpinner {
         @Override
         protected JComponent createEditor(SpinnerModel model) {
@@ -134,6 +148,7 @@ public class MandelbrotControl extends JPanel {
             super(new SpinnerNumberModel(value, null, null, stepSize));
         }
 
+        //A useful shortcut method
         public void updateModel(double value, double stepSize) {
             SpinnerNumberModel model = (SpinnerNumberModel) getModel();
             model.setValue(value);
@@ -147,6 +162,7 @@ public class MandelbrotControl extends JPanel {
             return prefSize;
         }
     }
+    //</snip>
 }
 
 

@@ -34,8 +34,11 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
+ * Arranges labels and spinners into two vertical columns.
+ * Labels at the left, spinners at the right. 
  * @author Mikhail Lapshin
  */
+//<snip>Helpful component for layout of labeled spinners
 public class JSpinnerPanel extends JPanel {
     private final JPanel labelPanel;
     private final JPanel spinnerPanel;
@@ -65,4 +68,5 @@ public class JSpinnerPanel extends JPanel {
         spinnerPanel.add(flowPanel);
     }
 }
+//</snip>
 

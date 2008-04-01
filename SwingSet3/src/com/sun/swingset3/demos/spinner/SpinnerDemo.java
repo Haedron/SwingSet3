@@ -86,7 +86,7 @@ public class SpinnerDemo extends JPanel {
         MandelbrotControl mandelbrotControl =
                 new MandelbrotControl(mandelbrot, resourceManager);
 
-        // Connect palette chooser and mandelbrot component 
+        // Connect palette chooser and mandelbrot component
         chooser.addPropertyChangeListener(
                 PaletteChooser.PALETTE_PROPERTY_NAME,
                 new PropertyChangeListener() {

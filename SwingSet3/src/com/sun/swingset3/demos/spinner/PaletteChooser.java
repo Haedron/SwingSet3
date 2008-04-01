@@ -71,6 +71,7 @@ public class PaletteChooser extends JPanel {
                 Math.toRadians(B_ANGLE), R_STEPS, G_STEPS, B_STEPS);
         shower = new JPaletteShower(palette, 250, 25);
 
+        //<snip>Use single change listener for several spinners
         changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 setPalette(createPalette());
@@ -78,6 +79,7 @@ public class PaletteChooser extends JPanel {
                 repaint();
             }
         };
+        //</snip>
 
         setBorder(BorderFactory.createTitledBorder(
                 resourceManager.getString("SpinnerDemo.colorPalette")));
@@ -147,8 +149,13 @@ public class PaletteChooser extends JPanel {
 
     private JSpinner createSpinner(SpinnerModel model, String resourceName,
                                    JSpinnerPanel parent) {
+
+        //<snip>Create spinner
         JSpinner spinner = new JSpinner(model);
+        //</snip>
+        //<snip>Use single change listener for several spinners
         spinner.addChangeListener(changeListener);
+        //</snip>
         parent.addSpinner(resourceManager.getString(resourceName), spinner);
         return spinner;
     }
