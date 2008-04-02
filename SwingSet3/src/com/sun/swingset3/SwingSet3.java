@@ -87,6 +87,8 @@ import javax.swing.event.ChangeListener;
 import com.sun.swingset3.codeview.CodeViewer;
 import com.sun.swingset3.utilities.RoundedBorder;
 import com.sun.swingset3.utilities.RoundedPanel;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 /**
  *
@@ -378,7 +380,6 @@ public class SwingSet3 extends SingleFrameApplication  {
         
         // Create splitpane on right to hold demo and source code
         demoSplitPane = new AnimatingSplitPane(JSplitPane.VERTICAL_SPLIT);
-        //demoSplitPane.setDividerLocation(.66f);
         demoSplitPane.setBorder(EMPTY_BORDER);
         mainPanel.add(demoSplitPane, BorderLayout.CENTER);
         
@@ -398,6 +399,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         codeContainer = new JPanel(new BorderLayout());
         codeContainer.add(codeViewer);
         codeContainer.setBorder(PANEL_BORDER);
+        codeContainer.setMinimumSize(new Dimension(0,0));
         demoSplitPane.setBottomComponent(codeContainer);
         
         addPropertyChangeListener(new SwingSetPropertyListener());        

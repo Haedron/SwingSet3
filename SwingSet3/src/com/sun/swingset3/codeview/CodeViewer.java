@@ -177,7 +177,7 @@ public class CodeViewer extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         JPanel bar = new JPanel(gridbag);
         
-        bar.setBorder(new EmptyBorder(10, 0, 10, 0));
+        bar.setBorder(new EmptyBorder(0, 0, 10, 0));
         
         NO_SNIPPET_SELECTED = getString("CodeViewer.snippets.selectOne", 
                                         "Select One");
@@ -217,7 +217,6 @@ public class CodeViewer extends JPanel {
         
         JPanel panel = new RoundedPanel(new BorderLayout(), 10);
         panel.setBorder(new RoundedBorder(10));
-        panel.add(Box.createVerticalStrut(12), BorderLayout.NORTH);
         
         noCodeLabel = new JLabel(getString("CodeViewer.noCodeLoaded", "no code loaded"));
         noCodeLabel.setHorizontalAlignment(JLabel.CENTER);

@@ -34,6 +34,8 @@ package com.sun.swingset3.utilities;
 import java.awt.Graphics;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.jdesktop.animation.timing.Animator;
@@ -50,13 +52,7 @@ public class AnimatingSplitPane extends JSplitPane {
     
     public AnimatingSplitPane(int orientation) {
         super(orientation);
-    }
-    
-    @Override
-    public void updateUI() {
-        // This will choke on Nimbus if we don't populate this value
-        UIManager.put("SplitPane.dividerSize", 12);
-        setUI(new NakedSplitPaneUI());
+        setOneTouchExpandable(false);
     }
     
     public void setExpanded(boolean expanded) {
@@ -82,18 +78,5 @@ public class AnimatingSplitPane extends JSplitPane {
     // possibly a bug in reflection when method is in super class (?)
     public void setDividerLocation(int dividerLocation) {
         super.setDividerLocation(dividerLocation);
-    }
-    
-    private static class NakedSplitPaneUI extends BasicSplitPaneUI {
-
-        @Override
-        public BasicSplitPaneDivider createDefaultDivider() {
-            return new BasicSplitPaneDivider(this) {
-                @Override
-                public void paint(Graphics g) {
-                    //System.out.println("not painting split pane ui!");
-                }
-            };
-        }
     }
 }
