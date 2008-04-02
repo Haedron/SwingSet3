@@ -334,7 +334,12 @@ public class SwingSet3 extends SingleFrameApplication  {
                 Utilities.deriveColorHSB(controlColor, 0, 0, -0.32f));
         
         // Calculate gradient colors for title panels
-        Color titleColor = UIManager.getColor(usingNimbus()? "nimbusBase" : "activeCaption");        
+        Color titleColor = UIManager.getColor(usingNimbus()? "nimbusBase" : "activeCaption");
+
+        // Some LAFs (e.g. GTK) don't contain "activeCaption" 
+        if (titleColor == null) {
+            titleColor = controlColor;
+        }
         float hsb[] = Color.RGBtoHSB(
                 titleColor.getRed(), titleColor.getGreen(), titleColor.getBlue(), null);
         UIManager.put(TITLE_GRADIENT_COLOR1_KEY, 
