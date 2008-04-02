@@ -51,12 +51,7 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,7 +96,6 @@ public class SwingSet3 extends SingleFrameApplication  {
     static final Logger logger = Logger.getLogger(SwingSet3.class.getName());
     
     private static final ServiceLoader<LookAndFeel> LOOK_AND_FEEL_LOADER = ServiceLoader.load(LookAndFeel.class); 
-    private static final ServiceLoader<DemoList> DEMO_LIST_LOADER = ServiceLoader.load(DemoList.class);
     
     public static String title;
 
@@ -123,8 +117,10 @@ public class SwingSet3 extends SingleFrameApplication  {
     public static final int DEMO_PANEL_HEIGHT = 400;
     public static final int DEMO_PANEL_WIDTH = MAIN_FRAME_WIDTH - DEMO_SELECTOR_WIDTH;
 
-    public static final Border EMPTY_BORDER = new EmptyBorder(0, 0, 0, 0);
-    public static final Border PANEL_BORDER = new EmptyBorder(10, 10, 10, 10);
+    private static final Border EMPTY_BORDER = new EmptyBorder(0, 0, 0, 0);
+    private static final Border PANEL_BORDER = new EmptyBorder(10, 10, 10, 10);
+    
+    private static final String DEMO_LIST_FILE = "/META-INF/demolist";
 
     static {
         // Property must be set *early* due to Apple Bug#3909714
@@ -221,31 +217,30 @@ public class SwingSet3 extends SingleFrameApplication  {
         Exception exception = null; 
 
         // First look for any demo list files specified on the command-line
-        List<String> userDemoList = new ArrayList<String>();
         for(String arg : args) {
             if (arg.equals("-a") || arg.equals("-augment")) {
                 augment = true;
             } else {
                 // process argument as filename containing names of demo classes
                 try {
-                    userDemoList.addAll(readDemoClassNames(new FileReader(arg) /*filename*/));
-                    
+                    demoList.addAll(readDemoClassNames(new FileReader(arg) /*filename*/));
                 } catch (IOException ex) {
                     exception = ex;
                     logger.log(Level.WARNING, "unable to read demo class names from file: "+arg, ex);
                 }
             }
         }
-        
-        if (userDemoList.isEmpty() || augment) {
-            // Use ServiceLoader to find all DemoList implementations that may exist
-            // within jar files supplied to swingset3
-            for(DemoList list: DEMO_LIST_LOADER) {
-                demoList.addAll(list.getDemoClassNames());
+
+        if (demoList.isEmpty() || augment) {
+            // Load default Demos
+            try {
+                demoList.addAll(readDemoClassNames(new InputStreamReader(getClass().getResourceAsStream(DEMO_LIST_FILE))));
+            } catch (IOException ex) {
+                exception = ex;
+                logger.log(Level.WARNING, "unable to read resource: " + DEMO_LIST_FILE, ex);
             }
         }
-        demoList.addAll(userDemoList);
-        
+
         if (demoList.isEmpty()) {
             displayErrorMessage(resourceMap.getString("error.noDemosLoaded"), 
                     exception);
@@ -707,7 +702,7 @@ public class SwingSet3 extends SingleFrameApplication  {
         }        
     }
  
-    public class ViewCodeSnippetAction extends AbstractAction {
+    private class ViewCodeSnippetAction extends AbstractAction {
         public ViewCodeSnippetAction() {
             super("View Source Code");
         }
