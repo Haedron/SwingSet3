@@ -78,11 +78,8 @@ public class IntroPanel extends RoundedPanel {
         Dimension size = getSize();
         Insets insets = getInsets();
         int w = size.width - insets.left - insets.right;
-        int h = size.height - insets.top - insets.bottom;
         
         Dimension prefSize = introImage.getPreferredSize();
-        int x = (w > prefSize.width? (w - prefSize.width)/2 : insets.left);
-        int y = insets.top;            
         introImage.setBounds(0, 0, prefSize.width, prefSize.height);
         
         if (introText.isVisible()) {

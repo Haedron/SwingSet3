@@ -371,12 +371,12 @@ public class DefaultsDisplay extends JPanel {
             
             setText(value != null? value.toString() : "unknown");
             setIcon(null);
-            setColors(table, row, hasFocus, isSelected);
+            setColors(table, row, isSelected);
             setBorder(this, hasFocus, isSelected);
             return this;
         }
         
-        protected void setColors(JTable table, int row, boolean hasFocus, boolean isSelected) {
+        protected void setColors(JTable table, int row, boolean isSelected) {
             if (!isSelected) {
                 setBackground(rowColors[row % rowColors.length]);
                 setForeground(table.getForeground());
@@ -480,7 +480,7 @@ public class DefaultsDisplay extends JPanel {
             if (renderer != null) {
                 // special hack renderer for icons needs to be colorized because
                 // it doesn't extend RowRenderer
-                setColors(table, row, hasFocus, isSelected);
+                setColors(table, row, isSelected);
                 setBorder(renderer, hasFocus, isSelected);
             
             } else {

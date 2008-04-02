@@ -36,7 +36,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import javax.swing.JPanel;
-import javax.swing.event.MouseInputAdapter;
 
 /**
  * GlassPane component which can be set on toplevel

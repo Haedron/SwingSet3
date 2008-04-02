@@ -43,7 +43,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -53,7 +52,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
 import com.sun.swingset3.demos.JHyperlink;
-import com.sun.swingset3.demos.DemoUtilities;
 
 /**
  * Table renderer which renders cell value as hyperlink with optional rollover underline.

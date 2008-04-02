@@ -32,7 +32,6 @@
 package com.sun.swingset3.demos.togglebutton;
 
 import java.awt.event.ActionListener;
-import java.util.Enumeration;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;

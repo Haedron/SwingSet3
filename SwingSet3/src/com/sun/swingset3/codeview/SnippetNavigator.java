@@ -32,7 +32,6 @@
 package com.sun.swingset3.codeview;
 
 import com.sun.swingset3.utilities.ArrowIcon;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -47,15 +46,11 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
@@ -174,7 +169,6 @@ public class SnippetNavigator extends JPanel {
         if (prevButton != null) {
             Color arrowColor = UIManager.getColor("Label.foreground");
             Color inactiveColor = UIManager.getColor("Label.disabledText");
-            Dimension labelSize = statusLabel.getPreferredSize();
             Dimension buttonSize = new Dimension(arrowSize + 12 + overlap,
                     arrowSize + 12);
 

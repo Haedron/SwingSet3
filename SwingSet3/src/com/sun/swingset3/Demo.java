@@ -37,14 +37,9 @@ import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipEntry;
 import java.util.logging.Level;
-import java.io.IOException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-
-import com.sun.swingset3.codeview.CodeViewer;
 
 /**
  * Wrapper class which encapsulates a GUI component to be displayed
