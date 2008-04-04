@@ -81,8 +81,9 @@ import javax.swing.text.Document;
 import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.DemoUtilities;
 import com.sun.swingset3.demos.Stacker;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import org.jdesktop.swingx.JXPanel;
+import javax.swing.border.TitledBorder;
 
 /**
  *
@@ -571,7 +572,8 @@ public class TableDemo extends JPanel {
                     "<html><p align=\"center\">Academy Award data<br>courtesy of Howard Katz</p></html>"));
             credits.setFont(UIManager.getFont("Table.font").deriveFont(24f));
             credits.setHorizontalAlignment(JLabel.CENTER);
-            credits.setBorder(new EmptyBorder(20,20,20,20));
+            credits.setBorder(new CompoundBorder(new TitledBorder(""),
+                    new EmptyBorder(20,20,20,20)));
             dataPanel.showMessageLayer(credits, .75f);
         }
         @Override

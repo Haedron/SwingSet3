@@ -39,7 +39,6 @@ import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.border.TitledBorder;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.jdesktop.swingx.JXPanel;
@@ -91,9 +90,8 @@ public class Stacker extends JLayeredPane {
         c.anchor = GridBagConstraints.CENTER;
 
         messageAlpha = new JXPanel();
+        messageAlpha.setOpaque(false);
         messageAlpha.setAlpha(0.0f);
-        //messageAlpha.setBackground(Color.white);
-        messageAlpha.setBorder(new TitledBorder(""));
         gridbag.addLayoutComponent(messageAlpha, c);
         messageLayer.add(messageAlpha);
         messageAlpha.add(message);
