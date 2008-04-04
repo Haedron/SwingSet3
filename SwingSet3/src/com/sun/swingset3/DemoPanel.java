@@ -105,10 +105,10 @@ public class DemoPanel extends JXPanel {
 
     private static class FadeOut extends PropertySetter {
         private JXPanel parent;
-        private JComponent out;
+        private JXPanel out;
         private JComponent in;
 
-        public FadeOut(JXPanel parent, JComponent out, JComponent in) {
+        public FadeOut(JXPanel parent, JXPanel out, JComponent in) {
             super(out, "alpha", 1.0f, 0.3f);
             this.parent = parent;
             this.out = out;

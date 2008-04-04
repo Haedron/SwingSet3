@@ -80,6 +80,9 @@ import javax.swing.text.Document;
 
 import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.DemoUtilities;
+import com.sun.swingset3.demos.Stacker;
+import javax.swing.border.EmptyBorder;
+import org.jdesktop.swingx.JXPanel;
 
 /**
  *
@@ -114,6 +117,7 @@ public class TableDemo extends JPanel {
     private OscarTableModel oscarModel;
 
     private JPanel controlPanel;
+    private Stacker dataPanel;
     private JTable oscarTable;
     private JCheckBox winnersCheckbox;
     private JTextField filterField;
@@ -181,9 +185,10 @@ public class TableDemo extends JPanel {
         //</snip>
 
         JScrollPane scrollpane = new JScrollPane(oscarTable);
-        add(BorderLayout.CENTER, scrollpane);
+        dataPanel = new Stacker(scrollpane);
+        add(dataPanel, BorderLayout.CENTER);
 
-        add(BorderLayout.SOUTH, createStatusBar());
+        add(createStatusBar(), BorderLayout.SOUTH);
 
     }
 
@@ -478,6 +483,7 @@ public class TableDemo extends JPanel {
 
         actionStatus.setText(getString("TableDemo.loadingStatusLabel",
                 "Loading data: "));
+        
         // display progress bar while data loads
         final JProgressBar progressBar = new JProgressBar();
         statusBarLeft.add(progressBar);
@@ -499,17 +505,18 @@ public class TableDemo extends JPanel {
 
     }
     //</snip>
-
+    
     protected void showMessage(String title, String message) {
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
     //<snip>Use SwingWorker to asynchronously load the data
-    private static class OscarDataLoader extends javax.swing.SwingWorker<List<OscarCandidate>, OscarCandidate> {
+    private class OscarDataLoader extends javax.swing.SwingWorker<List<OscarCandidate>, OscarCandidate> {
         private final URL oscarData;
         private final OscarTableModel oscarModel;
         private final List<OscarCandidate> candidates = new ArrayList<OscarCandidate>();
-
+        private JLabel credits;
+         
         private OscarDataLoader(URL oscarURL, OscarTableModel oscarTableModel) {
             this.oscarData = oscarURL;
             this.oscarModel = oscarTableModel;
@@ -546,6 +553,9 @@ public class TableDemo extends JPanel {
         //@Override
 
         protected void process(List<OscarCandidate> moreCandidates) {
+            if (credits == null) {
+                showCredits();
+            }
             oscarModel.add(moreCandidates);
         }
 
@@ -555,10 +565,19 @@ public class TableDemo extends JPanel {
                 oscarModel.add(candidate);
             }
         }
-
+        
+        private void showCredits() {
+            credits = new JLabel(getString("TableDemo.credits",
+                    "<html><p align=\"center\">Academy Award data<br>courtesy of Howard Katz</p></html>"));
+            credits.setFont(UIManager.getFont("Table.font").deriveFont(24f));
+            credits.setHorizontalAlignment(JLabel.CENTER);
+            credits.setBorder(new EmptyBorder(20,20,20,20));
+            dataPanel.showMessageLayer(credits, .75f);
+        }
         @Override
         protected void done() {
             setProgress(100);
+            dataPanel.hideMessageLayer();
         }
 
     }
