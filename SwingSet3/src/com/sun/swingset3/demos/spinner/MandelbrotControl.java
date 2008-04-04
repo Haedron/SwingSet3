@@ -145,7 +145,7 @@ public class MandelbrotControl extends JPanel {
         }
 
         public CoordSpinner(double value, double stepSize) {
-            super(new SpinnerNumberModel(value, null, null, stepSize));
+            super(new SpinnerNumberModel(value, -100, 100, stepSize));
         }
 
         //A useful shortcut method
