@@ -521,12 +521,14 @@ public class TableDemo extends JPanel {
                 @Override
                 protected void addCandidate(OscarCandidate candidate) {
                     candidates.add(candidate);
-                    try {
-                        Thread.sleep(1);
-                    } catch (Exception ex) {
+                    if (candidates.size() % 3 == 0) {
+                        try { // slow it down so we can see progress :-)
+                            Thread.sleep(1);
+                        } catch (Exception ex) {
+                        }
                     }
                     publish(candidate);
-                    setProgress(100 * candidates.size() / /*8430 remind:parser hangs?!*/ 8430);
+                    setProgress(100 * candidates.size() / 8545);
                 }
             };
             parser.parseDocument(oscarData);

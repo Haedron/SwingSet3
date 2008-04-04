@@ -77,19 +77,25 @@ public abstract class OscarDataParser extends DefaultHandler {
 
     //to maintain context
     private OscarCandidate tempOscarCandidate;
+        
+    private int count = 0;
+    
+    public int getCount() {
+        return count;
+    }
 
     public void parseDocument(URL oscarURL) {
         //get a factory
         SAXParserFactory spf = SAXParserFactory.newInstance();
-        InputStream is;
-        try {
 
+        try {
             //get a new instance of parser
             SAXParser sp = spf.newSAXParser();
 
             //parse the file and also register this class for call backs
-            is = new BufferedInputStream(oscarURL.openStream());
+            InputStream is = new BufferedInputStream(oscarURL.openStream());
             sp.parse(is, this);
+            System.out.println("done parsing count="+count);
             is.close();
 
         } catch (SAXException se) {
@@ -101,7 +107,6 @@ public abstract class OscarDataParser extends DefaultHandler {
         }
     }
 
-
     //Event Handlers
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         //reset
@@ -110,11 +115,13 @@ public abstract class OscarDataParser extends DefaultHandler {
             if (qName.equalsIgnoreCase(CATEGORIES_IN[i])) {
                 tempOscarCandidate = new OscarCandidate(CATEGORIES_OUT[i]);
                 tempOscarCandidate.setYear(Integer.parseInt(attributes.getValue("year")));
+                if (CATEGORIES_IN[i].equals("screenplayOriginal") &&
+                     tempOscarCandidate.getYear() == 2007) {
+                }
                 return;
             }
         }
     }
-
 
     public void characters(char[] ch, int start, int length) throws SAXException {
         tempVal = new String(ch, start, length);
@@ -134,6 +141,7 @@ public abstract class OscarDataParser extends DefaultHandler {
             for (String category : CATEGORIES_IN) {
                 if (qName.equalsIgnoreCase(category)) {
                     //add it to the list
+                    count++;
                     addCandidate(tempOscarCandidate);
                     break;
                 }
