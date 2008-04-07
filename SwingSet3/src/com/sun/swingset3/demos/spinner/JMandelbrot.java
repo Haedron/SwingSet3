@@ -33,6 +33,7 @@ package com.sun.swingset3.demos.spinner;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class JMandelbrot extends JComponent {
     private static final double ZOOM_RATE = 3;
     private static final int NUM_OF_THREADS = 4;
 
-    private Coords center;
+    private Point2D center;
     public static final String CENTER_PROPERTY_NAME = "center";
 
     private int maxIteration = 300;
@@ -193,8 +194,8 @@ public class JMandelbrot extends JComponent {
     }
     //</snip>
 
-    private Coords calcCenter() {
-        return new Coords(xLowLimit + (xHighLimit - xLowLimit) / 2,
+    private Point2D calcCenter() {
+        return new Point2D.Double(xLowLimit + (xHighLimit - xLowLimit) / 2,
                 yLowLimit + (yHighLimit - yLowLimit) / 2);
     }
 
@@ -296,12 +297,12 @@ public class JMandelbrot extends JComponent {
         return yHighLimit;
     }
 
-    public Coords getCenter() {
+    public Point2D getCenter() {
         return center;
     }
 
-    public void setCenter(Coords coords) {
-        Coords oldValue = this.center;
+    public void setCenter(Point2D coords) {
+        Point2D oldValue = this.center;
         this.center = coords;
 
         double width = xHighLimit - xLowLimit;

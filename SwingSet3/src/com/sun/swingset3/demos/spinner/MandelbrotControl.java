@@ -32,6 +32,7 @@ package com.sun.swingset3.demos.spinner;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -88,8 +89,8 @@ public class MandelbrotControl extends JPanel {
         xSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 Double newX = (Double) xSpinner.getValue();
-                mandelbrot.setCenter(
-                        new Coords(newX, mandelbrot.getCenter().getY()));
+                mandelbrot.setCenter(new Point2D.Double(
+                        newX, mandelbrot.getCenter().getY()));
                 mandelbrot.calculatePicture();
             }
         });
@@ -106,8 +107,8 @@ public class MandelbrotControl extends JPanel {
         ySpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 Double newY = (Double) ySpinner.getValue();
-                mandelbrot.setCenter(
-                        new Coords(mandelbrot.getCenter().getX(), newY));
+                mandelbrot.setCenter(new Point2D.Double(
+                        mandelbrot.getCenter().getX(), newY));
                 mandelbrot.calculatePicture();
             }
         });

@@ -49,7 +49,6 @@ import com.sun.swingset3.demos.ResourceManager;
         description = "Demonstrates JSpinner and SwingWorker",
         sourceFiles = {
                 "com/sun/swingset3/demos/spinner/SpinnerDemo.java",
-                "com/sun/swingset3/demos/spinner/Coords.java",
                 "com/sun/swingset3/demos/spinner/JMandelbrot.java",
                 "com/sun/swingset3/demos/spinner/JPaletteShower.java",
                 "com/sun/swingset3/demos/spinner/JSpinnerPanel.java",
