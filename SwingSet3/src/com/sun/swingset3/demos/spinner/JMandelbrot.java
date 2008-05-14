@@ -35,6 +35,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.util.List;
 
 import com.sun.swingset3.demos.ResourceManager;
@@ -58,7 +59,7 @@ public class JMandelbrot extends JComponent {
     private Palette palette;
     public static final String PALETTE_PROPERTY_NAME = "palette";
 
-    private Image buffer;
+    private BufferedImage buffer;
     private final MandelbrotCalculator[] calculators =
             new MandelbrotCalculator[NUM_OF_THREADS];
 
@@ -180,14 +181,8 @@ public class JMandelbrot extends JComponent {
             if ((calculators[i] != null) && !calculators[i].isDone()) {
                 calculators[i].cancel(true);
             }
-            int yEnd;
-            if (i == calculators.length - 1) {
-                yEnd = getHeight();
-            } else {
-                yEnd = yStart + yStep;
-            }
-            calculators[i] =
-                    new MandelbrotCalculator(0, getWidth(), yStart, yEnd);
+            int yEnd = i == calculators.length - 1 ? getHeight() : yStart + yStep;
+            calculators[i] = new MandelbrotCalculator(yStart, yEnd);
             calculators[i].execute();
             yStart = yEnd;
         }
@@ -207,27 +202,38 @@ public class JMandelbrot extends JComponent {
 
     //<snip>Use SwingWorker to asynchronously calculate parts of the picture
     private class MandelbrotCalculator extends SwingWorker<Object, Object> {
-        private final int xStart;
-        private final int xEnd;
         private final int yStart;
         private final int yEnd;
 
-        public MandelbrotCalculator(int xStart, int xEnd, int yStart, int yEnd) {
-            this.xStart = xStart;
-            this.xEnd = xEnd;
+        public MandelbrotCalculator(int yStart, int yEnd) {
             this.yStart = yStart;
             this.yEnd = yEnd;
         }
 
         protected Object doInBackground() throws Exception {
-            Graphics bg = buffer.getGraphics();
-            for (int yCo = yStart; yCo < yEnd; yCo++) {
-                for (int xCo = xStart; xCo < xEnd; xCo++) {
-                    double x = xCo / xScale + xLowLimit;
-                    double y = yCo / yScale + yLowLimit;
+            int[] data = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
+
+            double xArr[] = new double[buffer.getWidth()];
+
+            for (int i = 0; i < xArr.length; i++) {
+                xArr[i] = i / xScale + xLowLimit;
+            }
+
+            double yArr[] = new double[yEnd - yStart];
+
+            for (int i = 0; i < yArr.length; i++) {
+                yArr[i] = (yStart + i) / yScale + yLowLimit;
+            }
+
+            int i = yStart * buffer.getWidth();
+
+            for (double y : yArr) {
+                for (double x : xArr) {
                     int value = calcValue(x, y);
-                    bg.setColor(getColorByValue(value));
-                    bg.fillRect(xCo, yCo, 1, 1);
+
+                    data[i] = value == maxIteration ? 0 : palette.getRgbColor(value);
+
+                    i++;
                 }
                 if (Thread.currentThread().isInterrupted()) {
                     return null;
@@ -238,27 +244,22 @@ public class JMandelbrot extends JComponent {
         }
 
         private int calcValue(double x, double y) {
-            int iteration = 0;
             double x0 = x;
             double y0 = y;
-            while (iteration < maxIteration) {
+
+            for (int i = 0; i < maxIteration; i++) {
                 double x2 = x * x;
                 double y2 = y * y;
+
                 if (x2 + y2 > 4) {
-                    break;
+                    return i;
                 }
+
                 y = 2 * x * y + y0;
                 x = x2 - y2 + x0;
-                iteration++;
             }
-            return iteration;
-        }
 
-        private Color getColorByValue(int value) {
-            if (value == maxIteration) {
-                return Color.BLACK;
-            }
-            return palette.getColor(value);
+            return maxIteration;
         }
 
         @Override

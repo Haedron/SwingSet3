@@ -39,6 +39,7 @@ public class Palette {
     private final int minColor;
     private final int colorRange;
     private Color[] colors;
+    private int[] rgbColors;
     private final int rSteps;
     private final int gSteps;
     private final int bSteps;
@@ -73,6 +74,7 @@ public class Palette {
 
     private void fillColorTable() {
         colors = new Color[totalRange];
+        rgbColors = new int[totalRange];
         for (int i = 0; i < totalRange; i++) {
             double cosR = Math.cos(i * 2 * Math.PI / rRange + rStart);
             double cosG = Math.cos(i * 2 * Math.PI / gRange + gStart);
@@ -82,11 +84,16 @@ public class Palette {
                     (int) ((cosG * colorRange) + colorRange) / 2 + minColor,
                     (int) ((cosB * colorRange) + colorRange) / 2 + minColor);
             colors[i] = color;
+            rgbColors[i] = color.getRGB();
         }
     }
 
     public Color getColor(int index) {
         return colors[index];
+    }
+
+    public int getRgbColor(int index) {
+        return rgbColors[index];
     }
 
     public int getSize() {
